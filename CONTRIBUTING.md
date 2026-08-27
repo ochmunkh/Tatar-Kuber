@@ -19,7 +19,7 @@ TATAR-Kuber is early-stage and there is lots of high-impact work available.
 ```bash
 git clone https://github.com/ochmunkh/Tatar-Kuber && cd Tatar-Kuber
 go build ./...
-go test ./...          # 12 packages, must stay green
+go test ./...          # 14 packages, must stay green
 python3 scripts/validate_registry.py   # canonical registry sanity
 ```
 

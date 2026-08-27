@@ -228,12 +228,13 @@ Adapter Interface, 04 Severity & Risk Scoring, 05 CLI Spec, 06 Repository Struct
 
 ## Status
 
-`v1.0.0` — Tier 1 shipped: parallel adapters, explainable risk breakdown, live Mode B,
-CI/CD gatekeeper (policy + GitHub Action + SARIF), and distribution (brew / curl / Docker).
+**v1.0.0** — Live Mode B (parallel adapters) · explainable risk · CI/CD gatekeeper
+(policy + GitHub Action + SARIF) · goreleaser + brew/curl/Docker.
+
 All tests green, and **live Mode B is validated on a real `kind` cluster in CI** — the
 [real-cluster workflow](.github/workflows/real-cluster.yml) spins up a cluster, deploys a
 vulnerable workload, installs Trivy + Kubescape + Popeye and runs a real
-`tatar-kuber scan --kubeconfig` (last run: `scan_mode=remote`, 11 findings, score 59/100).
+`tatar-kuber scan --kubeconfig` (last run: `scan_mode=remote`, 11 findings, 59/100).
 Next: CLI test coverage and broader compliance mapping.
 
 ## Contributing
@@ -418,10 +419,11 @@ Adapter Interface, 04 Severity & Risk Scoring, 05 CLI Spec, 06 Repository Struct
 
 ### Төлөв
 
-`v1.0.0` — Tier 1 дууссан: parallel adapters, тайлбарлагдах risk breakdown, live Mode B,
-CI/CD gatekeeper (бодлого + GitHub Action + SARIF), түгээлт (brew / curl / Docker).
+**v1.0.0** — Live Mode B (parallel adapters) · тайлбарлагдах эрсдэл · CI/CD gatekeeper
+(бодлого + GitHub Action + SARIF) · goreleaser + brew/curl/Docker.
+
 Бүх тест ногоон, мөн **live Mode B нь бодит `kind` cluster дээр CI-д батлагдсан** —
 [real-cluster workflow](.github/workflows/real-cluster.yml) нь cluster босгож, эмзэг workload
 deploy хийж, Trivy + Kubescape + Popeye суулгаж, жинхэнэ `tatar-kuber scan --kubeconfig`
-ажиллуулна (сүүлийн run: `scan_mode=remote`, 11 finding, оноо 59/100).
+ажиллуулна (сүүлийн run: `scan_mode=remote`, 11 finding, 59/100).
 Дараа нь: CLI тест, өргөн compliance mapping.
