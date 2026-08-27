@@ -5,7 +5,8 @@
 ![Kubernetes](https://img.shields.io/badge/Kubernetes-security-326CE5?logo=kubernetes&logoColor=white)
 ![Scanners](https://img.shields.io/badge/scanners-Trivy%20%C2%B7%20Kubescape%20%C2%B7%20Checkov%20%C2%B7%20Popeye-2A4D69)
 ![Output](https://img.shields.io/badge/output-JSON%20%C2%B7%20SARIF%20%C2%B7%20HTML-1F6F54)
-![CI](https://img.shields.io/badge/CI-gate%20%C2%B7%20SARIF%20upload-6b46c1)
+[![CI](https://github.com/ochmunkh/Tatar-Kuber/actions/workflows/ci.yml/badge.svg)](https://github.com/ochmunkh/Tatar-Kuber/actions/workflows/ci.yml)
+[![Real cluster](https://github.com/ochmunkh/Tatar-Kuber/actions/workflows/real-cluster.yml/badge.svg)](https://github.com/ochmunkh/Tatar-Kuber/actions/workflows/real-cluster.yml)
 ![Tests](https://img.shields.io/badge/tests-14%20packages%20green-brightgreen)
 ![Release](https://img.shields.io/badge/release-v1.0.0-brightgreen)
 
@@ -229,7 +230,11 @@ Adapter Interface, 04 Severity & Risk Scoring, 05 CLI Spec, 06 Repository Struct
 
 `v1.0.0` — Tier 1 shipped: parallel adapters, explainable risk breakdown, live Mode B,
 CI/CD gatekeeper (policy + GitHub Action + SARIF), and distribution (brew / curl / Docker).
-All tests green. Next: real-cluster hardening of the live scanner flags and CLI test coverage.
+All tests green, and **live Mode B is validated on a real `kind` cluster in CI** — the
+[real-cluster workflow](.github/workflows/real-cluster.yml) spins up a cluster, deploys a
+vulnerable workload, installs Trivy + Kubescape + Popeye and runs a real
+`tatar-kuber scan --kubeconfig` (last run: `scan_mode=remote`, 11 findings, score 59/100).
+Next: CLI test coverage and broader compliance mapping.
 
 ## Contributing
 
@@ -415,4 +420,8 @@ Adapter Interface, 04 Severity & Risk Scoring, 05 CLI Spec, 06 Repository Struct
 
 `v1.0.0` — Tier 1 дууссан: parallel adapters, тайлбарлагдах risk breakdown, live Mode B,
 CI/CD gatekeeper (бодлого + GitHub Action + SARIF), түгээлт (brew / curl / Docker).
-Бүх тест ногоон. Дараа нь: live scanner флагуудыг бодит cluster дээр батжуулах, CLI тест.
+Бүх тест ногоон, мөн **live Mode B нь бодит `kind` cluster дээр CI-д батлагдсан** —
+[real-cluster workflow](.github/workflows/real-cluster.yml) нь cluster босгож, эмзэг workload
+deploy хийж, Trivy + Kubescape + Popeye суулгаж, жинхэнэ `tatar-kuber scan --kubeconfig`
+ажиллуулна (сүүлийн run: `scan_mode=remote`, 11 finding, оноо 59/100).
+Дараа нь: CLI тест, өргөн compliance mapping.
