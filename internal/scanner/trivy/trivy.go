@@ -4,7 +4,6 @@ package trivy
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -13,6 +12,7 @@ import (
 	"github.com/ochmunkh/tatar-kuber/internal/finding"
 	"github.com/ochmunkh/tatar-kuber/internal/normalizer"
 	"github.com/ochmunkh/tatar-kuber/internal/scanner"
+	"github.com/ochmunkh/tatar-kuber/internal/scanner/toolexec"
 )
 
 // Scanner implements scanner.ScannerAdapter.
@@ -31,20 +31,42 @@ func New(resolver *canonical.Resolver) *Scanner {
 
 func (s *Scanner) Name() string { return "trivy" }
 
-func (s *Scanner) Available() (bool, error) {
-	// TODO: PATH / ~/.tatar-kuber/tools/trivy шалгах.
-	return false, nil
-}
+func (s *Scanner) Available() (bool, error) { return toolexec.Available("trivy") }
 
 func (s *Scanner) Version(ctx context.Context) (string, error) {
-	return "", errors.New("not implemented")
+	return toolexec.Version(ctx, "trivy", "--version")
 }
 
 func (s *Scanner) Supports(mode scanner.Mode) bool { return true } // local + remote
 
+// Timeout — image CVE scan удаан тул урт хугацаа өгнө (Tier 1 per-scanner timeout).
+func (s *Scanner) Timeout() time.Duration { return 6 * time.Minute }
+
+// Scan — Live Mode B: "trivy k8s --format json" ажиллуулж raw JSON цуглуулна.
+// (Local manifest scan-д Checkov ашиглагдана; Normalize нь k8s форматыг хүлээдэг.)
 func (s *Scanner) Scan(ctx context.Context, t scanner.Target) (scanner.RawResult, error) {
-	// TODO: local: "trivy config -f json <path>"; remote: "trivy k8s --format json".
-	return scanner.RawResult{Scanner: "trivy", Format: "json"}, errors.New("not implemented")
+	if t.Mode != scanner.ModeRemote {
+		return scanner.RawResult{Scanner: "trivy"}, fmt.Errorf("trivy live: зөвхөн remote (Mode B) дэмжигдэнэ")
+	}
+	args := []string{"k8s", "--format", "json", "-q", "--scanners", "misconfig,vuln,secret"}
+	if len(t.Namespaces) > 0 {
+		args = append(args, "--include-namespaces", strings.Join(t.Namespaces, ","))
+	}
+	if t.Context != "" {
+		args = append(args, "--context", t.Context)
+	}
+	var env []string
+	if t.Kubeconfig != "" {
+		env = append(env, "KUBECONFIG="+t.Kubeconfig)
+	}
+	res, err := toolexec.Run(ctx, "trivy", args, env...)
+	if len(res.Stdout) == 0 {
+		if err != nil {
+			return scanner.RawResult{Scanner: "trivy"}, err
+		}
+		return scanner.RawResult{Scanner: "trivy"}, fmt.Errorf("trivy: хоосон гаралт (stderr: %s)", strings.TrimSpace(string(res.Stderr)))
+	}
+	return scanner.RawResult{Scanner: "trivy", Format: "json", Data: res.Stdout, ExitCode: res.ExitCode}, nil
 }
 
 // ---- Trivy JSON бүтэц (trivy k8s / config --format json) ----

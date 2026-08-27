@@ -4,7 +4,6 @@ package popeye
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -14,6 +13,7 @@ import (
 	"github.com/ochmunkh/tatar-kuber/internal/finding"
 	"github.com/ochmunkh/tatar-kuber/internal/normalizer"
 	"github.com/ochmunkh/tatar-kuber/internal/scanner"
+	"github.com/ochmunkh/tatar-kuber/internal/scanner/toolexec"
 )
 
 type Scanner struct {
@@ -27,15 +27,41 @@ func New(resolver *canonical.Resolver) *Scanner {
 
 func (s *Scanner) Name() string { return "popeye" }
 
-func (s *Scanner) Available() (bool, error) { return false, nil } // TODO
+func (s *Scanner) Available() (bool, error) { return toolexec.Available("popeye") }
 
-func (s *Scanner) Version(ctx context.Context) (string, error) { return "", errors.New("not implemented") }
+func (s *Scanner) Version(ctx context.Context) (string, error) {
+	return toolexec.Version(ctx, "popeye", "version")
+}
 
 func (s *Scanner) Supports(mode scanner.Mode) bool { return mode == scanner.ModeRemote } // live cluster only
 
+// Timeout — runtime hygiene шалгалт хурдан тул богино хугацаа.
+func (s *Scanner) Timeout() time.Duration { return 90 * time.Second }
+
+// Scan — Live Mode B: "popeye -o json" ажиллуулж stdout-ийн JSON-ыг буцаана.
 func (s *Scanner) Scan(ctx context.Context, t scanner.Target) (scanner.RawResult, error) {
-	// TODO: "popeye --out json".
-	return scanner.RawResult{Scanner: "popeye", Format: "json"}, errors.New("not implemented")
+	if t.Mode != scanner.ModeRemote {
+		return scanner.RawResult{Scanner: "popeye"}, fmt.Errorf("popeye: зөвхөн live cluster (Mode B)")
+	}
+	args := []string{"-o", "json"}
+	if t.Context != "" {
+		args = append(args, "--context", t.Context)
+	}
+	if len(t.Namespaces) == 1 {
+		args = append(args, "-n", t.Namespaces[0]) // popeye нэг namespace дэмждэг
+	}
+	var env []string
+	if t.Kubeconfig != "" {
+		env = append(env, "KUBECONFIG="+t.Kubeconfig)
+	}
+	res, err := toolexec.Run(ctx, "popeye", args, env...)
+	if len(res.Stdout) == 0 {
+		if err != nil {
+			return scanner.RawResult{Scanner: "popeye"}, err
+		}
+		return scanner.RawResult{Scanner: "popeye"}, fmt.Errorf("popeye: хоосон гаралт (stderr: %s)", strings.TrimSpace(string(res.Stderr)))
+	}
+	return scanner.RawResult{Scanner: "popeye", Format: "json", Data: res.Stdout, ExitCode: res.ExitCode}, nil
 }
 
 // ---- Popeye JSON бүтэц (popeye --out json) ----

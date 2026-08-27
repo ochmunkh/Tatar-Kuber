@@ -5,6 +5,7 @@ package risk
 
 import (
 	"math"
+	"sort"
 
 	"github.com/ochmunkh/tatar-kuber/internal/finding"
 )
@@ -48,8 +49,10 @@ type Context struct {
 	Exposure     float64 // Exp*
 }
 
-// FindingRisk — Level 1 оноо (finding.RiskContribution).
-func FindingRisk(f finding.Finding, ctx Context) float64 {
+// factors — finding-ийн risk үржүүлэгчдийг задалж буцаана (тэг бол default).
+// Энэ бол explainable score-ийн эх сурвалж: FindingRisk болон RiskFactors
+// хоёул эндээс гарна (нэг эх, зөрөхгүй).
+func factors(f finding.Finding, ctx Context) finding.RiskFactors {
 	w := baseWeight[f.Severity]
 	c := confidenceMul[f.Confidence]
 	if c == 0 {
@@ -63,7 +66,87 @@ func FindingRisk(f finding.Finding, ctx Context) float64 {
 	if ex == 0 {
 		ex = ExpUnknown
 	}
-	return w * ac * ex * c
+	return finding.RiskFactors{
+		BaseWeight:   w,
+		AssetContext: ac,
+		Exposure:     ex,
+		Confidence:   c,
+		Contribution: w * ac * ex * c,
+	}
+}
+
+// FindingRisk — Level 1 оноо (finding.RiskContribution).
+func FindingRisk(f finding.Finding, ctx Context) float64 {
+	return factors(f, ctx).Contribution
+}
+
+// buildBreakdown — cluster оноог хэрхэн тооцсоны explainable задаргаа:
+// high/low penalty, LOW pool cap-ийн нөлөө, томьёо, топ хувь нэмэгч findings.
+func buildBreakdown(fs []finding.Finding, penalties []float64, severities []finding.Severity) finding.RiskBreakdown {
+	var high, lowRaw float64
+	for i := range penalties {
+		switch severities[i] {
+		case finding.SeverityLow:
+			lowRaw += penalties[i]
+		case finding.SeverityInfo:
+			// оноонд нөлөөлөхгүй
+		default:
+			high += penalties[i]
+		}
+	}
+	lowCapped := math.Min(LowPoolCap, lowRaw)
+	total := high + lowCapped
+
+	type pc struct {
+		idx int
+		p   float64
+	}
+	ranked := make([]pc, 0, len(fs))
+	for i := range fs {
+		if severities[i] == finding.SeverityInfo || penalties[i] <= 0 {
+			continue
+		}
+		ranked = append(ranked, pc{i, penalties[i]})
+	}
+	sort.Slice(ranked, func(a, b int) bool {
+		if ranked[a].p != ranked[b].p {
+			return ranked[a].p > ranked[b].p
+		}
+		return fs[ranked[a].idx].ID < fs[ranked[b].idx].ID // тай-брейк: detrministik
+	})
+
+	denom := high + lowRaw // share-ийн суурь: түүхий нийт penalty (INFO-гүй)
+	n := len(ranked)
+	if n > 5 {
+		n = 5
+	}
+	tops := make([]finding.TopContributor, 0, n)
+	for _, e := range ranked[:n] {
+		share := 0.0
+		if denom > 0 {
+			share = e.p / denom * 100
+		}
+		f := fs[e.idx]
+		tops = append(tops, finding.TopContributor{
+			ID:               f.ID,
+			CanonicalControl: f.CanonicalControl,
+			Resource:         f.Resource,
+			Severity:         f.Severity,
+			Contribution:     round1(e.p),
+			Share:            round1(share),
+		})
+	}
+
+	return finding.RiskBreakdown{
+		TotalPenalty:     round1(total),
+		HighPenalty:      round1(high),
+		LowPenaltyRaw:    round1(lowRaw),
+		LowPenaltyCapped: round1(lowCapped),
+		LowPoolCap:       LowPoolCap,
+		Scale:            ScoreScale,
+		Formula:          "100 / (1 + P/K)",
+		TopContributors:  tops,
+	}
 }
 
 // ClusterScore — Level 2 (0..100), DIMINISHING загвар (v1.2.1).

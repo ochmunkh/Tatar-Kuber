@@ -4,8 +4,8 @@ package checkov
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -13,6 +13,7 @@ import (
 	"github.com/ochmunkh/tatar-kuber/internal/finding"
 	"github.com/ochmunkh/tatar-kuber/internal/normalizer"
 	"github.com/ochmunkh/tatar-kuber/internal/scanner"
+	"github.com/ochmunkh/tatar-kuber/internal/scanner/toolexec"
 )
 
 type Scanner struct {
@@ -26,15 +27,36 @@ func New(resolver *canonical.Resolver) *Scanner {
 
 func (s *Scanner) Name() string { return "checkov" }
 
-func (s *Scanner) Available() (bool, error) { return false, nil } // TODO
+func (s *Scanner) Available() (bool, error) { return toolexec.Available("checkov") }
 
-func (s *Scanner) Version(ctx context.Context) (string, error) { return "", errors.New("not implemented") }
+func (s *Scanner) Version(ctx context.Context) (string, error) {
+	return toolexec.Version(ctx, "checkov", "--version")
+}
 
 func (s *Scanner) Supports(mode scanner.Mode) bool { return mode == scanner.ModeLocal } // static / local
 
+// Timeout — IaC scan дунд зэрэг.
+func (s *Scanner) Timeout() time.Duration { return 3 * time.Minute }
+
+// Scan — local static: "checkov -d <path> -o json" ажиллуулж raw JSON буцаана.
+// (Checkov нь IaC/манифест шинжилдэг тул зөвхөн local горим.)
 func (s *Scanner) Scan(ctx context.Context, t scanner.Target) (scanner.RawResult, error) {
-	// TODO: "checkov -d <path> -o json".
-	return scanner.RawResult{Scanner: "checkov", Format: "json"}, errors.New("not implemented")
+	if t.Mode != scanner.ModeLocal || t.Path == "" {
+		return scanner.RawResult{Scanner: "checkov"}, fmt.Errorf("checkov: local зам (-f/--path) шаардлагатай")
+	}
+	flag := "-d" // лавлах
+	if fi, err := os.Stat(t.Path); err == nil && !fi.IsDir() {
+		flag = "-f" // ганц файл
+	}
+	args := []string{flag, t.Path, "-o", "json", "--compact", "--quiet"}
+	res, err := toolexec.Run(ctx, "checkov", args)
+	if len(res.Stdout) == 0 {
+		if err != nil {
+			return scanner.RawResult{Scanner: "checkov"}, err
+		}
+		return scanner.RawResult{Scanner: "checkov"}, fmt.Errorf("checkov: хоосон гаралт (stderr: %s)", strings.TrimSpace(string(res.Stderr)))
+	}
+	return scanner.RawResult{Scanner: "checkov", Format: "json", Data: res.Stdout, ExitCode: res.ExitCode}, nil
 }
 
 // ---- Checkov JSON бүтэц (checkov -o json) ----

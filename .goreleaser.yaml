@@ -1,0 +1,82 @@
+# TATAR-Kuber release тохиргоо (goreleaser v2).
+# Локал шалгах:  goreleaser release --snapshot --clean
+# Tag дээр CI автоматаар ажиллана (.github/workflows/release.yml).
+version: 2
+
+project_name: tatar-kuber
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: tatar-kuber
+    main: ./cmd/tatar-kuber
+    binary: tatar-kuber
+    env:
+      - CGO_ENABLED=0
+    goos: [linux, darwin, windows]
+    goarch: [amd64, arm64]
+    ldflags:
+      - -s -w -X github.com/ochmunkh/tatar-kuber/internal/cli.Version={{ .Version }}
+
+archives:
+  - id: default
+    name_template: >-
+      {{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}
+    formats: [tar.gz]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    files:
+      - README.md
+      - LICENSE
+      - schema/canonical-controls.yaml
+      - .tatar-kuber.yaml.example
+
+checksum:
+  name_template: "checksums.txt"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+
+release:
+  github:
+    owner: ochmunkh
+    name: Tatar-Kuber
+  draft: false
+  prerelease: auto
+  name_template: "TATAR-Kuber {{ .Tag }}"
+
+brews:
+  - name: tatar-kuber
+    repository:
+      owner: ochmunkh
+      name: homebrew-tap
+    homepage: "https://github.com/ochmunkh/Tatar-Kuber"
+    description: "Kubernetes security posture — Trivy/Kubescape/Checkov/Popeye нэг стандарт тайлан + CI gate"
+    license: "Apache-2.0"
+    # Tap token тохируулаагүй бол formula-г build хийгээд tap руу түлхэхийг АЛГАСна
+    # (release унахгүй). Дараа homebrew-tap + HOMEBREW_TAP_TOKEN нэмбэл автоматаар идэвхжинэ.
+    skip_upload: '{{ if isEnvSet "HOMEBREW_TAP_GITHUB_TOKEN" }}false{{ else }}true{{ end }}'
+    install: |
+      bin.install "tatar-kuber"
+    test: |
+      system "#{bin}/tatar-kuber", "version"
+
+dockers:
+  - image_templates:
+      - "ghcr.io/ochmunkh/tatar-kuber:{{ .Version }}"
+      - "ghcr.io/ochmunkh/tatar-kuber:latest"
+    dockerfile: Dockerfile.goreleaser
+    use: buildx
+    build_flag_templates:
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.source=https://github.com/ochmunkh/Tatar-Kuber"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
+      - "--label=org.opencontainers.image.licenses=Apache-2.0"

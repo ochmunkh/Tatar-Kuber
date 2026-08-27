@@ -1,0 +1,20 @@
+# TATAR-Kuber CI/CD gatekeeper policy (.tatar-kuber.yaml)
+# Хуулж аваад .tatar-kuber.yaml болгож repo-нхаа үндэст байрлуулна.
+# `tatar-kuber gate --input scan-result.json` энэ файлыг уншиж pass/fail шийднэ.
+
+# Энэ severity болон дээш түвшний олдвор байвал gate унана (exit 1).
+# Утга: critical | high | medium | low
+fail_on: high
+
+# (Сонголт) Cluster score үүнээс доош бол унана. 0 = хэрэгсэхгүй.
+min_score: 0
+
+# (Сонголт) Хүлээн зөвшөөрсөн эрсдэлүүд — gate-ээс хасна (аудитын мөр үлдээнэ).
+# control заавал; resource/namespace нарийвчлах бол нэмнэ.
+# expires (YYYY-MM-DD) — хугацаа дуусвал suppress автоматаар цуцлагдана.
+suppress:
+  - control: TATAR-CON-001
+    resource: deployment/legacy-api
+    namespace: default
+    reason: "Хуучин систем, 2027 Q1-д шилжүүлнэ (JIRA-1234)"
+    expires: 2027-03-31

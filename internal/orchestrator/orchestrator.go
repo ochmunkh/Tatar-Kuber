@@ -8,6 +8,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"sort"
+	"sync"
 	"time"
 
 	"github.com/ochmunkh/tatar-kuber/internal/blindshot"
@@ -31,6 +32,9 @@ func New(reg *canonical.Registry, adapters ...scanner.ScannerAdapter) *Pipeline 
 	return &Pipeline{reg: reg, adapters: adapters}
 }
 
+// Adapters — бүртгэлтэй adapter-уудыг буцаана (doctor/танилцах зорилгоор).
+func (p *Pipeline) Adapters() []scanner.ScannerAdapter { return p.adapters }
+
 // Meta — scan-ий тодорхойлолт.
 type Meta struct {
 	ClusterName string
@@ -39,28 +43,75 @@ type Meta struct {
 	Inventory   map[string]int // cluster объектын тоо (сонголт)
 }
 
-// Run — Available adapter-уудыг ажиллуулж raw цуглуулаад Process руу дамжуулна.
-// (Scanner binary байхгүй бол тухайн adapter алгасагдана.)
+// timeoutHinter — adapter өөрийн зөвлөмж timeout-оо илэрхийлж болно (сонголт).
+// Scanner тус бүр өөр өөр удах тул (Trivy image scan удаан, Popeye богино)
+// adapter энэ interface-ийг хэрэгжүүлбэл Run түүнийг хүндэтгэнэ.
+type timeoutHinter interface {
+	Timeout() time.Duration
+}
+
+// defaultAdapterTimeout — adapter зөвлөмжгүй, Target.Timeout-гүй үеийн нөөц хугацаа.
+const defaultAdapterTimeout = 4 * time.Minute
+
+// adapterTimeout — тухайн adapter-т ноогдох хугацаа:
+// adapter-ийн зөвлөмж > Target.Timeout > default.
+func adapterTimeout(a scanner.ScannerAdapter, t scanner.Target) time.Duration {
+	if h, ok := a.(timeoutHinter); ok && h.Timeout() > 0 {
+		return h.Timeout()
+	}
+	if t.Timeout > 0 {
+		return t.Timeout
+	}
+	return defaultAdapterTimeout
+}
+
+// Run — Available adapter бүрийг ЗЭРЭГ (concurrent) ажиллуулж raw цуглуулаад
+// Process руу дамжуулна. Онцлог:
+//   - adapter бүр өөрийн goroutine + өөрийн context.WithTimeout (scanner тус бүр өөр).
+//   - graceful degradation: нэг scanner унах/timeout болоход бусад нь ҮРГЭЛЖИЛНЭ
+//     (адаптер бүр тусдаа context тул нэгнийх нь алдаа бусдыг цуцлахгүй).
+//   - detrministik гаралт: үр дүнг adapter бүртгэлийн дарааллаар индексжүүлэн
+//     цуглуулна; цаашид Process доторх severity+ID эрэмбэ хэвээр.
+//   - (Scanner binary байхгүй бол тухайн adapter алгасагдана.)
 func (p *Pipeline) Run(ctx context.Context, t scanner.Target, m Meta) (finding.ScanResult, error) {
-	var raws []scanner.RawResult
-	for _, a := range p.adapters {
+	raws := make([]scanner.RawResult, len(p.adapters))
+	ok := make([]bool, len(p.adapters))
+
+	var wg sync.WaitGroup
+	for i, a := range p.adapters {
 		if !a.Supports(t.Mode) {
 			continue
 		}
-		ok, _ := a.Available()
-		if !ok {
+		if avail, _ := a.Available(); !avail {
 			continue
 		}
-		raw, err := a.Scan(ctx, t)
-		if err != nil {
-			continue // graceful degradation
-		}
-		if v, err := a.Version(ctx); err == nil {
-			raw.Version = v
-		}
-		raws = append(raws, raw)
+		wg.Add(1)
+		go func(i int, a scanner.ScannerAdapter) {
+			defer wg.Done()
+			// Тус бүр өөрийн context — нэгнийх нь timeout бусдад нөлөөлөхгүй.
+			actx, cancel := context.WithTimeout(ctx, adapterTimeout(a, t))
+			defer cancel()
+
+			raw, err := a.Scan(actx, t)
+			if err != nil {
+				return // graceful degradation: бусад adapter үргэлжилнэ
+			}
+			if v, verr := a.Version(actx); verr == nil {
+				raw.Version = v
+			}
+			raws[i] = raw
+			ok[i] = true
+		}(i, a)
 	}
-	return p.Process(raws, m)
+	wg.Wait()
+
+	collected := make([]scanner.RawResult, 0, len(raws))
+	for i := range raws {
+		if ok[i] {
+			collected = append(collected, raws[i])
+		}
+	}
+	return p.Process(collected, m)
 }
 
 // Process — цуглуулсан raw үр дүнгээс бүрэн ScanResult байгуулна.
@@ -90,7 +141,7 @@ func (p *Pipeline) Process(raws []scanner.RawResult, m Meta) (finding.ScanResult
 
 	deduped := dedup.Deduplicate(all, p.reg)
 	shot := blindshot.Apply(deduped, p.reg)
-	scored, score, band := risk.ApplyScores(shot)
+	scored, score, band, breakdown := risk.ApplyScores(shot)
 	sortBySeverity(scored) // Critical -> High -> Medium -> Low -> Info (тайланд эрэмбэ)
 
 	lang := m.Lang
@@ -114,6 +165,8 @@ func (p *Pipeline) Process(raws []scanner.RawResult, m Meta) (finding.ScanResult
 		Summary:  summarize(scored, score, band),
 		Findings: scored,
 	}
+	bd := breakdown
+	res.Summary.RiskBreakdown = &bd // оноог хэрхэн гаргасны explainable задаргаа
 	res.Metadata.ResultHash = resultHash(scored)
 	res.Metadata.Inventory = m.Inventory
 	return res, nil

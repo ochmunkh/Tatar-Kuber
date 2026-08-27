@@ -82,6 +82,11 @@ func Load(path string) (*Registry, error) {
 	if err != nil {
 		return nil, fmt.Errorf("canonical registry уншиж чадсангүй: %w", err)
 	}
+	return LoadBytes(data)
+}
+
+// LoadBytes — registry-г шууд байтаас ачаална (go:embed-тэй ажиллах, тестэд).
+func LoadBytes(data []byte) (*Registry, error) {
 	var r Registry
 	if err := yaml.Unmarshal(data, &r); err != nil {
 		return nil, fmt.Errorf("canonical registry parse алдаа: %w", err)

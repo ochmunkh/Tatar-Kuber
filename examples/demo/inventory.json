@@ -1,0 +1,9 @@
+{
+  "Nodes": 5,
+  "Namespaces": 8,
+  "Deployments": 31,
+  "Pods": 142,
+  "Services": 54,
+  "Ingresses": 6,
+  "ClusterRoles": 27
+}

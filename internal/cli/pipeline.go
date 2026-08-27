@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
+	tatarkuber "github.com/ochmunkh/tatar-kuber"
 	"github.com/ochmunkh/tatar-kuber/internal/canonical"
 	"github.com/ochmunkh/tatar-kuber/internal/orchestrator"
 	"github.com/ochmunkh/tatar-kuber/internal/scanner"
@@ -17,6 +18,8 @@ import (
 
 // resolveRegistry — canonical-controls.yaml замыг олно.
 // Дараалал: --registry флаг > $TATAR_REGISTRY > ./schema/canonical-controls.yaml.
+// Олдохгүй бол "" буцаана (алдаа биш) — buildPipeline шигтгэсэн (embedded)
+// registry рүү шилжинэ, ингэснээр суулгасан binary дангаараа ажиллана.
 func resolveRegistry(flag string) (string, error) {
 	if flag != "" {
 		return flag, nil
@@ -28,12 +31,20 @@ func resolveRegistry(flag string) (string, error) {
 	if _, err := os.Stat(def); err == nil {
 		return def, nil
 	}
-	return "", fmt.Errorf("canonical registry олдсонгүй: --registry эсвэл $TATAR_REGISTRY заана уу")
+	return "", nil // fallback: embedded
+}
+
+// loadRegistry — registry-г файлаас, эсвэл олдохгүй бол шигтгэсэн байтаас ачаална.
+func loadRegistry(path string) (*canonical.Registry, error) {
+	if path == "" {
+		return canonical.LoadBytes(tatarkuber.CanonicalControlsYAML)
+	}
+	return canonical.Load(path)
 }
 
 // buildPipeline — registry + 4 adapter-аас pipeline угсарна.
 func buildPipeline(registryPath string) (*orchestrator.Pipeline, error) {
-	reg, err := canonical.Load(registryPath)
+	reg, err := loadRegistry(registryPath)
 	if err != nil {
 		return nil, err
 	}

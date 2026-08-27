@@ -1,0 +1,11 @@
+.git
+.github
+dist
+out
+tatar-out
+*.sarif
+*.html
+scan-result.json
+testdata
+tests
+docs

@@ -78,15 +78,49 @@ type Finding struct {
 	Remediation      string     `json:"remediation"`
 	FoundBy          []string   `json:"found_by"`
 	Confidence       Confidence `json:"confidence"`
-	BlindShot        bool       `json:"blind_shot"`
-	BlindShotReason  string     `json:"blind_shot_reason,omitempty"`
-	RiskContribution float64    `json:"risk_contribution,omitempty"`
+	BlindShot        bool          `json:"blind_shot"`
+	BlindShotReason  string        `json:"blind_shot_reason,omitempty"`
+	RiskContribution float64       `json:"risk_contribution,omitempty"`
+	RiskFactors      *RiskFactors  `json:"risk_factors,omitempty"` // оноо яагаад ийм болсныг задлан харуулна
 	Status           Status     `json:"status"`
 	Owner            string     `json:"owner,omitempty"`
 	FirstSeen        string     `json:"first_seen"`
 	LastSeen         string     `json:"last_seen"`
 	References       []string   `json:"references,omitempty"`
 	RawRefs          []RawRef   `json:"raw_refs,omitempty"`
+}
+
+// RiskFactors — finding-ийн risk_contribution-ыг үржүүлэгч тус бүрээр задалж
+// харуулна: contribution = base_weight × asset_context × exposure × confidence.
+// Ингэснээр оноо "хар хайрцаг" биш, шалгагдах, тайлбарлагдах болно.
+type RiskFactors struct {
+	BaseWeight   float64 `json:"base_weight"`   // severity-ийн суурь жин (Crit10..Info0)
+	AssetContext float64 `json:"asset_context"` // prod 1.5 / unknown 1.0 / dev 0.8
+	Exposure     float64 `json:"exposure"`      // internet 1.5 / internal 1.0
+	Confidence   float64 `json:"confidence"`    // scanner corroboration 1.2/1.0/0.8
+	Contribution float64 `json:"contribution"`  // эцсийн үржвэр
+}
+
+// TopContributor — cluster оноог хамгийн ихээр бууруулсан findings.
+type TopContributor struct {
+	ID           string   `json:"id"`
+	CanonicalControl string `json:"canonical_control"`
+	Resource     string   `json:"resource"`
+	Severity     Severity `json:"severity"`
+	Contribution float64  `json:"contribution"`
+	Share        float64  `json:"share"` // нийт penalty-д эзлэх хувь (0..100)
+}
+
+// RiskBreakdown — cluster оноог хэрхэн тооцсоны бүрэн тайлбар (explainable score).
+type RiskBreakdown struct {
+	TotalPenalty     float64          `json:"total_penalty"`      // score-д орсон эцсийн penalty
+	HighPenalty      float64          `json:"high_penalty"`       // CRITICAL/HIGH/MEDIUM нийлбэр
+	LowPenaltyRaw    float64          `json:"low_penalty_raw"`    // LOW-ийн түүхий нийлбэр
+	LowPenaltyCapped float64          `json:"low_penalty_capped"` // min(cap, raw)
+	LowPoolCap       float64          `json:"low_pool_cap"`       // LOW pool дээд хязгаар
+	Scale            float64          `json:"scale"`              // diminishing масштаб K
+	Formula          string           `json:"formula"`            // "100 / (1 + P/K)"
+	TopContributors  []TopContributor `json:"top_contributors"`
 }
 
 // ScanResult — scan-result.json дээд түвшний бүтэц (§2).
@@ -116,6 +150,7 @@ type Summary struct {
 	RiskScore     int              `json:"risk_score"`
 	RiskBand      string           `json:"risk_band"`
 	TotalFindings int              `json:"total_findings"`
+	RiskBreakdown *RiskBreakdown   `json:"risk_breakdown,omitempty"` // оноо хэрхэн гарсны тайлбар
 }
 
 // NormalizeSeverity — scanner severity string -> TATAR Severity. Хоосон/UNKNOWN -> "".

@@ -1,0 +1,6 @@
+# goreleaser энэ Dockerfile-ыг ашиглана — binary урьдчilан build хийгдсэн байдлаар
+# контекстэд ирнэ (дахин build хийхгүй).
+FROM gcr.io/distroless/static:nonroot
+COPY tatar-kuber /usr/local/bin/tatar-kuber
+USER nonroot:nonroot
+ENTRYPOINT ["/usr/local/bin/tatar-kuber"]

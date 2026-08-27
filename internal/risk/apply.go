@@ -28,9 +28,10 @@ func DetectExposure(f finding.Finding) float64 {
 	return ExpUnknown
 }
 
-// ApplyScores — finding бүрийн RiskContribution-ыг тооцоолж, cluster оноо
-// (0..100) ба band-ыг буцаана.
-func ApplyScores(findings []finding.Finding) ([]finding.Finding, int, string) {
+// ApplyScores — finding бүрийн RiskContribution + RiskFactors (explainable)-ыг
+// тооцоолж, cluster оноо (0..100), band, БА оноог хэрхэн гаргасны бүрэн
+// задаргаа (RiskBreakdown)-ыг буцаана.
+func ApplyScores(findings []finding.Finding) ([]finding.Finding, int, string, finding.RiskBreakdown) {
 	out := make([]finding.Finding, len(findings))
 	copy(out, findings)
 
@@ -41,13 +42,18 @@ func ApplyScores(findings []finding.Finding) ([]finding.Finding, int, string) {
 			AssetContext: DetectAssetContext(out[i].Namespace),
 			Exposure:     DetectExposure(out[i]),
 		}
-		p := FindingRisk(out[i], ctx)
-		out[i].RiskContribution = round1(p)
-		penalties[i] = p
+		rf := factors(out[i], ctx)
+		penalties[i] = rf.Contribution
 		severities[i] = out[i].Severity
+
+		out[i].RiskContribution = round1(rf.Contribution)
+		rounded := rf
+		rounded.Contribution = round1(rf.Contribution)
+		out[i].RiskFactors = &rounded // задаргаа finding дотор шингэнэ
 	}
 	score, band := ClusterScore(penalties, severities)
-	return out, score, band
+	bd := buildBreakdown(out, penalties, severities)
+	return out, score, band, bd
 }
 
 func round1(f float64) float64 {

@@ -4,8 +4,8 @@ package kubescape
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -13,6 +13,7 @@ import (
 	"github.com/ochmunkh/tatar-kuber/internal/finding"
 	"github.com/ochmunkh/tatar-kuber/internal/normalizer"
 	"github.com/ochmunkh/tatar-kuber/internal/scanner"
+	"github.com/ochmunkh/tatar-kuber/internal/scanner/toolexec"
 )
 
 type Scanner struct {
@@ -26,15 +27,49 @@ func New(resolver *canonical.Resolver) *Scanner {
 
 func (s *Scanner) Name() string { return "kubescape" }
 
-func (s *Scanner) Available() (bool, error) { return false, nil } // TODO
+func (s *Scanner) Available() (bool, error) { return toolexec.Available("kubescape") }
 
-func (s *Scanner) Version(ctx context.Context) (string, error) { return "", errors.New("not implemented") }
+func (s *Scanner) Version(ctx context.Context) (string, error) {
+	return toolexec.Version(ctx, "kubescape", "version")
+}
 
 func (s *Scanner) Supports(mode scanner.Mode) bool { return true } // local + remote
 
+// Timeout — cluster-wide posture scan дунд зэрэг удана.
+func (s *Scanner) Timeout() time.Duration { return 4 * time.Minute }
+
+// Scan — Live Mode B: "kubescape scan --format json --output <tmp>" ажиллуулж,
+// файлын JSON гаралтыг уншиж буцаана.
 func (s *Scanner) Scan(ctx context.Context, t scanner.Target) (scanner.RawResult, error) {
-	// TODO: "kubescape scan --format json --output -".
-	return scanner.RawResult{Scanner: "kubescape", Format: "json"}, errors.New("not implemented")
+	if t.Mode != scanner.ModeRemote {
+		return scanner.RawResult{Scanner: "kubescape"}, fmt.Errorf("kubescape live: зөвхөн remote (Mode B) дэмжигдэнэ")
+	}
+	tmp, err := os.CreateTemp("", "tatar-kubescape-*.json")
+	if err != nil {
+		return scanner.RawResult{Scanner: "kubescape"}, err
+	}
+	tmpPath := tmp.Name()
+	_ = tmp.Close()
+	defer os.Remove(tmpPath)
+
+	args := []string{"scan", "--format", "json", "--output", tmpPath}
+	if len(t.Namespaces) > 0 {
+		args = append(args, "--include-namespaces", strings.Join(t.Namespaces, ","))
+	}
+	var env []string
+	if t.Kubeconfig != "" {
+		env = append(env, "KUBECONFIG="+t.Kubeconfig)
+	}
+	res, runErr := toolexec.Run(ctx, "kubescape", args, env...)
+
+	data, _ := os.ReadFile(tmpPath)
+	if len(data) == 0 {
+		if runErr != nil {
+			return scanner.RawResult{Scanner: "kubescape"}, runErr
+		}
+		return scanner.RawResult{Scanner: "kubescape"}, fmt.Errorf("kubescape: хоосон гаралт (stderr: %s)", strings.TrimSpace(string(res.Stderr)))
+	}
+	return scanner.RawResult{Scanner: "kubescape", Format: "json", Data: data, ExitCode: res.ExitCode}, nil
 }
 
 // ---- Kubescape JSON бүтэц (kubescape scan --format json) ----

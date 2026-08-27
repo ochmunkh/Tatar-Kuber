@@ -17,6 +17,7 @@ func cmdScan(args []string) int {
 	file := fs.String("f", "", "local manifest/Helm зам (Mode A)")
 	kubeconfig := fs.String("kubeconfig", "", "kubeconfig файл (Mode B)")
 	context_ := fs.String("context", "", "kubeconfig context (Mode B)")
+	namespaces := fs.String("namespace", "", "хязгаарлах namespace-ууд (таслалаар, Mode B)")
 	rawDir := fs.String("raw-dir", "", "цуглуулсан scanner raw JSON-уудын хавтас (offline ingest)")
 	cluster := fs.String("cluster", "cluster", "cluster/target нэр (тайланд)")
 	outDir := fs.String("o", ".", "гаралтын хавтас")
@@ -65,6 +66,7 @@ func cmdScan(args []string) int {
 		Path:       *file,
 		Kubeconfig: *kubeconfig,
 		Context:    *context_,
+		Namespaces: splitCSV(*namespaces),
 	}
 	r, err := p.Run(context.Background(), target, orchestrator.Meta{ClusterName: *cluster, ScanMode: mode, Lang: *lang})
 	if err != nil {

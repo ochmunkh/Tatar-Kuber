@@ -1,0 +1,77 @@
+name: "TATAR-Kuber"
+description: "Kubernetes security posture gate — Trivy · Kubescape · Checkov · Popeye нэг стандарт тайлан + CI gate + SARIF"
+branding:
+  icon: "shield"
+  color: "green"
+
+inputs:
+  path:
+    description: "Local manifest/Helm зам (Mode A static scan)"
+    required: false
+    default: "."
+  raw-dir:
+    description: "Урьдчилан цуглуулсан scanner raw JSON-уудын хавтас (offline ingest). Заавал бол path-г орлоно."
+    required: false
+    default: ""
+  fail-on:
+    description: "Gate severity босго: critical | high | medium | low"
+    required: false
+    default: "high"
+  min-score:
+    description: "Cluster score доод хязгаар (0 = хэрэгсэхгүй)"
+    required: false
+    default: "0"
+  policy:
+    description: ".tatar-kuber.yaml бодлогын файл"
+    required: false
+    default: ".tatar-kuber.yaml"
+  version:
+    description: "tatar-kuber хувилбар (go install tag). default: latest"
+    required: false
+    default: "latest"
+  registry:
+    description: "canonical-controls.yaml зам"
+    required: false
+    default: "schema/canonical-controls.yaml"
+
+outputs:
+  sarif:
+    description: "Үүсгэсэн SARIF файлын зам"
+    value: ${{ steps.run.outputs.sarif }}
+  result:
+    description: "scan-result.json-ы зам"
+    value: ${{ steps.run.outputs.result }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: "1.22"
+
+    - name: Run TATAR-Kuber
+      id: run
+      shell: bash
+      run: |
+        set -euo pipefail
+        go install "github.com/ochmunkh/tatar-kuber/cmd/tatar-kuber@${{ inputs.version }}"
+        BIN="$(go env GOPATH)/bin/tatar-kuber"
+        mkdir -p tatar-out
+
+        if [ -n "${{ inputs.raw-dir }}" ]; then
+          "$BIN" scan --raw-dir "${{ inputs.raw-dir }}" -o tatar-out --registry "${{ inputs.registry }}"
+        else
+          "$BIN" scan -f "${{ inputs.path }}" -o tatar-out --registry "${{ inputs.registry }}"
+        fi
+
+        "$BIN" report --input tatar-out/scan-result.json -o sarif --out tatar-out/tatar-kuber.sarif
+        echo "sarif=tatar-out/tatar-kuber.sarif" >> "$GITHUB_OUTPUT"
+        echo "result=tatar-out/scan-result.json" >> "$GITHUB_OUTPUT"
+
+        # Gate — босго давбал энэ алхам exit 1 буцааж workflow-г унагана.
+        "$BIN" gate \
+          --input tatar-out/scan-result.json \
+          --policy "${{ inputs.policy }}" \
+          --fail-on "${{ inputs.fail-on }}" \
+          --min-score "${{ inputs.min-score }}"

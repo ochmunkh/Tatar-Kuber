@@ -1,0 +1,47 @@
+# TATAR-Kuber security gate — өөрийгөө шалгах (dogfood) + жишээ загвар.
+# Энэ workflow нь examples/demo доторх demo scanner гаралтыг нэгтгэж SARIF үүсгээд
+# GitHub Code Scanning руу upload хийж, дараа нь gate ажиллуулна.
+#
+# Өөрийн repo-д ашиглах бол:
+#   - "Build from source" алхмыг → uses: ochmunkh/Tatar-Kuber@v1  болгож болно
+#   - --raw-dir examples/demo  →  -f ./k8s (өөрийн манифест) эсвэл live --kubeconfig
+#   - Gate дээрх continue-on-error-ийг УСТГАНА (босго давбал PR унана)
+name: Security Gate
+
+on:
+  workflow_dispatch:
+  pull_request:
+
+permissions:
+  contents: read
+  security-events: write # SARIF-ийг Code Scanning руу upload хийхэд шаардлагатай
+
+jobs:
+  tatar-kuber:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+          cache: true
+
+      - name: Build tatar-kuber
+        run: go build -o tatar-kuber ./cmd/tatar-kuber
+
+      - name: Scan + SARIF
+        run: |
+          ./tatar-kuber scan --raw-dir examples/demo --cluster ci-demo -o out
+          ./tatar-kuber report --input out/scan-result.json -o sarif --out tatar-kuber.sarif
+
+      - name: Upload SARIF to GitHub Code Scanning
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: tatar-kuber.sarif
+          category: tatar-kuber
+
+      - name: Gate
+        continue-on-error: true # ЖИШЭЭ: жинхэнэ хэрэглээнд энэ мөрийг устгана
+        run: ./tatar-kuber gate --input out/scan-result.json --fail-on high
