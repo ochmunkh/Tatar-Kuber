@@ -27,3 +27,34 @@ jobs:
 
       - name: Test
         run: go test ./... -count=1
+
+  security:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write # gosec SARIF-ийг Code Scanning руу upload
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+          cache: true
+
+      # Хамааралууд болон stdlib дахь мэдэгдэж буй CVE-г шалгана (нарийвчлалтай).
+      - name: govulncheck
+        run: |
+          go install golang.org/x/vuln/cmd/govulncheck@latest
+          "$(go env GOPATH)/bin/govulncheck" ./...
+
+      # Статик аюулгүй байдлын шинжилгээ (SAST). CI-г унагахгүй — үр дүнг Code Scanning-д мэдээлнэ.
+      - name: gosec (SAST)
+        uses: securego/gosec@master
+        with:
+          args: "-no-fail -fmt sarif -out gosec.sarif ./..."
+
+      - name: Upload gosec SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: gosec.sarif
+          category: gosec

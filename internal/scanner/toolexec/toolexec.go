@@ -66,7 +66,9 @@ func Run(ctx context.Context, name string, args []string, extraEnv ...string) (R
 	if !ok {
 		return Result{ExitCode: -1}, fmt.Errorf("%s: олдсонгүй (PATH эсвэл %s шалгана уу)", name, ToolsDir())
 	}
-	cmd := exec.CommandContext(ctx, path, args...)
+	// Аюулгүй: shell дуудлагагүй (execve шууд), path нь PATH/ToolsDir-ээс шийдэгдсэн,
+	// args нь тогтмол флаг + тодорхой утга — shell metachar-ийн injection боломжгүй.
+	cmd := exec.CommandContext(ctx, path, args...) // #nosec G204 -- see comment above
 	cmd.Env = append(os.Environ(), extraEnv...)
 	var out, errb bytes.Buffer
 	cmd.Stdout = &out
