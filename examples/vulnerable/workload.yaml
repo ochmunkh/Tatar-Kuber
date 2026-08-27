@@ -1,0 +1,39 @@
+# ⚠️ ЗОРИУДААР ЭМЗЭГ манифест — ЗӨВХӨН demo/тест зориулалттай.
+# real-cluster CI (kind) дээр live Mode B-г батлахад ашиглана. Production-д БҮҮ ашигла.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  labels:
+    app: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      hostNetwork: true # TATAR-CON-006
+      hostPID: true # TATAR-CON-005
+      containers:
+        - name: api
+          image: nginx:latest # TATAR-IMG-003 (:latest)
+          securityContext:
+            privileged: true # TATAR-CON-001
+            runAsNonRoot: false # TATAR-CON-002
+            allowPrivilegeEscalation: true # TATAR-CON-003
+            readOnlyRootFilesystem: false # TATAR-CON-009
+          # probe / resources.limits байхгүй → TATAR-OPS-*, TATAR-CON-010
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: orphan-svc
+spec:
+  selector:
+    app: does-not-exist # dead service → TATAR-OPS-003 (popeye)
+  ports:
+    - port: 80

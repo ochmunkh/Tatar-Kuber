@@ -1,0 +1,93 @@
+# Live Mode B-г БОДИТ cluster дээр батлах: kind cluster босгож, зориудаар эмзэг
+# workload deploy хийж, жинхэнэ scanner-уудыг ажиллуулж, tatar-kuber-ээр live scan хийнэ.
+# Гараар ажиллуулна (workflow_dispatch); тайланг artifact болгож хадгална.
+name: Real cluster (kind)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * 1" # 7 хоног тутам (Даваа) — live флагууд эвдрээгүйг хянана
+
+permissions:
+  contents: read
+
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+          cache: true
+
+      - name: Build tatar-kuber
+        run: go build -o tatar-kuber ./cmd/tatar-kuber
+
+      - name: Create kind cluster
+        uses: helm/kind-action@v1.10.0
+        with:
+          cluster_name: tatar-demo
+
+      - name: Deploy intentionally-vulnerable workloads
+        run: |
+          kubectl create namespace demo --dry-run=client -o yaml | kubectl apply -f -
+          kubectl apply -n demo -f examples/vulnerable/
+          kubectl get all -n demo
+
+      - name: Install Trivy
+        run: curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin
+
+      - name: Install Kubescape
+        run: |
+          curl -s https://raw.githubusercontent.com/kubescape/kubescape/master/install.sh | /bin/bash
+          echo "$HOME/.kubescape/bin" >> "$GITHUB_PATH"
+
+      - name: Install Popeye
+        run: |
+          VER="$(curl -s https://api.github.com/repos/derailed/popeye/releases/latest | grep -o '"tag_name": *"[^"]*"' | head -1 | sed -E 's/.*"v?([^"]+)".*/\1/')"
+          curl -sfL "https://github.com/derailed/popeye/releases/download/v${VER}/popeye_linux_amd64.tar.gz" -o /tmp/popeye.tgz
+          tar -xzf /tmp/popeye.tgz -C /tmp popeye
+          sudo install -m0755 /tmp/popeye /usr/local/bin/popeye
+        continue-on-error: true # popeye нэмэлт — суулгаж чадахгүй бол алгасна
+
+      - name: Doctor — which scanners are live
+        run: ./tatar-kuber doctor
+
+      - name: Live scan (Mode B) on namespace demo
+        run: |
+          CTX="$(kubectl config current-context)"
+          echo "context: $CTX"
+          ./tatar-kuber scan \
+            --kubeconfig "$HOME/.kube/config" \
+            --context "$CTX" \
+            --namespace demo \
+            --cluster kind-demo \
+            -o out
+          echo "----- summary -----"
+          ./tatar-kuber report --input out/scan-result.json -o json | grep -E '"risk_score"|"total_findings"|"scan_mode"' || true
+
+      - name: Reports (HTML + SARIF)
+        run: |
+          ./tatar-kuber report --input out/scan-result.json -o html  --out out/report.html
+          ./tatar-kuber report --input out/scan-result.json -o sarif --out out/tatar-kuber.sarif
+
+      - name: Upload live scan artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-scan-report
+          path: out/
+
+      - name: Assert live scan actually found issues
+        run: |
+          FOUND="$(./tatar-kuber report --input out/scan-result.json -o json | grep -o '"total_findings": *[0-9]*' | grep -o '[0-9]*' | head -1)"
+          echo "total_findings=$FOUND"
+          if [ "${FOUND:-0}" -lt 1 ]; then
+            echo "::error::Live Mode B ямар ч finding олсонгүй — scanner флаг эсвэл cluster хандалт эвдэрсэн байж болзошгүй"
+            exit 1
+          fi
+
+      - name: Gate (informational)
+        continue-on-error: true
+        run: ./tatar-kuber gate --input out/scan-result.json --fail-on high
