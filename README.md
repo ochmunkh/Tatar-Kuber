@@ -237,6 +237,25 @@ vulnerable workload, installs Trivy + Kubescape + Popeye and runs a real
 `tatar-kuber scan --kubeconfig` (last run: `scan_mode=remote`, 11 findings, 59/100).
 Next: CLI test coverage and broader compliance mapping.
 
+## Security
+
+A security tool should hold itself to the standard it enforces:
+
+- **SAST + vuln scanning in CI** — every push runs [`govulncheck`](https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck)
+  (known CVEs in dependencies **and** the Go standard library) and [`gosec`](https://github.com/securego/gosec)
+  (static analysis), with gosec results uploaded to the GitHub **Code scanning** tab. See
+  [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
+- **Patched toolchain** — release binaries are built with a current, patched Go stdlib
+  (pinned via `toolchain` in `go.mod`), so the report renderer stays clear of `html/template` CVEs.
+- **Minimal supply chain** — one direct dependency (`gopkg.in/yaml.v3`) plus the standard library.
+- **Safe by construction** — read-only cluster access (`get`/`list`/`watch`), no shell invocation
+  (scanners run via `exec` with fixed args, no `sh -c`), and reports render through `html/template`
+  auto-escaping.
+- **Handle output as sensitive** — a report can contain secret matches, CVEs and cluster detail;
+  treat `scan-result.json` and HTML/SARIF reports as confidential.
+
+Found a vulnerability? Use GitHub's **Security → Report a vulnerability** (private disclosure).
+
 ## Contributing
 
 Contributions are welcome! 🎉 The cleanest first PR is a **new scanner adapter** — see
@@ -427,3 +446,22 @@ Adapter Interface, 04 Severity & Risk Scoring, 05 CLI Spec, 06 Repository Struct
 deploy хийж, Trivy + Kubescape + Popeye суулгаж, жинхэнэ `tatar-kuber scan --kubeconfig`
 ажиллуулна (сүүлийн run: `scan_mode=remote`, 11 finding, 59/100).
 Дараа нь: CLI тест, өргөн compliance mapping.
+
+### Аюулгүй байдал
+
+Аюулгүй байдлын багаж өөрөө өөрийн шаарддаг стандартыг барих ёстой:
+
+- **CI-д SAST + CVE скан** — push бүрд [`govulncheck`](https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck)
+  (хамаарал **болон** Go stdlib дахь мэдэгдэж буй CVE) + [`gosec`](https://github.com/securego/gosec)
+  (статик шинжилгээ) ажиллана; gosec-ийн үр дүн GitHub **Code scanning** таб руу ордог.
+  ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)).
+- **Patched toolchain** — release бинарууд зассан Go stdlib-ээр build хийгддэг (`go.mod`-ийн
+  `toolchain`-аар бэхлэсэн) тул тайлан рендерлэгч `html/template` CVE-үүдээс цэвэр.
+- **Минимал supply chain** — ганц шууд хамаарал (`gopkg.in/yaml.v3`) + stdlib.
+- **Бүтцээрээ аюулгүй** — read-only cluster хандалт (`get`/`list`/`watch`), shell дуудлагагүй
+  (scanner-ууд тогтмол аргументтэй `exec`-ээр, `sh -c` байхгүй), тайлан `html/template`
+  auto-escape-аар рендерлэгддэг.
+- **Гаралтыг нууц гэж үз** — тайлан нь secret, CVE, cluster мэдээлэл агуулж болзошгүй тул
+  `scan-result.json` болон HTML/SARIF тайланг нууц мэдээлэл гэж хандах.
+
+Эмзэг байдал олсон уу? GitHub-ын **Security → Report a vulnerability** (хаалттай мэдээлэл).
