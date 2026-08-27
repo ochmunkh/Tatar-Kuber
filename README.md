@@ -235,7 +235,8 @@ All tests green, and **live Mode B is validated on a real `kind` cluster in CI**
 [real-cluster workflow](.github/workflows/real-cluster.yml) spins up a cluster, deploys a
 vulnerable workload, installs Trivy + Kubescape + Popeye and runs a real
 `tatar-kuber scan --kubeconfig` (last run: `scan_mode=remote`, 11 findings, 59/100).
-Next: CLI test coverage and broader compliance mapping.
+Next: CLI test coverage and broader compliance mapping. Where it's headed — v2 (audit-grade PDF +
+compliance mapping + trending), v3 (continuous + dashboard): see the [**Roadmap**](ROADMAP.md).
 
 ## Security
 
@@ -445,7 +446,8 @@ Adapter Interface, 04 Severity & Risk Scoring, 05 CLI Spec, 06 Repository Struct
 [real-cluster workflow](.github/workflows/real-cluster.yml) нь cluster босгож, эмзэг workload
 deploy хийж, Trivy + Kubescape + Popeye суулгаж, жинхэнэ `tatar-kuber scan --kubeconfig`
 ажиллуулна (сүүлийн run: `scan_mode=remote`, 11 finding, 59/100).
-Дараа нь: CLI тест, өргөн compliance mapping.
+Дараа нь: CLI тест, өргөн compliance mapping. Хаашаа явж байгаа — v2 (аудитын PDF + compliance
+mapping + trending), v3 (тасралтгүй + dashboard): [**Замын зураг**](ROADMAP.md)-г үз.
 
 ### Аюулгүй байдал
 
