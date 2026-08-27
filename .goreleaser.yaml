@@ -51,6 +51,7 @@ release:
     name: Tatar-Kuber
   draft: false
   prerelease: auto
+  mode: replace # ижил tag дахин гаргахад хуучин artifacts-ыг орлуулна
   name_template: "TATAR-Kuber {{ .Tag }}"
 
 brews:
