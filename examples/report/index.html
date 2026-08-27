@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TATAR-Kuber — example report</title>
+<style>
+ body{font-family:Segoe UI,Arial,sans-serif;background:#f4f6f8;color:#1a2b3a;margin:0;padding:40px 20px}
+ .wrap{max-width:720px;margin:0 auto}
+ h1{color:#2A4D69;margin:0 0 4px}
+ h1 span{color:#1F6F54}
+ .sub{color:#5f7285;margin:0 0 24px}
+ .card{display:block;background:#fff;border:1.5px solid #d5dee6;border-radius:12px;padding:16px 20px;margin:10px 0;text-decoration:none;color:inherit;transition:border-color .15s}
+ .card:hover{border-color:#1F6F54}
+ .card b{font-size:16px;color:#2A4D69}
+ .card .d{font-size:13px;color:#5f7285;margin-top:3px}
+ .foot{color:#8195a6;font-size:13px;margin-top:24px}
+ .foot a{color:#1a6fb5}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>TATAR-<span>Kuber</span> — example report</h1>
+  <p class="sub">Generated from the demo data in <code>examples/demo/</code> — no cluster, no install. / Cluster, суулгац шаардлагагүй.</p>
+
+  <a class="card" href="report.html"><b>🇬🇧 HTML dashboard (English)</b><div class="d">Executive summary, explainable risk score, deduplicated findings</div></a>
+  <a class="card" href="report-mn.html"><b>🇲🇳 HTML dashboard (Монгол)</b><div class="d">Гүйцэтгэх хураангуй, тайлбарлагдах эрсдэл, давхардал арилгасан илрүүлэлт</div></a>
+  <a class="card" href="tatar-kuber.sarif"><b>SARIF 2.1.0</b><div class="d">For GitHub / GitLab / Azure code scanning</div></a>
+  <a class="card" href="scan-result.json"><b>scan-result.json</b><div class="d">The canonical machine-readable output</div></a>
+
+  <p class="foot">Reproduce: <code>tatar-kuber scan --raw-dir examples/demo -o out</code> ·
+  <a href="https://github.com/ochmunkh/Tatar-Kuber">github.com/ochmunkh/Tatar-Kuber</a></p>
+</div>
+</body>
+</html>

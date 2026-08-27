@@ -1,0 +1,1764 @@
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "TATAR-Kuber",
+          "version": "1.0.0",
+          "informationUri": "https://github.com/ochmunkh/tatar-kuber",
+          "rules": [
+            {
+              "id": "TATAR-IMG-001",
+              "name": "Critical CVE in container image",
+              "shortDescription": {
+                "text": "Critical CVE in container image"
+              },
+              "properties": {
+                "category": "Image Security",
+                "security-severity": "9.5"
+              }
+            },
+            {
+              "id": "TATAR-RBAC-001",
+              "name": "cluster-admin binding overuse",
+              "shortDescription": {
+                "text": "cluster-admin binding overuse"
+              },
+              "properties": {
+                "category": "RBAC \u0026 Authorization",
+                "security-severity": "9.5"
+              }
+            },
+            {
+              "id": "TATAR-CON-003",
+              "name": "Allow privilege escalation",
+              "shortDescription": {
+                "text": "Allow privilege escalation"
+              },
+              "properties": {
+                "category": "Container Security",
+                "security-severity": "8.0"
+              }
+            },
+            {
+              "id": "TATAR-CON-001",
+              "name": "Privileged container enabled",
+              "shortDescription": {
+                "text": "Privileged container enabled"
+              },
+              "properties": {
+                "category": "Container Security",
+                "security-severity": "8.0"
+              }
+            },
+            {
+              "id": "TATAR-CON-006",
+              "name": "Host network enabled",
+              "shortDescription": {
+                "text": "Host network enabled"
+              },
+              "properties": {
+                "category": "Container Security",
+                "security-severity": "8.0"
+              }
+            },
+            {
+              "id": "TATAR-IMG-002",
+              "name": "High CVE in container image",
+              "shortDescription": {
+                "text": "High CVE in container image"
+              },
+              "properties": {
+                "category": "Image Security",
+                "security-severity": "8.0"
+              }
+            },
+            {
+              "id": "TATAR-CON-005",
+              "name": "Host PID namespace shared",
+              "shortDescription": {
+                "text": "Host PID namespace shared"
+              },
+              "properties": {
+                "category": "Container Security",
+                "security-severity": "8.0"
+              }
+            },
+            {
+              "id": "TATAR-SEC-001",
+              "name": "Secret exposed in environment variable",
+              "shortDescription": {
+                "text": "Secret exposed in environment variable"
+              },
+              "properties": {
+                "category": "Secret Management",
+                "security-severity": "8.0"
+              }
+            },
+            {
+              "id": "TATAR-RBAC-002",
+              "name": "Wildcard permissions in role",
+              "shortDescription": {
+                "text": "Wildcard permissions in role"
+              },
+              "properties": {
+                "category": "RBAC \u0026 Authorization",
+                "security-severity": "8.0"
+              }
+            },
+            {
+              "id": "TATAR-CON-009",
+              "name": "Read-only root filesystem disabled",
+              "shortDescription": {
+                "text": "Read-only root filesystem disabled"
+              },
+              "properties": {
+                "category": "Container Security",
+                "security-severity": "5.0"
+              }
+            },
+            {
+              "id": "TATAR-SEC-003",
+              "name": "Service account token auto-mounted",
+              "shortDescription": {
+                "text": "Service account token auto-mounted"
+              },
+              "properties": {
+                "category": "Secret Management",
+                "security-severity": "5.0"
+              }
+            },
+            {
+              "id": "TATAR-IMG-003",
+              "name": "Image uses :latest tag",
+              "shortDescription": {
+                "text": "Image uses :latest tag"
+              },
+              "properties": {
+                "category": "Image Security",
+                "security-severity": "5.0"
+              }
+            },
+            {
+              "id": "TATAR-OPS-003",
+              "name": "Orphan / dead service (no endpoints)",
+              "shortDescription": {
+                "text": "Orphan / dead service (no endpoints)"
+              },
+              "properties": {
+                "category": "Operational Health",
+                "security-severity": "5.0"
+              }
+            },
+            {
+              "id": "TATAR-CON-011",
+              "name": "Default seccomp profile not set",
+              "shortDescription": {
+                "text": "Default seccomp profile not set"
+              },
+              "properties": {
+                "category": "Container Security",
+                "security-severity": "5.0"
+              }
+            },
+            {
+              "id": "TATAR-CON-002",
+              "name": "Container running as root",
+              "shortDescription": {
+                "text": "Container running as root"
+              },
+              "properties": {
+                "category": "Container Security",
+                "security-severity": "5.0"
+              }
+            },
+            {
+              "id": "TATAR-NET-001",
+              "name": "Missing NetworkPolicy",
+              "shortDescription": {
+                "text": "Missing NetworkPolicy"
+              },
+              "properties": {
+                "category": "Network Security",
+                "security-severity": "5.0"
+              }
+            },
+            {
+              "id": "TATAR-OPS-005",
+              "name": "imagePullPolicy not set correctly",
+              "shortDescription": {
+                "text": "imagePullPolicy not set correctly"
+              },
+              "properties": {
+                "category": "Operational Health",
+                "security-severity": "3.0"
+              }
+            },
+            {
+              "id": "TATAR-CON-010",
+              "name": "Missing CPU/memory limits",
+              "shortDescription": {
+                "text": "Missing CPU/memory limits"
+              },
+              "properties": {
+                "category": "Container Security",
+                "security-severity": "3.0"
+              }
+            },
+            {
+              "id": "TATAR-OPS-002",
+              "name": "Missing liveness probe",
+              "shortDescription": {
+                "text": "Missing liveness probe"
+              },
+              "properties": {
+                "category": "Operational Health",
+                "security-severity": "3.0"
+              }
+            },
+            {
+              "id": "TATAR-OPS-001",
+              "name": "Missing readiness probe",
+              "shortDescription": {
+                "text": "Missing readiness probe"
+              },
+              "properties": {
+                "category": "Operational Health",
+                "security-severity": "3.0"
+              }
+            },
+            {
+              "id": "TATAR-OPS-004",
+              "name": "Unused ConfigMap / Secret",
+              "shortDescription": {
+                "text": "Unused ConfigMap / Secret"
+              },
+              "properties": {
+                "category": "Operational Health",
+                "security-severity": "3.0"
+              }
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "TATAR-IMG-001",
+          "level": "error",
+          "message": {
+            "text": "Critical CVE in container image — Update the base image/package or apply a patch."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/api"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "trivy"
+            ],
+            "tatar_id": "TK-9b701e"
+          }
+        },
+        {
+          "ruleId": "TATAR-RBAC-001",
+          "level": "error",
+          "message": {
+            "text": "cluster-admin binding overuse — Restrict cluster-admin; use specific scoped roles."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "clusterrolebinding/admin-bind"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "kubescape"
+            ],
+            "tatar_id": "TK-951f02"
+          }
+        },
+        {
+          "ruleId": "TATAR-CON-003",
+          "level": "error",
+          "message": {
+            "text": "Allow privilege escalation — Set securityContext.allowPrivilegeEscalation=false."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/root-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-099acc"
+          }
+        },
+        {
+          "ruleId": "TATAR-CON-001",
+          "level": "error",
+          "message": {
+            "text": "Privileged container enabled — Set securityContext.privileged=false."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/privileged-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-31cdab"
+          }
+        },
+        {
+          "ruleId": "TATAR-CON-006",
+          "level": "error",
+          "message": {
+            "text": "Host network enabled — Set hostNetwork=false."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/host-ns-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-3d236f"
+          }
+        },
+        {
+          "ruleId": "TATAR-IMG-002",
+          "level": "error",
+          "message": {
+            "text": "High CVE in container image — Update the base image/package."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/api"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "trivy"
+            ],
+            "tatar_id": "TK-41b754"
+          }
+        },
+        {
+          "ruleId": "TATAR-CON-003",
+          "level": "error",
+          "message": {
+            "text": "Allow privilege escalation — Set securityContext.allowPrivilegeEscalation=false."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/latest-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-4aa9f9"
+          }
+        },
+        {
+          "ruleId": "TATAR-CON-003",
+          "level": "error",
+          "message": {
+            "text": "Allow privilege escalation — Set securityContext.allowPrivilegeEscalation=false."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/privileged-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-5704a8"
+          }
+        },
+        {
+          "ruleId": "TATAR-CON-003",
+          "level": "error",
+          "message": {
+            "text": "Allow privilege escalation — Set securityContext.allowPrivilegeEscalation=false."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/secret-env-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-68270b"
+          }
+        },
+        {
+          "ruleId": "TATAR-CON-001",
+          "level": "error",
+          "message": {
+            "text": "Privileged container enabled — Set securityContext.privileged=false."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/api"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov",
+              "kubescape",
+              "trivy"
+            ],
+            "tatar_id": "TK-8d84b4"
+          }
+        },
+        {
+          "ruleId": "TATAR-CON-003",
+          "level": "error",
+          "message": {
+            "text": "Allow privilege escalation — Set securityContext.allowPrivilegeEscalation=false."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/host-ns-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-98dbfd"
+          }
+        },
+        {
+          "ruleId": "TATAR-CON-005",
+          "level": "error",
+          "message": {
+            "text": "Host PID namespace shared — Set hostPID=false."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/host-ns-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-ace1a8"
+          }
+        },
+        {
+          "ruleId": "TATAR-SEC-001",
+          "level": "error",
+          "message": {
+            "text": "Secret exposed in environment variable — Use Kubernetes Secrets with volume mounts."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "default/pod/worker"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "trivy"
+            ],
+            "tatar_id": "TK-63fbfb"
+          }
+        },
+        {
+          "ruleId": "TATAR-RBAC-002",
+          "level": "error",
+          "message": {
+            "text": "Wildcard permissions in role — Narrow permissions to specific resources/verbs."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "default/clusterrole/too-powerful"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-9716b3"
+          }
+        },
+        {
+          "ruleId": "TATAR-CON-009",
+          "level": "warning",
+          "message": {
+            "text": "Read-only root filesystem disabled — Set securityContext.readOnlyRootFilesystem=true."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/privileged-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-082fb3"
+          }
+        },
+        {
+          "ruleId": "TATAR-SEC-003",
+          "level": "warning",
+          "message": {
+            "text": "Service account token auto-mounted — Set automountServiceAccountToken=false."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/latest-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-2681ba"
+          }
+        },
+        {
+          "ruleId": "TATAR-IMG-003",
+          "level": "warning",
+          "message": {
+            "text": "Image uses :latest tag — Use a specific version (digest/tag)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/privileged-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-270b9f"
+          }
+        },
+        {
+          "ruleId": "TATAR-SEC-003",
+          "level": "warning",
+          "message": {
+            "text": "Service account token auto-mounted — Set automountServiceAccountToken=false."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/host-ns-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-2a5ed4"
+          }
+        },
+        {
+          "ruleId": "TATAR-OPS-003",
+          "level": "warning",
+          "message": {
+            "text": "Orphan / dead service (no endpoints) — Delete the service or fix its selector."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/service/orphan-svc"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "popeye"
+            ],
+            "tatar_id": "TK-45802d"
+          }
+        },
+        {
+          "ruleId": "TATAR-CON-009",
+          "level": "warning",
+          "message": {
+            "text": "Read-only root filesystem disabled — Set securityContext.readOnlyRootFilesystem=true."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/latest-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-516c6d"
+          }
+        },
+        {
+          "ruleId": "TATAR-IMG-003",
+          "level": "warning",
+          "message": {
+            "text": "Image uses :latest tag — Use a specific version (digest/tag)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/secret-env-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-6139b2"
+          }
+        },
+        {
+          "ruleId": "TATAR-CON-009",
+          "level": "warning",
+          "message": {
+            "text": "Read-only root filesystem disabled — Set securityContext.readOnlyRootFilesystem=true."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/secret-env-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-6beef8"
+          }
+        },
+        {
+          "ruleId": "TATAR-CON-011",
+          "level": "warning",
+          "message": {
+            "text": "Default seccomp profile not set — Set seccompProfile.type=RuntimeDefault."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/privileged-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-719563"
+          }
+        },
+        {
+          "ruleId": "TATAR-CON-002",
+          "level": "warning",
+          "message": {
+            "text": "Container running as root — Set securityContext.runAsNonRoot=true."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/privileged-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-7be77a"
+          }
+        },
+        {
+          "ruleId": "TATAR-CON-009",
+          "level": "warning",
+          "message": {
+            "text": "Read-only root filesystem disabled — Set securityContext.readOnlyRootFilesystem=true."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/root-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-7e89d4"
+          }
+        },
+        {
+          "ruleId": "TATAR-CON-002",
+          "level": "warning",
+          "message": {
+            "text": "Container running as root — Set securityContext.runAsNonRoot=true."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/host-ns-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-814cb7"
+          }
+        },
+        {
+          "ruleId": "TATAR-CON-011",
+          "level": "warning",
+          "message": {
+            "text": "Default seccomp profile not set — Set seccompProfile.type=RuntimeDefault."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/latest-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-839459"
+          }
+        },
+        {
+          "ruleId": "TATAR-CON-002",
+          "level": "warning",
+          "message": {
+            "text": "Container running as root — Set securityContext.runAsNonRoot=true."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/root-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-87988c"
+          }
+        },
+        {
+          "ruleId": "TATAR-CON-002",
+          "level": "warning",
+          "message": {
+            "text": "Container running as root — Set securityContext.runAsNonRoot=true."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/api"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "trivy"
+            ],
+            "tatar_id": "TK-8b4244"
+          }
+        },
+        {
+          "ruleId": "TATAR-CON-011",
+          "level": "warning",
+          "message": {
+            "text": "Default seccomp profile not set — Set seccompProfile.type=RuntimeDefault."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/secret-env-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-8ee9df"
+          }
+        },
+        {
+          "ruleId": "TATAR-IMG-003",
+          "level": "warning",
+          "message": {
+            "text": "Image uses :latest tag — Use a specific version (digest/tag)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/latest-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-a5de8c"
+          }
+        },
+        {
+          "ruleId": "TATAR-SEC-003",
+          "level": "warning",
+          "message": {
+            "text": "Service account token auto-mounted — Set automountServiceAccountToken=false."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/root-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-a87376"
+          }
+        },
+        {
+          "ruleId": "TATAR-CON-011",
+          "level": "warning",
+          "message": {
+            "text": "Default seccomp profile not set — Set seccompProfile.type=RuntimeDefault."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/host-ns-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-a9ae78"
+          }
+        },
+        {
+          "ruleId": "TATAR-SEC-003",
+          "level": "warning",
+          "message": {
+            "text": "Service account token auto-mounted — Set automountServiceAccountToken=false."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/privileged-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-b856db"
+          }
+        },
+        {
+          "ruleId": "TATAR-NET-001",
+          "level": "warning",
+          "message": {
+            "text": "Missing NetworkPolicy — Define a NetworkPolicy for each namespace."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/api"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "kubescape"
+            ],
+            "tatar_id": "TK-bb3bbf"
+          }
+        },
+        {
+          "ruleId": "TATAR-CON-011",
+          "level": "warning",
+          "message": {
+            "text": "Default seccomp profile not set — Set seccompProfile.type=RuntimeDefault."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/root-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-bd2b14"
+          }
+        },
+        {
+          "ruleId": "TATAR-CON-009",
+          "level": "warning",
+          "message": {
+            "text": "Read-only root filesystem disabled — Set securityContext.readOnlyRootFilesystem=true."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/host-ns-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-ca93ac"
+          }
+        },
+        {
+          "ruleId": "TATAR-IMG-003",
+          "level": "warning",
+          "message": {
+            "text": "Image uses :latest tag — Use a specific version (digest/tag)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/host-ns-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-cd6234"
+          }
+        },
+        {
+          "ruleId": "TATAR-CON-002",
+          "level": "warning",
+          "message": {
+            "text": "Container running as root — Set securityContext.runAsNonRoot=true."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/latest-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-d3601d"
+          }
+        },
+        {
+          "ruleId": "TATAR-SEC-003",
+          "level": "warning",
+          "message": {
+            "text": "Service account token auto-mounted — Set automountServiceAccountToken=false."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/secret-env-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-deeec9"
+          }
+        },
+        {
+          "ruleId": "TATAR-IMG-003",
+          "level": "warning",
+          "message": {
+            "text": "Image uses :latest tag — Use a specific version (digest/tag)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/root-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-eaf694"
+          }
+        },
+        {
+          "ruleId": "TATAR-CON-002",
+          "level": "warning",
+          "message": {
+            "text": "Container running as root — Set securityContext.runAsNonRoot=true."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/secret-env-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-ee582c"
+          }
+        },
+        {
+          "ruleId": "TATAR-OPS-005",
+          "level": "note",
+          "message": {
+            "text": "imagePullPolicy not set correctly — Set imagePullPolicy explicitly to IfNotPresent/Always."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/root-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-038d0c"
+          }
+        },
+        {
+          "ruleId": "TATAR-CON-010",
+          "level": "note",
+          "message": {
+            "text": "Missing CPU/memory limits — Set resources.limits.cpu and .memory."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/secret-env-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-074f58"
+          }
+        },
+        {
+          "ruleId": "TATAR-OPS-002",
+          "level": "note",
+          "message": {
+            "text": "Missing liveness probe — Add a livenessProbe."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/host-ns-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-0ae0b9"
+          }
+        },
+        {
+          "ruleId": "TATAR-OPS-001",
+          "level": "note",
+          "message": {
+            "text": "Missing readiness probe — Add a readinessProbe."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/secret-env-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-18ab67"
+          }
+        },
+        {
+          "ruleId": "TATAR-OPS-002",
+          "level": "note",
+          "message": {
+            "text": "Missing liveness probe — Add a livenessProbe."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/secret-env-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-237bab"
+          }
+        },
+        {
+          "ruleId": "TATAR-OPS-001",
+          "level": "note",
+          "message": {
+            "text": "Missing readiness probe — Add a readinessProbe."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/privileged-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-2b7f65"
+          }
+        },
+        {
+          "ruleId": "TATAR-OPS-004",
+          "level": "note",
+          "message": {
+            "text": "Unused ConfigMap / Secret — Delete the unused object."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/configmap/unused-cm"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "popeye"
+            ],
+            "tatar_id": "TK-497ef2"
+          }
+        },
+        {
+          "ruleId": "TATAR-OPS-005",
+          "level": "note",
+          "message": {
+            "text": "imagePullPolicy not set correctly — Set imagePullPolicy explicitly to IfNotPresent/Always."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/privileged-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-692c88"
+          }
+        },
+        {
+          "ruleId": "TATAR-CON-010",
+          "level": "note",
+          "message": {
+            "text": "Missing CPU/memory limits — Set resources.limits.cpu and .memory."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/privileged-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-721ece"
+          }
+        },
+        {
+          "ruleId": "TATAR-OPS-002",
+          "level": "note",
+          "message": {
+            "text": "Missing liveness probe — Add a livenessProbe."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/privileged-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-74c9df"
+          }
+        },
+        {
+          "ruleId": "TATAR-CON-010",
+          "level": "note",
+          "message": {
+            "text": "Missing CPU/memory limits — Set resources.limits.cpu and .memory."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/root-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-9ee9a8"
+          }
+        },
+        {
+          "ruleId": "TATAR-OPS-005",
+          "level": "note",
+          "message": {
+            "text": "imagePullPolicy not set correctly — Set imagePullPolicy explicitly to IfNotPresent/Always."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/host-ns-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-ae88c4"
+          }
+        },
+        {
+          "ruleId": "TATAR-OPS-002",
+          "level": "note",
+          "message": {
+            "text": "Missing liveness probe — Add a livenessProbe."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/latest-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-af8897"
+          }
+        },
+        {
+          "ruleId": "TATAR-OPS-002",
+          "level": "note",
+          "message": {
+            "text": "Missing liveness probe — Add a livenessProbe."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/root-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-b37a35"
+          }
+        },
+        {
+          "ruleId": "TATAR-OPS-001",
+          "level": "note",
+          "message": {
+            "text": "Missing readiness probe — Add a readinessProbe."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/latest-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-c4c3a4"
+          }
+        },
+        {
+          "ruleId": "TATAR-OPS-001",
+          "level": "note",
+          "message": {
+            "text": "Missing readiness probe — Add a readinessProbe."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/host-ns-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-d677b8"
+          }
+        },
+        {
+          "ruleId": "TATAR-CON-010",
+          "level": "note",
+          "message": {
+            "text": "Missing CPU/memory limits — Set resources.limits.cpu and .memory."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/latest-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-d83cf4"
+          }
+        },
+        {
+          "ruleId": "TATAR-OPS-005",
+          "level": "note",
+          "message": {
+            "text": "imagePullPolicy not set correctly — Set imagePullPolicy explicitly to IfNotPresent/Always."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/pod/api-7d8"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "popeye"
+            ],
+            "tatar_id": "TK-da455b"
+          }
+        },
+        {
+          "ruleId": "TATAR-OPS-005",
+          "level": "note",
+          "message": {
+            "text": "imagePullPolicy not set correctly — Set imagePullPolicy explicitly to IfNotPresent/Always."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/secret-env-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-e42455"
+          }
+        },
+        {
+          "ruleId": "TATAR-CON-010",
+          "level": "note",
+          "message": {
+            "text": "Missing CPU/memory limits — Set resources.limits.cpu and .memory."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/host-ns-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-e674e7"
+          }
+        },
+        {
+          "ruleId": "TATAR-OPS-001",
+          "level": "note",
+          "message": {
+            "text": "Missing readiness probe — Add a readinessProbe."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/root-app"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-f46eb1"
+          }
+        }
+      ]
+    }
+  ]
+}

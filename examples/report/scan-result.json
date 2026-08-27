@@ -1,0 +1,2712 @@
+{
+  "schema_version": "1.0",
+  "metadata": {
+    "scan_id": "a5760e362e01cd02bed67bb9fc82009a",
+    "cluster_name": "demo-prod",
+    "scan_mode": "remote",
+    "lang": "en",
+    "tatar_version": "1.0.0",
+    "scanner_versions": {
+      "checkov": "3.2.10",
+      "kubescape": "3.1.4",
+      "popeye": "0.22.1",
+      "trivy": "0.67.2"
+    },
+    "started_at": "2026-08-27T15:01:35Z",
+    "finished_at": "2026-08-27T15:01:35Z",
+    "result_hash": "sha256:7e8d21c7b2a4d125c76f9e22d6f1af48f5c380279129b1a869df303eb5657765",
+    "inventory": {
+      "ClusterRoles": 27,
+      "Deployments": 31,
+      "Ingresses": 6,
+      "Namespaces": 8,
+      "Nodes": 5,
+      "Pods": 142,
+      "Services": 54
+    }
+  },
+  "summary": {
+    "counts": {
+      "CRITICAL": 2,
+      "HIGH": 12,
+      "INFO": 0,
+      "LOW": 21,
+      "MEDIUM": 28
+    },
+    "blind_shot": 0,
+    "risk_score": 23,
+    "risk_band": "Critical",
+    "total_findings": 63,
+    "risk_breakdown": {
+      "total_penalty": 334,
+      "high_penalty": 324,
+      "low_penalty_raw": 37.8,
+      "low_penalty_capped": 10,
+      "low_pool_cap": 10,
+      "scale": 100,
+      "formula": "100 / (1 + P/K)",
+      "top_contributors": [
+        {
+          "id": "TK-9b701e",
+          "canonical_control": "TATAR-IMG-001",
+          "resource": "deployment/api",
+          "severity": "CRITICAL",
+          "contribution": 18,
+          "share": 5
+        },
+        {
+          "id": "TK-099acc",
+          "canonical_control": "TATAR-CON-003",
+          "resource": "deployment/root-app",
+          "severity": "HIGH",
+          "contribution": 12.6,
+          "share": 3.5
+        },
+        {
+          "id": "TK-31cdab",
+          "canonical_control": "TATAR-CON-001",
+          "resource": "deployment/privileged-app",
+          "severity": "HIGH",
+          "contribution": 12.6,
+          "share": 3.5
+        },
+        {
+          "id": "TK-3d236f",
+          "canonical_control": "TATAR-CON-006",
+          "resource": "deployment/host-ns-app",
+          "severity": "HIGH",
+          "contribution": 12.6,
+          "share": 3.5
+        },
+        {
+          "id": "TK-41b754",
+          "canonical_control": "TATAR-IMG-002",
+          "resource": "deployment/api",
+          "severity": "HIGH",
+          "contribution": 12.6,
+          "share": 3.5
+        }
+      ]
+    }
+  },
+  "findings": [
+    {
+      "id": "TK-9b701e",
+      "canonical_control": "TATAR-IMG-001",
+      "resource": "deployment/api",
+      "namespace": "production",
+      "type": "vulnerability",
+      "category": "Image Security",
+      "severity": "CRITICAL",
+      "original_severity": "CRITICAL",
+      "title": "Critical CVE in container image",
+      "description": "openssl critical flaw",
+      "evidence": [
+        {
+          "scanner": "trivy",
+          "value": "fixed in 3.1.4",
+          "detail": "openssl@3.1.0"
+        }
+      ],
+      "remediation": "Update the base image/package or apply a patch.",
+      "found_by": [
+        "trivy"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 18,
+      "risk_factors": {
+        "base_weight": 10,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 18
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "references": [
+        "CVE-2024-0001",
+        "https://avd.aquasec.com/nvd/cve-2024-0001"
+      ],
+      "raw_refs": [
+        {
+          "scanner": "trivy",
+          "rule_id": "CVE-*"
+        }
+      ]
+    },
+    {
+      "id": "TK-951f02",
+      "canonical_control": "TATAR-RBAC-001",
+      "resource": "clusterrolebinding/admin-bind",
+      "type": "rbac",
+      "category": "RBAC \u0026 Authorization",
+      "severity": "CRITICAL",
+      "original_severity": "CRITICAL",
+      "title": "cluster-admin binding overuse",
+      "description": "",
+      "remediation": "Restrict cluster-admin; use specific scoped roles.",
+      "found_by": [
+        "kubescape"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 12,
+      "risk_factors": {
+        "base_weight": 10,
+        "asset_context": 1,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 12
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "kubescape",
+          "rule_id": "C-0035"
+        }
+      ]
+    },
+    {
+      "id": "TK-099acc",
+      "canonical_control": "TATAR-CON-003",
+      "resource": "deployment/root-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "HIGH",
+      "original_severity": "HIGH",
+      "title": "Allow privilege escalation",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/root-user.yaml:2-20"
+        }
+      ],
+      "remediation": "Set securityContext.allowPrivilegeEscalation=false.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 12.6,
+      "risk_factors": {
+        "base_weight": 7,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 12.6
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_20"
+        }
+      ]
+    },
+    {
+      "id": "TK-31cdab",
+      "canonical_control": "TATAR-CON-001",
+      "resource": "deployment/privileged-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "HIGH",
+      "original_severity": "HIGH",
+      "title": "Privileged container enabled",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/privileged.yaml:2-18"
+        }
+      ],
+      "remediation": "Set securityContext.privileged=false.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 12.6,
+      "risk_factors": {
+        "base_weight": 7,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 12.6
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_16"
+        }
+      ]
+    },
+    {
+      "id": "TK-3d236f",
+      "canonical_control": "TATAR-CON-006",
+      "resource": "deployment/host-ns-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "HIGH",
+      "original_severity": "HIGH",
+      "title": "Host network enabled",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/host-namespaces.yaml:2-19"
+        }
+      ],
+      "remediation": "Set hostNetwork=false.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 12.6,
+      "risk_factors": {
+        "base_weight": 7,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 12.6
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_19"
+        }
+      ]
+    },
+    {
+      "id": "TK-41b754",
+      "canonical_control": "TATAR-IMG-002",
+      "resource": "deployment/api",
+      "namespace": "production",
+      "type": "vulnerability",
+      "category": "Image Security",
+      "severity": "HIGH",
+      "original_severity": "HIGH",
+      "title": "High CVE in container image",
+      "description": "libcurl high flaw",
+      "evidence": [
+        {
+          "scanner": "trivy",
+          "value": "fixed in 8.1.2",
+          "detail": "libcurl@8.1.0"
+        }
+      ],
+      "remediation": "Update the base image/package.",
+      "found_by": [
+        "trivy"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 12.6,
+      "risk_factors": {
+        "base_weight": 7,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 12.6
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "references": [
+        "CVE-2024-0002",
+        "https://avd.aquasec.com/nvd/cve-2024-0002"
+      ],
+      "raw_refs": [
+        {
+          "scanner": "trivy",
+          "rule_id": "CVE-*"
+        }
+      ]
+    },
+    {
+      "id": "TK-4aa9f9",
+      "canonical_control": "TATAR-CON-003",
+      "resource": "deployment/latest-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "HIGH",
+      "original_severity": "HIGH",
+      "title": "Allow privilege escalation",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/latest-tag.yaml:2-16"
+        }
+      ],
+      "remediation": "Set securityContext.allowPrivilegeEscalation=false.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 12.6,
+      "risk_factors": {
+        "base_weight": 7,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 12.6
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_20"
+        }
+      ]
+    },
+    {
+      "id": "TK-5704a8",
+      "canonical_control": "TATAR-CON-003",
+      "resource": "deployment/privileged-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "HIGH",
+      "original_severity": "HIGH",
+      "title": "Allow privilege escalation",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/privileged.yaml:2-18"
+        }
+      ],
+      "remediation": "Set securityContext.allowPrivilegeEscalation=false.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 12.6,
+      "risk_factors": {
+        "base_weight": 7,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 12.6
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_20"
+        }
+      ]
+    },
+    {
+      "id": "TK-68270b",
+      "canonical_control": "TATAR-CON-003",
+      "resource": "deployment/secret-env-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "HIGH",
+      "original_severity": "HIGH",
+      "title": "Allow privilege escalation",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/secret-env.yaml:2-21"
+        }
+      ],
+      "remediation": "Set securityContext.allowPrivilegeEscalation=false.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 12.6,
+      "risk_factors": {
+        "base_weight": 7,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 12.6
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_20"
+        }
+      ]
+    },
+    {
+      "id": "TK-8d84b4",
+      "canonical_control": "TATAR-CON-001",
+      "resource": "deployment/api",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "HIGH",
+      "original_severity": "HIGH",
+      "title": "Privileged container enabled",
+      "description": "Container running in privileged mode.",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/api.yaml:1-22"
+        },
+        {
+          "scanner": "trivy",
+          "path": "spec.template.spec.containers[0].securityContext.privileged"
+        }
+      ],
+      "remediation": "Set securityContext.privileged=false.",
+      "found_by": [
+        "checkov",
+        "kubescape",
+        "trivy"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 12.6,
+      "risk_factors": {
+        "base_weight": 7,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 12.6
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "references": [
+        "https://avd.aquasec.com/misconfig/ksv017",
+        "https://docs.prismacloud.io/en/enterprise-edition/policy-reference/kubernetes-policies/kubernetes-policy-index/bc-k8s-15"
+      ],
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_16"
+        },
+        {
+          "scanner": "kubescape",
+          "rule_id": "C-0057"
+        },
+        {
+          "scanner": "trivy",
+          "rule_id": "AVD-KSV0017"
+        }
+      ]
+    },
+    {
+      "id": "TK-98dbfd",
+      "canonical_control": "TATAR-CON-003",
+      "resource": "deployment/host-ns-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "HIGH",
+      "original_severity": "HIGH",
+      "title": "Allow privilege escalation",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/host-namespaces.yaml:2-19"
+        }
+      ],
+      "remediation": "Set securityContext.allowPrivilegeEscalation=false.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 12.6,
+      "risk_factors": {
+        "base_weight": 7,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 12.6
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_20"
+        }
+      ]
+    },
+    {
+      "id": "TK-ace1a8",
+      "canonical_control": "TATAR-CON-005",
+      "resource": "deployment/host-ns-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "HIGH",
+      "original_severity": "HIGH",
+      "title": "Host PID namespace shared",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/host-namespaces.yaml:2-19"
+        }
+      ],
+      "remediation": "Set hostPID=false.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 12.6,
+      "risk_factors": {
+        "base_weight": 7,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 12.6
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_17"
+        }
+      ]
+    },
+    {
+      "id": "TK-63fbfb",
+      "canonical_control": "TATAR-SEC-001",
+      "resource": "pod/worker",
+      "namespace": "default",
+      "type": "secret",
+      "category": "Secret Management",
+      "severity": "HIGH",
+      "original_severity": "HIGH",
+      "title": "Secret exposed in environment variable",
+      "description": "Илэрсэн нууц: AWS",
+      "evidence": [
+        {
+          "scanner": "trivy",
+          "detail": "env: AWS_ACCESS_KEY_ID=AKIA********"
+        }
+      ],
+      "remediation": "Use Kubernetes Secrets with volume mounts.",
+      "found_by": [
+        "trivy"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 8.4,
+      "risk_factors": {
+        "base_weight": 7,
+        "asset_context": 1,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 8.4
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "trivy",
+          "rule_id": "secret"
+        }
+      ]
+    },
+    {
+      "id": "TK-9716b3",
+      "canonical_control": "TATAR-RBAC-002",
+      "resource": "clusterrole/too-powerful",
+      "namespace": "default",
+      "type": "rbac",
+      "category": "RBAC \u0026 Authorization",
+      "severity": "HIGH",
+      "original_severity": "HIGH",
+      "title": "Wildcard permissions in role",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/wildcard-rbac.yaml:2-10"
+        }
+      ],
+      "remediation": "Narrow permissions to specific resources/verbs.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 8.4,
+      "risk_factors": {
+        "base_weight": 7,
+        "asset_context": 1,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 8.4
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_49"
+        }
+      ]
+    },
+    {
+      "id": "TK-082fb3",
+      "canonical_control": "TATAR-CON-009",
+      "resource": "deployment/privileged-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Read-only root filesystem disabled",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/privileged.yaml:2-18"
+        }
+      ],
+      "remediation": "Set securityContext.readOnlyRootFilesystem=true.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 5.4,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 5.4
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_22"
+        }
+      ]
+    },
+    {
+      "id": "TK-2681ba",
+      "canonical_control": "TATAR-SEC-003",
+      "resource": "deployment/latest-app",
+      "namespace": "production",
+      "type": "secret",
+      "category": "Secret Management",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Service account token auto-mounted",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/latest-tag.yaml:2-16"
+        }
+      ],
+      "remediation": "Set automountServiceAccountToken=false.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 5.4,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 5.4
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_38"
+        }
+      ]
+    },
+    {
+      "id": "TK-270b9f",
+      "canonical_control": "TATAR-IMG-003",
+      "resource": "deployment/privileged-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Image Security",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Image uses :latest tag",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/privileged.yaml:2-18"
+        }
+      ],
+      "remediation": "Use a specific version (digest/tag).",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 5.4,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 5.4
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_43"
+        }
+      ]
+    },
+    {
+      "id": "TK-2a5ed4",
+      "canonical_control": "TATAR-SEC-003",
+      "resource": "deployment/host-ns-app",
+      "namespace": "production",
+      "type": "secret",
+      "category": "Secret Management",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Service account token auto-mounted",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/host-namespaces.yaml:2-19"
+        }
+      ],
+      "remediation": "Set automountServiceAccountToken=false.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 5.4,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 5.4
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_38"
+        }
+      ]
+    },
+    {
+      "id": "TK-45802d",
+      "canonical_control": "TATAR-OPS-003",
+      "resource": "service/orphan-svc",
+      "namespace": "production",
+      "type": "hygiene",
+      "category": "Operational Health",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Orphan / dead service (no endpoints)",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "popeye",
+          "detail": "No pods match service selector"
+        }
+      ],
+      "remediation": "Delete the service or fix its selector.",
+      "found_by": [
+        "popeye"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 5.4,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 5.4
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "popeye",
+          "rule_id": "POP-1102"
+        }
+      ]
+    },
+    {
+      "id": "TK-516c6d",
+      "canonical_control": "TATAR-CON-009",
+      "resource": "deployment/latest-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Read-only root filesystem disabled",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/latest-tag.yaml:2-16"
+        }
+      ],
+      "remediation": "Set securityContext.readOnlyRootFilesystem=true.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 5.4,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 5.4
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_22"
+        }
+      ]
+    },
+    {
+      "id": "TK-6139b2",
+      "canonical_control": "TATAR-IMG-003",
+      "resource": "deployment/secret-env-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Image Security",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Image uses :latest tag",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/secret-env.yaml:2-21"
+        }
+      ],
+      "remediation": "Use a specific version (digest/tag).",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 5.4,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 5.4
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_43"
+        }
+      ]
+    },
+    {
+      "id": "TK-6beef8",
+      "canonical_control": "TATAR-CON-009",
+      "resource": "deployment/secret-env-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Read-only root filesystem disabled",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/secret-env.yaml:2-21"
+        }
+      ],
+      "remediation": "Set securityContext.readOnlyRootFilesystem=true.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 5.4,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 5.4
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_22"
+        }
+      ]
+    },
+    {
+      "id": "TK-719563",
+      "canonical_control": "TATAR-CON-011",
+      "resource": "deployment/privileged-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Default seccomp profile not set",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/privileged.yaml:2-18"
+        }
+      ],
+      "remediation": "Set seccompProfile.type=RuntimeDefault.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 5.4,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 5.4
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_31"
+        }
+      ]
+    },
+    {
+      "id": "TK-7be77a",
+      "canonical_control": "TATAR-CON-002",
+      "resource": "deployment/privileged-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Container running as root",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/privileged.yaml:2-18"
+        }
+      ],
+      "remediation": "Set securityContext.runAsNonRoot=true.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 5.4,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 5.4
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_23"
+        }
+      ]
+    },
+    {
+      "id": "TK-7e89d4",
+      "canonical_control": "TATAR-CON-009",
+      "resource": "deployment/root-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Read-only root filesystem disabled",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/root-user.yaml:2-20"
+        }
+      ],
+      "remediation": "Set securityContext.readOnlyRootFilesystem=true.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 5.4,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 5.4
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_22"
+        }
+      ]
+    },
+    {
+      "id": "TK-814cb7",
+      "canonical_control": "TATAR-CON-002",
+      "resource": "deployment/host-ns-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Container running as root",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/host-namespaces.yaml:2-19"
+        }
+      ],
+      "remediation": "Set securityContext.runAsNonRoot=true.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 5.4,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 5.4
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_23"
+        }
+      ]
+    },
+    {
+      "id": "TK-839459",
+      "canonical_control": "TATAR-CON-011",
+      "resource": "deployment/latest-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Default seccomp profile not set",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/latest-tag.yaml:2-16"
+        }
+      ],
+      "remediation": "Set seccompProfile.type=RuntimeDefault.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 5.4,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 5.4
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_31"
+        }
+      ]
+    },
+    {
+      "id": "TK-87988c",
+      "canonical_control": "TATAR-CON-002",
+      "resource": "deployment/root-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Container running as root",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/root-user.yaml:2-20"
+        }
+      ],
+      "remediation": "Set securityContext.runAsNonRoot=true.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 5.4,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 5.4
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_23"
+        }
+      ]
+    },
+    {
+      "id": "TK-8b4244",
+      "canonical_control": "TATAR-CON-002",
+      "resource": "deployment/api",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Container running as root",
+      "description": "Container runs as root.",
+      "evidence": [
+        {
+          "scanner": "trivy",
+          "path": "spec.template.spec.containers[0].securityContext.runAsNonRoot"
+        }
+      ],
+      "remediation": "Set securityContext.runAsNonRoot=true.",
+      "found_by": [
+        "trivy"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 5.4,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 5.4
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "trivy",
+          "rule_id": "AVD-KSV0012"
+        }
+      ]
+    },
+    {
+      "id": "TK-8ee9df",
+      "canonical_control": "TATAR-CON-011",
+      "resource": "deployment/secret-env-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Default seccomp profile not set",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/secret-env.yaml:2-21"
+        }
+      ],
+      "remediation": "Set seccompProfile.type=RuntimeDefault.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 5.4,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 5.4
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_31"
+        }
+      ]
+    },
+    {
+      "id": "TK-a5de8c",
+      "canonical_control": "TATAR-IMG-003",
+      "resource": "deployment/latest-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Image Security",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Image uses :latest tag",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/latest-tag.yaml:2-16"
+        }
+      ],
+      "remediation": "Use a specific version (digest/tag).",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 5.4,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 5.4
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_43"
+        }
+      ]
+    },
+    {
+      "id": "TK-a87376",
+      "canonical_control": "TATAR-SEC-003",
+      "resource": "deployment/root-app",
+      "namespace": "production",
+      "type": "secret",
+      "category": "Secret Management",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Service account token auto-mounted",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/root-user.yaml:2-20"
+        }
+      ],
+      "remediation": "Set automountServiceAccountToken=false.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 5.4,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 5.4
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_38"
+        }
+      ]
+    },
+    {
+      "id": "TK-a9ae78",
+      "canonical_control": "TATAR-CON-011",
+      "resource": "deployment/host-ns-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Default seccomp profile not set",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/host-namespaces.yaml:2-19"
+        }
+      ],
+      "remediation": "Set seccompProfile.type=RuntimeDefault.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 5.4,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 5.4
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_31"
+        }
+      ]
+    },
+    {
+      "id": "TK-b856db",
+      "canonical_control": "TATAR-SEC-003",
+      "resource": "deployment/privileged-app",
+      "namespace": "production",
+      "type": "secret",
+      "category": "Secret Management",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Service account token auto-mounted",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/privileged.yaml:2-18"
+        }
+      ],
+      "remediation": "Set automountServiceAccountToken=false.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 5.4,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 5.4
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_38"
+        }
+      ]
+    },
+    {
+      "id": "TK-bb3bbf",
+      "canonical_control": "TATAR-NET-001",
+      "resource": "deployment/api",
+      "namespace": "production",
+      "type": "network",
+      "category": "Network Security",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Missing NetworkPolicy",
+      "description": "",
+      "remediation": "Define a NetworkPolicy for each namespace.",
+      "found_by": [
+        "kubescape"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 5.4,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 5.4
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "kubescape",
+          "rule_id": "C-0260"
+        }
+      ]
+    },
+    {
+      "id": "TK-bd2b14",
+      "canonical_control": "TATAR-CON-011",
+      "resource": "deployment/root-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Default seccomp profile not set",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/root-user.yaml:2-20"
+        }
+      ],
+      "remediation": "Set seccompProfile.type=RuntimeDefault.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 5.4,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 5.4
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_31"
+        }
+      ]
+    },
+    {
+      "id": "TK-ca93ac",
+      "canonical_control": "TATAR-CON-009",
+      "resource": "deployment/host-ns-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Read-only root filesystem disabled",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/host-namespaces.yaml:2-19"
+        }
+      ],
+      "remediation": "Set securityContext.readOnlyRootFilesystem=true.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 5.4,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 5.4
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_22"
+        }
+      ]
+    },
+    {
+      "id": "TK-cd6234",
+      "canonical_control": "TATAR-IMG-003",
+      "resource": "deployment/host-ns-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Image Security",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Image uses :latest tag",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/host-namespaces.yaml:2-19"
+        }
+      ],
+      "remediation": "Use a specific version (digest/tag).",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 5.4,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 5.4
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_43"
+        }
+      ]
+    },
+    {
+      "id": "TK-d3601d",
+      "canonical_control": "TATAR-CON-002",
+      "resource": "deployment/latest-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Container running as root",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/latest-tag.yaml:2-16"
+        }
+      ],
+      "remediation": "Set securityContext.runAsNonRoot=true.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 5.4,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 5.4
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_23"
+        }
+      ]
+    },
+    {
+      "id": "TK-deeec9",
+      "canonical_control": "TATAR-SEC-003",
+      "resource": "deployment/secret-env-app",
+      "namespace": "production",
+      "type": "secret",
+      "category": "Secret Management",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Service account token auto-mounted",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/secret-env.yaml:2-21"
+        }
+      ],
+      "remediation": "Set automountServiceAccountToken=false.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 5.4,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 5.4
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_38"
+        }
+      ]
+    },
+    {
+      "id": "TK-eaf694",
+      "canonical_control": "TATAR-IMG-003",
+      "resource": "deployment/root-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Image Security",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Image uses :latest tag",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/root-user.yaml:2-20"
+        }
+      ],
+      "remediation": "Use a specific version (digest/tag).",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 5.4,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 5.4
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_43"
+        }
+      ]
+    },
+    {
+      "id": "TK-ee582c",
+      "canonical_control": "TATAR-CON-002",
+      "resource": "deployment/secret-env-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Container running as root",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/secret-env.yaml:2-21"
+        }
+      ],
+      "remediation": "Set securityContext.runAsNonRoot=true.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 5.4,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 5.4
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_23"
+        }
+      ]
+    },
+    {
+      "id": "TK-038d0c",
+      "canonical_control": "TATAR-OPS-005",
+      "resource": "deployment/root-app",
+      "namespace": "production",
+      "type": "hygiene",
+      "category": "Operational Health",
+      "severity": "LOW",
+      "original_severity": "LOW",
+      "title": "imagePullPolicy not set correctly",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/root-user.yaml:2-20"
+        }
+      ],
+      "remediation": "Set imagePullPolicy explicitly to IfNotPresent/Always.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 1.8,
+      "risk_factors": {
+        "base_weight": 1,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 1.8
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_15"
+        }
+      ]
+    },
+    {
+      "id": "TK-074f58",
+      "canonical_control": "TATAR-CON-010",
+      "resource": "deployment/secret-env-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "LOW",
+      "original_severity": "LOW",
+      "title": "Missing CPU/memory limits",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/secret-env.yaml:2-21"
+        }
+      ],
+      "remediation": "Set resources.limits.cpu and .memory.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 1.8,
+      "risk_factors": {
+        "base_weight": 1,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 1.8
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_10"
+        },
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_11"
+        }
+      ]
+    },
+    {
+      "id": "TK-0ae0b9",
+      "canonical_control": "TATAR-OPS-002",
+      "resource": "deployment/host-ns-app",
+      "namespace": "production",
+      "type": "hygiene",
+      "category": "Operational Health",
+      "severity": "LOW",
+      "original_severity": "LOW",
+      "title": "Missing liveness probe",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/host-namespaces.yaml:2-19"
+        }
+      ],
+      "remediation": "Add a livenessProbe.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 1.8,
+      "risk_factors": {
+        "base_weight": 1,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 1.8
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_8"
+        }
+      ]
+    },
+    {
+      "id": "TK-18ab67",
+      "canonical_control": "TATAR-OPS-001",
+      "resource": "deployment/secret-env-app",
+      "namespace": "production",
+      "type": "hygiene",
+      "category": "Operational Health",
+      "severity": "LOW",
+      "original_severity": "LOW",
+      "title": "Missing readiness probe",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/secret-env.yaml:2-21"
+        }
+      ],
+      "remediation": "Add a readinessProbe.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 1.8,
+      "risk_factors": {
+        "base_weight": 1,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 1.8
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_9"
+        }
+      ]
+    },
+    {
+      "id": "TK-237bab",
+      "canonical_control": "TATAR-OPS-002",
+      "resource": "deployment/secret-env-app",
+      "namespace": "production",
+      "type": "hygiene",
+      "category": "Operational Health",
+      "severity": "LOW",
+      "original_severity": "LOW",
+      "title": "Missing liveness probe",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/secret-env.yaml:2-21"
+        }
+      ],
+      "remediation": "Add a livenessProbe.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 1.8,
+      "risk_factors": {
+        "base_weight": 1,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 1.8
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_8"
+        }
+      ]
+    },
+    {
+      "id": "TK-2b7f65",
+      "canonical_control": "TATAR-OPS-001",
+      "resource": "deployment/privileged-app",
+      "namespace": "production",
+      "type": "hygiene",
+      "category": "Operational Health",
+      "severity": "LOW",
+      "original_severity": "LOW",
+      "title": "Missing readiness probe",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/privileged.yaml:2-18"
+        }
+      ],
+      "remediation": "Add a readinessProbe.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 1.8,
+      "risk_factors": {
+        "base_weight": 1,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 1.8
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_9"
+        }
+      ]
+    },
+    {
+      "id": "TK-497ef2",
+      "canonical_control": "TATAR-OPS-004",
+      "resource": "configmap/unused-cm",
+      "namespace": "production",
+      "type": "hygiene",
+      "category": "Operational Health",
+      "severity": "LOW",
+      "original_severity": "LOW",
+      "title": "Unused ConfigMap / Secret",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "popeye",
+          "detail": "Used? Unable to locate resource reference"
+        }
+      ],
+      "remediation": "Delete the unused object.",
+      "found_by": [
+        "popeye"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 1.8,
+      "risk_factors": {
+        "base_weight": 1,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 1.8
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "popeye",
+          "rule_id": "POP-400"
+        }
+      ]
+    },
+    {
+      "id": "TK-692c88",
+      "canonical_control": "TATAR-OPS-005",
+      "resource": "deployment/privileged-app",
+      "namespace": "production",
+      "type": "hygiene",
+      "category": "Operational Health",
+      "severity": "LOW",
+      "original_severity": "LOW",
+      "title": "imagePullPolicy not set correctly",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/privileged.yaml:2-18"
+        }
+      ],
+      "remediation": "Set imagePullPolicy explicitly to IfNotPresent/Always.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 1.8,
+      "risk_factors": {
+        "base_weight": 1,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 1.8
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_15"
+        }
+      ]
+    },
+    {
+      "id": "TK-721ece",
+      "canonical_control": "TATAR-CON-010",
+      "resource": "deployment/privileged-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "LOW",
+      "original_severity": "LOW",
+      "title": "Missing CPU/memory limits",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/privileged.yaml:2-18"
+        }
+      ],
+      "remediation": "Set resources.limits.cpu and .memory.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 1.8,
+      "risk_factors": {
+        "base_weight": 1,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 1.8
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_10"
+        },
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_11"
+        }
+      ]
+    },
+    {
+      "id": "TK-74c9df",
+      "canonical_control": "TATAR-OPS-002",
+      "resource": "deployment/privileged-app",
+      "namespace": "production",
+      "type": "hygiene",
+      "category": "Operational Health",
+      "severity": "LOW",
+      "original_severity": "LOW",
+      "title": "Missing liveness probe",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/privileged.yaml:2-18"
+        }
+      ],
+      "remediation": "Add a livenessProbe.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 1.8,
+      "risk_factors": {
+        "base_weight": 1,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 1.8
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_8"
+        }
+      ]
+    },
+    {
+      "id": "TK-9ee9a8",
+      "canonical_control": "TATAR-CON-010",
+      "resource": "deployment/root-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "LOW",
+      "original_severity": "LOW",
+      "title": "Missing CPU/memory limits",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/root-user.yaml:2-20"
+        }
+      ],
+      "remediation": "Set resources.limits.cpu and .memory.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 1.8,
+      "risk_factors": {
+        "base_weight": 1,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 1.8
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_10"
+        },
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_11"
+        }
+      ]
+    },
+    {
+      "id": "TK-ae88c4",
+      "canonical_control": "TATAR-OPS-005",
+      "resource": "deployment/host-ns-app",
+      "namespace": "production",
+      "type": "hygiene",
+      "category": "Operational Health",
+      "severity": "LOW",
+      "original_severity": "LOW",
+      "title": "imagePullPolicy not set correctly",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/host-namespaces.yaml:2-19"
+        }
+      ],
+      "remediation": "Set imagePullPolicy explicitly to IfNotPresent/Always.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 1.8,
+      "risk_factors": {
+        "base_weight": 1,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 1.8
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_15"
+        }
+      ]
+    },
+    {
+      "id": "TK-af8897",
+      "canonical_control": "TATAR-OPS-002",
+      "resource": "deployment/latest-app",
+      "namespace": "production",
+      "type": "hygiene",
+      "category": "Operational Health",
+      "severity": "LOW",
+      "original_severity": "LOW",
+      "title": "Missing liveness probe",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/latest-tag.yaml:2-16"
+        }
+      ],
+      "remediation": "Add a livenessProbe.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 1.8,
+      "risk_factors": {
+        "base_weight": 1,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 1.8
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_8"
+        }
+      ]
+    },
+    {
+      "id": "TK-b37a35",
+      "canonical_control": "TATAR-OPS-002",
+      "resource": "deployment/root-app",
+      "namespace": "production",
+      "type": "hygiene",
+      "category": "Operational Health",
+      "severity": "LOW",
+      "original_severity": "LOW",
+      "title": "Missing liveness probe",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/root-user.yaml:2-20"
+        }
+      ],
+      "remediation": "Add a livenessProbe.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 1.8,
+      "risk_factors": {
+        "base_weight": 1,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 1.8
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_8"
+        }
+      ]
+    },
+    {
+      "id": "TK-c4c3a4",
+      "canonical_control": "TATAR-OPS-001",
+      "resource": "deployment/latest-app",
+      "namespace": "production",
+      "type": "hygiene",
+      "category": "Operational Health",
+      "severity": "LOW",
+      "original_severity": "LOW",
+      "title": "Missing readiness probe",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/latest-tag.yaml:2-16"
+        }
+      ],
+      "remediation": "Add a readinessProbe.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 1.8,
+      "risk_factors": {
+        "base_weight": 1,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 1.8
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_9"
+        }
+      ]
+    },
+    {
+      "id": "TK-d677b8",
+      "canonical_control": "TATAR-OPS-001",
+      "resource": "deployment/host-ns-app",
+      "namespace": "production",
+      "type": "hygiene",
+      "category": "Operational Health",
+      "severity": "LOW",
+      "original_severity": "LOW",
+      "title": "Missing readiness probe",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/host-namespaces.yaml:2-19"
+        }
+      ],
+      "remediation": "Add a readinessProbe.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 1.8,
+      "risk_factors": {
+        "base_weight": 1,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 1.8
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_9"
+        }
+      ]
+    },
+    {
+      "id": "TK-d83cf4",
+      "canonical_control": "TATAR-CON-010",
+      "resource": "deployment/latest-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "LOW",
+      "original_severity": "LOW",
+      "title": "Missing CPU/memory limits",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/latest-tag.yaml:2-16"
+        }
+      ],
+      "remediation": "Set resources.limits.cpu and .memory.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 1.8,
+      "risk_factors": {
+        "base_weight": 1,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 1.8
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_10"
+        },
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_11"
+        }
+      ]
+    },
+    {
+      "id": "TK-da455b",
+      "canonical_control": "TATAR-OPS-005",
+      "resource": "pod/api-7d8",
+      "namespace": "production",
+      "type": "hygiene",
+      "category": "Operational Health",
+      "severity": "LOW",
+      "original_severity": "LOW",
+      "title": "imagePullPolicy not set correctly",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "popeye",
+          "detail": "No image tag/digest pinned; using latest is unwise"
+        }
+      ],
+      "remediation": "Set imagePullPolicy explicitly to IfNotPresent/Always.",
+      "found_by": [
+        "popeye"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 1.8,
+      "risk_factors": {
+        "base_weight": 1,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 1.8
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "popeye",
+          "rule_id": "POP-106"
+        }
+      ]
+    },
+    {
+      "id": "TK-e42455",
+      "canonical_control": "TATAR-OPS-005",
+      "resource": "deployment/secret-env-app",
+      "namespace": "production",
+      "type": "hygiene",
+      "category": "Operational Health",
+      "severity": "LOW",
+      "original_severity": "LOW",
+      "title": "imagePullPolicy not set correctly",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/secret-env.yaml:2-21"
+        }
+      ],
+      "remediation": "Set imagePullPolicy explicitly to IfNotPresent/Always.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 1.8,
+      "risk_factors": {
+        "base_weight": 1,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 1.8
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_15"
+        }
+      ]
+    },
+    {
+      "id": "TK-e674e7",
+      "canonical_control": "TATAR-CON-010",
+      "resource": "deployment/host-ns-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "LOW",
+      "original_severity": "LOW",
+      "title": "Missing CPU/memory limits",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/host-namespaces.yaml:2-19"
+        }
+      ],
+      "remediation": "Set resources.limits.cpu and .memory.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 1.8,
+      "risk_factors": {
+        "base_weight": 1,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 1.8
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_10"
+        },
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_11"
+        }
+      ]
+    },
+    {
+      "id": "TK-f46eb1",
+      "canonical_control": "TATAR-OPS-001",
+      "resource": "deployment/root-app",
+      "namespace": "production",
+      "type": "hygiene",
+      "category": "Operational Health",
+      "severity": "LOW",
+      "original_severity": "LOW",
+      "title": "Missing readiness probe",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/root-user.yaml:2-20"
+        }
+      ],
+      "remediation": "Add a readinessProbe.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 1.8,
+      "risk_factors": {
+        "base_weight": 1,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 1.8
+      },
+      "status": "OPEN",
+      "first_seen": "2026-08-27T15:01:35Z",
+      "last_seen": "2026-08-27T15:01:35Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_9"
+        }
+      ]
+    }
+  ]
+}

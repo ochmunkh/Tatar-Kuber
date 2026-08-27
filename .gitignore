@@ -3,6 +3,7 @@
 *.out
 ~/.tatar-kuber/
 scan-result.json
+!/examples/report/scan-result.json
 raw/
 *.pdf
 .DS_Store

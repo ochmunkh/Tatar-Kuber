@@ -38,6 +38,36 @@ de-duplicated view with confidence, evidence and remediation.
 
 ![TATAR-Kuber тайлан — Монгол](docs/img/report-mn.jpg)
 
+**See a real report without installing anything:** live example at
+**https://ochmunkh.github.io/Tatar-Kuber/** ([English](https://ochmunkh.github.io/Tatar-Kuber/report.html) ·
+[Монгол](https://ochmunkh.github.io/Tatar-Kuber/report-mn.html) ·
+[SARIF](https://ochmunkh.github.io/Tatar-Kuber/tatar-kuber.sarif)), or open the committed
+files in [`examples/report/`](examples/report).
+
+## Deduplication in action (`3 findings → 1`)
+
+Trivy, Kubescape and Checkov each flag the **same** privileged container on
+`deployment/api` — with three different rule IDs:
+
+```
+Trivy      AVD-KSV0017  Privileged container      Deployment/api
+Kubescape  C-0057       Privileged container      .../Deployment/production/api
+Checkov    CKV_K8S_16   Container ... privileged   Deployment.production.api
+```
+
+TATAR-Kuber merges them into **one** finding:
+
+```json
+{ "canonical_control": "TATAR-CON-001", "resource": "deployment/api",
+  "found_by": ["checkov", "kubescape", "trivy"], "confidence": "HIGH",
+  "raw_refs": [{"scanner":"checkov","rule_id":"CKV_K8S_16"},
+               {"scanner":"kubescape","rule_id":"C-0057"},
+               {"scanner":"trivy","rule_id":"AVD-KSV0017"}] }
+```
+
+One issue, three tools agreeing (→ HIGH confidence), original rule IDs preserved.
+Full walk-through: [`docs/dedup-example.md`](docs/dedup-example.md).
+
 ## Design principles
 
 - **Read-Only First** — never modifies the customer environment (`get` / `list` / `watch` only).
@@ -223,6 +253,36 @@ TATAR-Kuber нь **Trivy · Kubescape · Checkov · Popeye**-ийг ажиллу
 **англи эсвэл монгол** хэлээр. Инженер / auditor / CISO бүгд ойлгоно.
 
 **Зохиогч:** Enkhbat.O — Security Analyst
+
+### Давхардлыг арилгах жишээ (`3 finding → 1`)
+
+Trivy, Kubescape, Checkov гурав `deployment/api` дээрх **ижил** privileged контейнерыг
+гурван өөр rule ID-гаар илрүүлнэ:
+
+```
+Trivy      AVD-KSV0017  Privileged container      Deployment/api
+Kubescape  C-0057       Privileged container      .../Deployment/production/api
+Checkov    CKV_K8S_16   Container ... privileged   Deployment.production.api
+```
+
+TATAR-Kuber эдгээрийг **нэг** finding болгож нэгтгэнэ:
+
+```json
+{ "canonical_control": "TATAR-CON-001", "resource": "deployment/api",
+  "found_by": ["checkov", "kubescape", "trivy"], "confidence": "HIGH",
+  "raw_refs": [{"scanner":"checkov","rule_id":"CKV_K8S_16"},
+               {"scanner":"kubescape","rule_id":"C-0057"},
+               {"scanner":"trivy","rule_id":"AVD-KSV0017"}] }
+```
+
+Нэг асуудал, гурван багаж санал нийлсэн (→ HIGH итгэл), эх rule ID-ууд хадгалагдсан.
+Бүрэн тайлбар: [`docs/dedup-example.md`](docs/dedup-example.md).
+
+**Суулгалгүйгээр жинхэнэ тайлан үзэх:** амьд жишээ
+**https://ochmunkh.github.io/Tatar-Kuber/** ([Англи](https://ochmunkh.github.io/Tatar-Kuber/report.html) ·
+[Монгол](https://ochmunkh.github.io/Tatar-Kuber/report-mn.html) ·
+[SARIF](https://ochmunkh.github.io/Tatar-Kuber/tatar-kuber.sarif)), эсвэл
+[`examples/report/`](examples/report)-д commit хийсэн файлуудыг нээ.
 
 ### Гол зарчим
 
