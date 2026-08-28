@@ -382,7 +382,7 @@ tatar-kuber report --input out/scan-result.json -o html --out report.html
 
 ### Архитектур
 
-![TATAR-Kuber архитектур](docs/img/architecture.png)
+![TATAR-Kuber архитектур](docs/img/architecture-mn.png)
 
 ```
 эх сурвалж → scanner-ууд (зэрэг) → normalize → canonical + dedup → blind-shot → risk score → тайлан → CI gate
