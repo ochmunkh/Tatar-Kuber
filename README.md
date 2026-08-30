@@ -263,6 +263,13 @@ Contributions are welcome! 🎉 The cleanest first PR is a **new scanner adapter
 [CONTRIBUTING.md](CONTRIBUTING.md) and [`docs/03-Scanner-Adapter-Interface.md`](docs).
 Please keep `go test ./...` green and read the [Code of Conduct](CODE_OF_CONDUCT.md).
 
+## Contact
+
+**Author:** Enkhbat Oyunbayar — Security Analyst · Ulaanbaatar
+
+[![Facebook](https://img.shields.io/badge/Facebook-Enkhbat%20Oyunbayar-1877F2?logo=facebook&logoColor=white)](https://www.facebook.com/enkhbat.o/)
+[![GitHub](https://img.shields.io/badge/GitHub-ochmunkh-181717?logo=github&logoColor=white)](https://github.com/ochmunkh)
+
 ## License
 
 Open Core. Community CLI — Apache-2.0.
@@ -467,3 +474,10 @@ mapping + trending), v3 (тасралтгүй + dashboard): [**Замын зур
   `scan-result.json` болон HTML/SARIF тайланг нууц мэдээлэл гэж хандах.
 
 Эмзэг байдал олсон уу? GitHub-ын **Security → Report a vulnerability** (хаалттай мэдээлэл).
+
+### Холбоо барих
+
+**Зохиогч:** Enkhbat Oyunbayar — Security Analyst · Улаанбаатар
+
+[![Facebook](https://img.shields.io/badge/Facebook-Enkhbat%20Oyunbayar-1877F2?logo=facebook&logoColor=white)](https://www.facebook.com/enkhbat.o/)
+[![GitHub](https://img.shields.io/badge/GitHub-ochmunkh-181717?logo=github&logoColor=white)](https://github.com/ochmunkh)
