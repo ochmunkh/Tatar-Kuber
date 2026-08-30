@@ -18,6 +18,7 @@ func sample() finding.ScanResult {
 			ID: "TK-abc123", CanonicalControl: "TATAR-CON-001", Resource: "deployment/api",
 			Severity: finding.SeverityHigh, Title: "Privileged", FoundBy: []string{"trivy"},
 			RiskContribution: 10.5, RiskFactors: &finding.RiskFactors{BaseWeight: 7, AssetContext: 1.0, Exposure: 1.5, Confidence: 1.0, Contribution: 10.5},
+			Attack: []finding.AttackTechnique{{Technique: "T1611", Name: "Escape to Host", Tactic: "Privilege Escalation"}},
 		}},
 	}
 }
@@ -45,8 +46,11 @@ func TestRender_RoundTrip(t *testing.T) {
 		t.Errorf("risk_factors round-trip алдаа: %+v", back.Findings[0].RiskFactors)
 	}
 	// JSON түлхүүрүүд snake_case-ээр гарсан эсэх
+	if len(back.Findings[0].Attack) != 1 || back.Findings[0].Attack[0].Technique != "T1611" {
+		t.Errorf("attack round-trip алдаа: %+v", back.Findings[0].Attack)
+	}
 	raw := b.String()
-	for _, key := range []string{`"risk_breakdown"`, `"risk_factors"`, `"top_contributors"`, `"total_penalty"`, `"base_weight"`} {
+	for _, key := range []string{`"risk_breakdown"`, `"risk_factors"`, `"top_contributors"`, `"total_penalty"`, `"base_weight"`, `"attack"`, `"technique"`, `"tactic"`} {
 		if !bytes.Contains([]byte(raw), []byte(key)) {
 			t.Errorf("JSON-д %s түлхүүр алга", key)
 		}

@@ -82,12 +82,23 @@ type Finding struct {
 	BlindShotReason  string        `json:"blind_shot_reason,omitempty"`
 	RiskContribution float64       `json:"risk_contribution,omitempty"`
 	RiskFactors      *RiskFactors  `json:"risk_factors,omitempty"` // оноо яагаад ийм болсныг задлан харуулна
+	Attack           []AttackTechnique `json:"attack,omitempty"`   // энэ сул тал БОЛОМЖТОЙ БОЛГОДОГ MITRE ATT&CK техник(үүд)
 	Status           Status     `json:"status"`
 	Owner            string     `json:"owner,omitempty"`
 	FirstSeen        string     `json:"first_seen"`
 	LastSeen         string     `json:"last_seen"`
 	References       []string   `json:"references,omitempty"`
 	RawRefs          []RawRef   `json:"raw_refs,omitempty"`
+}
+
+// AttackTechnique — тухайн сул тал (misconfiguration) ямар MITRE ATT&CK for
+// Containers техникийг БОЛОМЖТОЙ БОЛГОДГИЙГ (enables) илэрхийлнэ. Энэ бол
+// "илрүүлсэн техник" биш — posture дахь эмзэг байдал халдлагыг хөнгөвчилдгийг
+// заана (Tatar-Triage-ийн detection-аас ялгаатай, зориудаар "may enable" хүрээтэй).
+type AttackTechnique struct {
+	Technique string `json:"technique" yaml:"technique"` // ж: T1611
+	Name      string `json:"name" yaml:"name"`           // ж: Escape to Host
+	Tactic    string `json:"tactic" yaml:"tactic"`       // ж: Privilege Escalation
 }
 
 // RiskFactors — finding-ийн risk_contribution-ыг үржүүлэгч тус бүрээр задалж

@@ -84,7 +84,8 @@ type labels struct {
 	Cluster, Mode, ExecSummary, TopRisks, Recommendations, NoRisks, ClusterInventory,
 	Findings, Severity, Control, Resource, Title, Evidence, Fix, FoundBy, Conf,
 	ScannerVersions, Schema, ResultHash, GeneratedBy, ScoringBands, References,
-	ScoreBreakdown, Formula, Penalty, HighPool, LowPool, Capped, FactorsHint string
+	ScoreBreakdown, Formula, Penalty, HighPool, LowPool, Capped, FactorsHint,
+	AttackExposure, MayEnable string
 }
 
 var labelsEN = labels{
@@ -98,6 +99,7 @@ var labelsEN = labels{
 	ScoreBreakdown: "Score breakdown", Formula: "Formula", Penalty: "Total penalty (P)",
 	HighPool: "Crit/High/Med", LowPool: "LOW pool", Capped: "capped",
 	FactorsHint: "base × context × exposure × confidence",
+	AttackExposure: "ATT&CK exposure — may enable", MayEnable: "may enable",
 }
 
 var labelsMN = labels{
@@ -111,6 +113,7 @@ var labelsMN = labels{
 	ScoreBreakdown: "Онооны задаргаа", Formula: "Томьёо", Penalty: "Нийт торгууль (P)",
 	HighPool: "Crit/High/Med", LowPool: "LOW сан", Capped: "хязгаарлав",
 	FactorsHint: "суурь × орчин × ил гарц × итгэл",
+	AttackExposure: "ATT&CK эрсдэл — боломжжуулна", MayEnable: "боломжжуулна",
 }
 
 func pickLabels(lang string) labels {
@@ -126,12 +129,19 @@ type topRisk struct {
 	Share float64
 }
 
+// attackTactic — MITRE ATT&CK tactic-ийн exposure (хэдэн finding боломжжуулна).
+type attackTactic struct {
+	Tactic string
+	Count  int
+}
+
 // view — тайлангийн загварт дамжуулах өгөгдөл (ScanResult + тооцоолсон хэсгүүд).
 type view struct {
 	finding.ScanResult
 	L               labels
 	TopRisks        []topRisk
 	Recommendations []string
+	AttackExposure  []attackTactic
 }
 
 // Render — ScanResult -> HTML dashboard.
@@ -166,6 +176,27 @@ func Render(w io.Writer, res finding.ScanResult) error {
 			seenRem[f.Remediation] = true
 			vm.Recommendations = append(vm.Recommendations, f.Remediation)
 		}
+	}
+
+	// ATT&CK tactic exposure: хэдэн finding тухайн tactic-ийг боломжжуулж байна.
+	tc := map[string]int{}
+	var tacticOrder []string
+	for _, f := range res.Findings {
+		for _, a := range f.Attack {
+			if _, ok := tc[a.Tactic]; !ok {
+				tacticOrder = append(tacticOrder, a.Tactic)
+			}
+			tc[a.Tactic]++
+		}
+	}
+	sort.SliceStable(tacticOrder, func(i, j int) bool {
+		if tc[tacticOrder[i]] != tc[tacticOrder[j]] {
+			return tc[tacticOrder[i]] > tc[tacticOrder[j]]
+		}
+		return tacticOrder[i] < tacticOrder[j]
+	})
+	for _, t := range tacticOrder {
+		vm.AttackExposure = append(vm.AttackExposure, attackTactic{Tactic: t, Count: tc[t]})
 	}
 	return tmpl.Execute(w, vm)
 }
@@ -216,6 +247,7 @@ const dashboard = `<!DOCTYPE html>
  .evv{color:#1F6F54}
  .fbb{display:inline-block;background:#2A4D69;color:#fff;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700;margin:1px 2px 1px 0;letter-spacing:.5px}
  .cmp{display:inline-block;background:#eef2f6;color:#42586b;border:1px solid #d5dee6;border-radius:4px;padding:0 5px;font-size:10px;margin:1px 2px 0 0}
+ .atk{display:inline-block;background:#4a2c6f;color:#fff;border-radius:4px;padding:0 5px;font-size:10px;font-weight:700;margin:1px 2px 0 0}
  .ref{font-size:11px;color:#1a6fb5;text-decoration:none}
  .ref:hover{text-decoration:underline}
  .refs{margin-top:4px}
@@ -271,6 +303,14 @@ const dashboard = `<!DOCTYPE html>
    </div>
   </div>
   {{end}}
+  {{if .AttackExposure}}
+  <div class="col">
+   <h3>{{$.L.AttackExposure}}</h3>
+   <div class="bd">
+    {{range .AttackExposure}}<div class="bdrow"><span>{{.Tactic}}</span><b>{{.Count}}</b></div>{{end}}
+   </div>
+  </div>
+  {{end}}
  </div>
 
 {{if .Metadata.Inventory}}
@@ -287,7 +327,7 @@ const dashboard = `<!DOCTYPE html>
   {{range .Findings}}
    <tr>
     <td><span class="badge {{if eq (printf "%s" .Severity) "CRITICAL"}}bC{{else if eq (printf "%s" .Severity) "HIGH"}}bH{{else if eq (printf "%s" .Severity) "MEDIUM"}}bM{{else if eq (printf "%s" .Severity) "LOW"}}bL{{else}}bI{{end}}">{{.Severity}}</span>{{if .BlindShot}} <span class="bs">blind</span>{{end}}</td>
-    <td>{{.CanonicalControl}}<br><span class="cc">{{.Category}}</span>{{with refCodes .References}}<br>{{range .}}<span class="cmp">{{.}}</span>{{end}}{{end}}</td>
+    <td>{{.CanonicalControl}}<br><span class="cc">{{.Category}}</span>{{with refCodes .References}}<br>{{range .}}<span class="cmp">{{.}}</span>{{end}}{{end}}{{if .Attack}}<br>{{range .Attack}}<span class="atk" title="{{.Name}} · {{.Tactic}} ({{$.L.MayEnable}})">⚔ {{.Technique}}</span>{{end}}{{end}}</td>
     <td>{{if .Namespace}}{{.Namespace}}/{{end}}{{.Resource}}</td>
     <td>{{.Title}}{{if .BlindShot}}<br><span class="fb">{{.BlindShotReason}}</span>{{end}}{{with refURLs .References}}<div class="refs"><span class="refhdr">{{$.L.References}}</span>{{range .}}<div class="refrow">• <a class="ref" href="{{.}}" target="_blank" rel="noopener">{{linkLabel .}}</a></div>{{end}}</div>{{end}}</td>
     <td class="ev">{{if .Evidence}}{{range .Evidence}}<div class="evrow"><span class="evs">{{.Scanner}}</span> {{if .Path}}<code>{{.Path}}</code>{{end}}{{if .Detail}}{{.Detail}}{{end}}{{if .Value}} <span class="evv">({{.Value}})</span>{{end}}</div>{{end}}{{else}}—{{end}}</td>

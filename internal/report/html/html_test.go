@@ -15,7 +15,7 @@ func TestRender_HTML(t *testing.T) {
 		Summary: finding.Summary{Counts: map[finding.Severity]int{finding.SeverityHigh: 1}, RiskScore: 78, RiskBand: "Good", TotalFindings: 1,
 			RiskBreakdown: &finding.RiskBreakdown{TotalPenalty: 12.6, HighPenalty: 12.6, LowPenaltyRaw: 0, LowPenaltyCapped: 0, LowPoolCap: 10, Scale: 100, Formula: "100 / (1 + P/K)",
 				TopContributors: []finding.TopContributor{{ID: "f1", CanonicalControl: "TATAR-CON-001", Resource: "deployment/api", Severity: finding.SeverityHigh, Contribution: 12.6, Share: 100}}}},
-		Findings: []finding.Finding{{ID: "f1", CanonicalControl: "TATAR-CON-001", Resource: "deployment/api", Namespace: "production", Severity: finding.SeverityHigh, Title: "Privileged container", RiskContribution: 12.6, RiskFactors: &finding.RiskFactors{BaseWeight: 7, AssetContext: 1.5, Exposure: 1.0, Confidence: 1.2, Contribution: 12.6}, References: []string{"CIS-5.2.5", "MITRE-T1611", "https://avd.aquasec.com/misconfig/ksv017"}, Evidence: []finding.Evidence{{Scanner: "kubescape", Path: "spec.template.spec.containers[0].securityContext.privileged", Value: "зөвлөмж: false"}}, Remediation: "securityContext.privileged=false болгоно", FoundBy: []string{"trivy", "kubescape"}, Confidence: finding.ConfidenceHigh}},
+		Findings: []finding.Finding{{ID: "f1", CanonicalControl: "TATAR-CON-001", Resource: "deployment/api", Namespace: "production", Severity: finding.SeverityHigh, Title: "Privileged container", RiskContribution: 12.6, RiskFactors: &finding.RiskFactors{BaseWeight: 7, AssetContext: 1.5, Exposure: 1.0, Confidence: 1.2, Contribution: 12.6}, Attack: []finding.AttackTechnique{{Technique: "T1611", Name: "Escape to Host", Tactic: "Privilege Escalation"}}, References: []string{"CIS-5.2.5", "MITRE-T1611", "https://avd.aquasec.com/misconfig/ksv017"}, Evidence: []finding.Evidence{{Scanner: "kubescape", Path: "spec.template.spec.containers[0].securityContext.privileged", Value: "зөвлөмж: false"}}, Remediation: "securityContext.privileged=false болгоно", FoundBy: []string{"trivy", "kubescape"}, Confidence: finding.ConfidenceHigh}},
 	}
 	var b bytes.Buffer
 	if err := Render(&b, res); err != nil {
@@ -37,6 +37,9 @@ func TestRender_HTML(t *testing.T) {
 		"100/(1+P/100)",     // formula with scale
 		"7 × 1.5 × 1 × 1.2", // factor breakdown of the top risk
 		"(100%)",            // score share of the top contributor
+		"T1611",             // MITRE ATT&CK technique badge
+		"Escape to Host",    // technique name (badge tooltip)
+		"class=\"atk\"",     // ATT&CK badge styling present
 	} {
 		if !strings.Contains(s, want) {
 			t.Errorf("HTML-д %q алга", want)

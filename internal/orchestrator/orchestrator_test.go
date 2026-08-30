@@ -91,6 +91,21 @@ func TestPipeline_EndToEnd(t *testing.T) {
 		t.Errorf("CON-001 evidence=%d ширхэг, олон scanner-ийн нотолгоо нэгдсэн байх ёстой", len(priv.Evidence))
 	}
 
+	// MITRE ATT&CK: privileged control (CON-001) нь T1611-ийг боломжжуулна ("may enable")
+	var hasAttack bool
+	for _, f := range res.Findings {
+		if f.CanonicalControl == "TATAR-CON-001" {
+			for _, a := range f.Attack {
+				if a.Technique == "T1611" && a.Tactic == "Privilege Escalation" {
+					hasAttack = true
+				}
+			}
+		}
+	}
+	if !hasAttack {
+		t.Error("TATAR-CON-001 дээр MITRE T1611 (Escape to Host) attack харгалзуулалт алга")
+	}
+
 	// summary + score
 	if res.Summary.TotalFindings == 0 {
 		t.Error("total findings = 0")

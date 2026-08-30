@@ -34,6 +34,10 @@ controls:
   references:
   - CIS-5.2.1
   - MITRE-T1611
+  attack:
+    - technique: T1611
+      name: Escape to Host
+      tactic: Privilege Escalation
   mappings:
     trivy:
     - AVD-KSV0017
@@ -83,6 +87,10 @@ controls:
     mn: securityContext.allowPrivilegeEscalation=false.
   references:
   - CIS-5.2.5
+  attack:
+    - technique: T1611
+      name: Escape to Host
+      tactic: Privilege Escalation
   mappings:
     trivy:
     - AVD-KSV0001
@@ -128,6 +136,10 @@ controls:
     mn: hostPID=false.
   references:
   - CIS-5.2.2
+  attack:
+    - technique: T1611
+      name: Escape to Host
+      tactic: Privilege Escalation
   mappings:
     trivy:
     - AVD-KSV0010
@@ -150,6 +162,10 @@ controls:
     mn: hostNetwork=false.
   references:
   - CIS-5.2.4
+  attack:
+    - technique: T1611
+      name: Escape to Host
+      tactic: Privilege Escalation
   mappings:
     trivy:
     - AVD-KSV0009
@@ -284,6 +300,10 @@ controls:
   references:
   - CIS-5.1.1
   - MITRE-T1078
+  attack:
+    - technique: T1078
+      name: Valid Accounts
+      tactic: Privilege Escalation
   mappings:
     trivy: []
     kubescape:
@@ -304,6 +324,10 @@ controls:
     mn: Эрхийг тодорхой resource/verb болгож нарийсгана.
   references:
   - CIS-5.1.3
+  attack:
+    - technique: T1078
+      name: Valid Accounts
+      tactic: Privilege Escalation
   mappings:
     trivy: []
     kubescape:
@@ -388,6 +412,10 @@ controls:
     mn: Namespace бүрт NetworkPolicy тодорхойлно.
   references:
   - CIS-5.3.2
+  attack:
+    - technique: T1046
+      name: Network Service Discovery
+      tactic: Discovery
   mappings:
     trivy:
     - AVD-KSV0038
@@ -509,6 +537,10 @@ controls:
     mn: Тодорхой хувилбар (digest/tag) ашиглана.
   references:
   - CIS-5.7.4
+  attack:
+    - technique: T1525
+      name: Implant Internal Image
+      tactic: Persistence
   mappings:
     trivy:
     - AVD-KSV0013
@@ -551,6 +583,10 @@ controls:
     mn: Kubernetes Secret + volume mount ашиглана.
   references:
   - CIS-5.4.1
+  attack:
+    - technique: T1552.007
+      name: "Unsecured Credentials: Container API"
+      tactic: Credential Access
   mappings:
     trivy:
     - secret
@@ -592,6 +628,10 @@ controls:
     mn: automountServiceAccountToken=false.
   references:
   - CIS-5.1.6
+  attack:
+    - technique: T1528
+      name: Steal Application Access Token
+      tactic: Credential Access
   mappings:
     trivy:
     - AVD-KSV0036

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/ochmunkh/tatar-kuber/internal/finding"
 	"gopkg.in/yaml.v3"
 )
 
@@ -47,6 +48,7 @@ type Control struct {
 	Description     string              `yaml:"description"`
 	Remediation     I18n                `yaml:"remediation"`
 	References      []string            `yaml:"references"`
+	Attack          []finding.AttackTechnique `yaml:"attack,omitempty"` // энэ control БОЛОМЖТОЙ БОЛГОХ MITRE ATT&CK техник(үүд)
 	Mappings        map[string][]string `yaml:"mappings"` // scanner -> rule IDs
 	BlindShotRules  []BlindShotRule     `yaml:"blind_shot_rules"`
 	SupersededBy    string              `yaml:"superseded_by,omitempty"`

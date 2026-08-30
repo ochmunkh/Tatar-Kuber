@@ -44,6 +44,7 @@
  .evv{color:#1F6F54}
  .fbb{display:inline-block;background:#2A4D69;color:#fff;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700;margin:1px 2px 1px 0;letter-spacing:.5px}
  .cmp{display:inline-block;background:#eef2f6;color:#42586b;border:1px solid #d5dee6;border-radius:4px;padding:0 5px;font-size:10px;margin:1px 2px 0 0}
+ .atk{display:inline-block;background:#4a2c6f;color:#fff;border-radius:4px;padding:0 5px;font-size:10px;font-weight:700;margin:1px 2px 0 0}
  .ref{font-size:11px;color:#1a6fb5;text-decoration:none}
  .ref:hover{text-decoration:underline}
  .refs{margin-top:4px}
@@ -58,7 +59,7 @@
 <body>
 <header>
  <h1>TATAR-Kuber Security Report</h1>
- <div class="sub">Кластер: demo-prod · Горим: remote · 2026-08-27T15:01:55Z</div>
+ <div class="sub">Кластер: demo-prod · Горим: remote · 2026-08-30T13:03:46Z</div>
 </header>
 <div class="wrap">
 
@@ -99,6 +100,14 @@
    </div>
   </div>
   
+  
+  <div class="col">
+   <h3>ATT&amp;CK эрсдэл — боломжжуулна</h3>
+   <div class="bd">
+    <div class="bdrow"><span>Privilege Escalation</span><b>11</b></div><div class="bdrow"><span>Credential Access</span><b>6</b></div><div class="bdrow"><span>Persistence</span><b>5</b></div><div class="bdrow"><span>Discovery</span><b>1</b></div>
+   </div>
+  </div>
+  
  </div>
 
 
@@ -126,7 +135,7 @@
   
    <tr>
     <td><span class="badge bC">CRITICAL</span></td>
-    <td>TATAR-RBAC-001<br><span class="cc">RBAC &amp; Authorization</span></td>
+    <td>TATAR-RBAC-001<br><span class="cc">RBAC &amp; Authorization</span><br><span class="atk" title="Valid Accounts · Privilege Escalation (боломжжуулна)">⚔ T1078</span></td>
     <td>clusterrolebinding/admin-bind</td>
     <td>cluster-admin эрхийг хэт олгосон</td>
     <td class="ev">—</td>
@@ -137,7 +146,7 @@
   
    <tr>
     <td><span class="badge bH">HIGH</span></td>
-    <td>TATAR-CON-003<br><span class="cc">Container Security</span></td>
+    <td>TATAR-CON-003<br><span class="cc">Container Security</span><br><span class="atk" title="Escape to Host · Privilege Escalation (боломжжуулна)">⚔ T1611</span></td>
     <td>production/deployment/root-app</td>
     <td>Эрх өсгөлтийг зөвшөөрсөн</td>
     <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/root-user.yaml:2-20</code></div></td>
@@ -148,7 +157,7 @@
   
    <tr>
     <td><span class="badge bH">HIGH</span></td>
-    <td>TATAR-CON-001<br><span class="cc">Container Security</span></td>
+    <td>TATAR-CON-001<br><span class="cc">Container Security</span><br><span class="atk" title="Escape to Host · Privilege Escalation (боломжжуулна)">⚔ T1611</span></td>
     <td>production/deployment/privileged-app</td>
     <td>Эрх нэмэгдүүлсэн (privileged) контейнер</td>
     <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/privileged.yaml:2-18</code></div></td>
@@ -159,7 +168,7 @@
   
    <tr>
     <td><span class="badge bH">HIGH</span></td>
-    <td>TATAR-CON-006<br><span class="cc">Container Security</span></td>
+    <td>TATAR-CON-006<br><span class="cc">Container Security</span><br><span class="atk" title="Escape to Host · Privilege Escalation (боломжжуулна)">⚔ T1611</span></td>
     <td>production/deployment/host-ns-app</td>
     <td>Host сүлжээ идэвхжсэн</td>
     <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/host-namespaces.yaml:2-19</code></div></td>
@@ -181,7 +190,7 @@
   
    <tr>
     <td><span class="badge bH">HIGH</span></td>
-    <td>TATAR-CON-003<br><span class="cc">Container Security</span></td>
+    <td>TATAR-CON-003<br><span class="cc">Container Security</span><br><span class="atk" title="Escape to Host · Privilege Escalation (боломжжуулна)">⚔ T1611</span></td>
     <td>production/deployment/latest-app</td>
     <td>Эрх өсгөлтийг зөвшөөрсөн</td>
     <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/latest-tag.yaml:2-16</code></div></td>
@@ -192,7 +201,7 @@
   
    <tr>
     <td><span class="badge bH">HIGH</span></td>
-    <td>TATAR-CON-003<br><span class="cc">Container Security</span></td>
+    <td>TATAR-CON-003<br><span class="cc">Container Security</span><br><span class="atk" title="Escape to Host · Privilege Escalation (боломжжуулна)">⚔ T1611</span></td>
     <td>production/deployment/privileged-app</td>
     <td>Эрх өсгөлтийг зөвшөөрсөн</td>
     <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/privileged.yaml:2-18</code></div></td>
@@ -203,7 +212,7 @@
   
    <tr>
     <td><span class="badge bH">HIGH</span></td>
-    <td>TATAR-CON-003<br><span class="cc">Container Security</span></td>
+    <td>TATAR-CON-003<br><span class="cc">Container Security</span><br><span class="atk" title="Escape to Host · Privilege Escalation (боломжжуулна)">⚔ T1611</span></td>
     <td>production/deployment/secret-env-app</td>
     <td>Эрх өсгөлтийг зөвшөөрсөн</td>
     <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/secret-env.yaml:2-21</code></div></td>
@@ -214,7 +223,7 @@
   
    <tr>
     <td><span class="badge bH">HIGH</span></td>
-    <td>TATAR-CON-001<br><span class="cc">Container Security</span></td>
+    <td>TATAR-CON-001<br><span class="cc">Container Security</span><br><span class="atk" title="Escape to Host · Privilege Escalation (боломжжуулна)">⚔ T1611</span></td>
     <td>production/deployment/api</td>
     <td>Эрх нэмэгдүүлсэн (privileged) контейнер<div class="refs"><span class="refhdr">Эх сурвалж</span><div class="refrow">• <a class="ref" href="https://avd.aquasec.com/misconfig/ksv017" target="_blank" rel="noopener">Trivy Advisory</a></div><div class="refrow">• <a class="ref" href="https://docs.prismacloud.io/en/enterprise-edition/policy-reference/kubernetes-policies/kubernetes-policy-index/bc-k8s-15" target="_blank" rel="noopener">docs.prismacloud.io</a></div></div></td>
     <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/api.yaml:1-22</code></div><div class="evrow"><span class="evs">trivy</span> <code>spec.template.spec.containers[0].securityContext.privileged</code></div></td>
@@ -225,7 +234,7 @@
   
    <tr>
     <td><span class="badge bH">HIGH</span></td>
-    <td>TATAR-CON-003<br><span class="cc">Container Security</span></td>
+    <td>TATAR-CON-003<br><span class="cc">Container Security</span><br><span class="atk" title="Escape to Host · Privilege Escalation (боломжжуулна)">⚔ T1611</span></td>
     <td>production/deployment/host-ns-app</td>
     <td>Эрх өсгөлтийг зөвшөөрсөн</td>
     <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/host-namespaces.yaml:2-19</code></div></td>
@@ -236,7 +245,7 @@
   
    <tr>
     <td><span class="badge bH">HIGH</span></td>
-    <td>TATAR-CON-005<br><span class="cc">Container Security</span></td>
+    <td>TATAR-CON-005<br><span class="cc">Container Security</span><br><span class="atk" title="Escape to Host · Privilege Escalation (боломжжуулна)">⚔ T1611</span></td>
     <td>production/deployment/host-ns-app</td>
     <td>Host PID namespace хуваалцсан</td>
     <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/host-namespaces.yaml:2-19</code></div></td>
@@ -247,7 +256,7 @@
   
    <tr>
     <td><span class="badge bH">HIGH</span></td>
-    <td>TATAR-SEC-001<br><span class="cc">Secret Management</span></td>
+    <td>TATAR-SEC-001<br><span class="cc">Secret Management</span><br><span class="atk" title="Unsecured Credentials: Container API · Credential Access (боломжжуулна)">⚔ T1552.007</span></td>
     <td>default/pod/worker</td>
     <td>Env хувьсагчид ил гарсан secret</td>
     <td class="ev"><div class="evrow"><span class="evs">trivy</span> env: AWS_ACCESS_KEY_ID=AKIA********</div></td>
@@ -258,7 +267,7 @@
   
    <tr>
     <td><span class="badge bH">HIGH</span></td>
-    <td>TATAR-RBAC-002<br><span class="cc">RBAC &amp; Authorization</span></td>
+    <td>TATAR-RBAC-002<br><span class="cc">RBAC &amp; Authorization</span><br><span class="atk" title="Valid Accounts · Privilege Escalation (боломжжуулна)">⚔ T1078</span></td>
     <td>default/clusterrole/too-powerful</td>
     <td>Role дахь wildcard эрх</td>
     <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/wildcard-rbac.yaml:2-10</code></div></td>
@@ -280,7 +289,7 @@
   
    <tr>
     <td><span class="badge bM">MEDIUM</span></td>
-    <td>TATAR-SEC-003<br><span class="cc">Secret Management</span></td>
+    <td>TATAR-SEC-003<br><span class="cc">Secret Management</span><br><span class="atk" title="Steal Application Access Token · Credential Access (боломжжуулна)">⚔ T1528</span></td>
     <td>production/deployment/latest-app</td>
     <td>SA token автоматаар холбогдсон</td>
     <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/latest-tag.yaml:2-16</code></div></td>
@@ -291,7 +300,7 @@
   
    <tr>
     <td><span class="badge bM">MEDIUM</span></td>
-    <td>TATAR-IMG-003<br><span class="cc">Image Security</span></td>
+    <td>TATAR-IMG-003<br><span class="cc">Image Security</span><br><span class="atk" title="Implant Internal Image · Persistence (боломжжуулна)">⚔ T1525</span></td>
     <td>production/deployment/privileged-app</td>
     <td>Image :latest tag ашигласан</td>
     <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/privileged.yaml:2-18</code></div></td>
@@ -302,7 +311,7 @@
   
    <tr>
     <td><span class="badge bM">MEDIUM</span></td>
-    <td>TATAR-SEC-003<br><span class="cc">Secret Management</span></td>
+    <td>TATAR-SEC-003<br><span class="cc">Secret Management</span><br><span class="atk" title="Steal Application Access Token · Credential Access (боломжжуулна)">⚔ T1528</span></td>
     <td>production/deployment/host-ns-app</td>
     <td>SA token автоматаар холбогдсон</td>
     <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/host-namespaces.yaml:2-19</code></div></td>
@@ -335,7 +344,7 @@
   
    <tr>
     <td><span class="badge bM">MEDIUM</span></td>
-    <td>TATAR-IMG-003<br><span class="cc">Image Security</span></td>
+    <td>TATAR-IMG-003<br><span class="cc">Image Security</span><br><span class="atk" title="Implant Internal Image · Persistence (боломжжуулна)">⚔ T1525</span></td>
     <td>production/deployment/secret-env-app</td>
     <td>Image :latest tag ашигласан</td>
     <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/secret-env.yaml:2-21</code></div></td>
@@ -445,7 +454,7 @@
   
    <tr>
     <td><span class="badge bM">MEDIUM</span></td>
-    <td>TATAR-IMG-003<br><span class="cc">Image Security</span></td>
+    <td>TATAR-IMG-003<br><span class="cc">Image Security</span><br><span class="atk" title="Implant Internal Image · Persistence (боломжжуулна)">⚔ T1525</span></td>
     <td>production/deployment/latest-app</td>
     <td>Image :latest tag ашигласан</td>
     <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/latest-tag.yaml:2-16</code></div></td>
@@ -456,7 +465,7 @@
   
    <tr>
     <td><span class="badge bM">MEDIUM</span></td>
-    <td>TATAR-SEC-003<br><span class="cc">Secret Management</span></td>
+    <td>TATAR-SEC-003<br><span class="cc">Secret Management</span><br><span class="atk" title="Steal Application Access Token · Credential Access (боломжжуулна)">⚔ T1528</span></td>
     <td>production/deployment/root-app</td>
     <td>SA token автоматаар холбогдсон</td>
     <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/root-user.yaml:2-20</code></div></td>
@@ -478,7 +487,7 @@
   
    <tr>
     <td><span class="badge bM">MEDIUM</span></td>
-    <td>TATAR-SEC-003<br><span class="cc">Secret Management</span></td>
+    <td>TATAR-SEC-003<br><span class="cc">Secret Management</span><br><span class="atk" title="Steal Application Access Token · Credential Access (боломжжуулна)">⚔ T1528</span></td>
     <td>production/deployment/privileged-app</td>
     <td>SA token автоматаар холбогдсон</td>
     <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/privileged.yaml:2-18</code></div></td>
@@ -489,7 +498,7 @@
   
    <tr>
     <td><span class="badge bM">MEDIUM</span></td>
-    <td>TATAR-NET-001<br><span class="cc">Network Security</span></td>
+    <td>TATAR-NET-001<br><span class="cc">Network Security</span><br><span class="atk" title="Network Service Discovery · Discovery (боломжжуулна)">⚔ T1046</span></td>
     <td>production/deployment/api</td>
     <td>NetworkPolicy дутуу</td>
     <td class="ev">—</td>
@@ -522,7 +531,7 @@
   
    <tr>
     <td><span class="badge bM">MEDIUM</span></td>
-    <td>TATAR-IMG-003<br><span class="cc">Image Security</span></td>
+    <td>TATAR-IMG-003<br><span class="cc">Image Security</span><br><span class="atk" title="Implant Internal Image · Persistence (боломжжуулна)">⚔ T1525</span></td>
     <td>production/deployment/host-ns-app</td>
     <td>Image :latest tag ашигласан</td>
     <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/host-namespaces.yaml:2-19</code></div></td>
@@ -544,7 +553,7 @@
   
    <tr>
     <td><span class="badge bM">MEDIUM</span></td>
-    <td>TATAR-SEC-003<br><span class="cc">Secret Management</span></td>
+    <td>TATAR-SEC-003<br><span class="cc">Secret Management</span><br><span class="atk" title="Steal Application Access Token · Credential Access (боломжжуулна)">⚔ T1528</span></td>
     <td>production/deployment/secret-env-app</td>
     <td>SA token автоматаар холбогдсон</td>
     <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/secret-env.yaml:2-21</code></div></td>
@@ -555,7 +564,7 @@
   
    <tr>
     <td><span class="badge bM">MEDIUM</span></td>
-    <td>TATAR-IMG-003<br><span class="cc">Image Security</span></td>
+    <td>TATAR-IMG-003<br><span class="cc">Image Security</span><br><span class="atk" title="Implant Internal Image · Persistence (боломжжуулна)">⚔ T1525</span></td>
     <td>production/deployment/root-app</td>
     <td>Image :latest tag ашигласан</td>
     <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/root-user.yaml:2-20</code></div></td>

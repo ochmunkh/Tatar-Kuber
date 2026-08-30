@@ -96,6 +96,7 @@ Full walk-through: [`docs/dedup-example.md`](docs/dedup-example.md).
 - **Confidence engine** — multi-scanner agreement and check determinism (a Trivy-only CVE is still HIGH)
 - **Blind-shot engine** — context-aware severity down-grade (never suppresses; stays visible)
 - **Explainable risk scoring v1.2.1** — per-finding `risk_factors` (base × context × exposure × confidence) + a cluster `risk_breakdown` with formula and top contributors
+- **MITRE ATT&CK for Containers** — findings map to the adversary techniques they *may enable* (e.g. privileged container → T1611 Escape to Host), with a per-tactic **ATT&CK exposure** summary. Framed as exposure, **not** detection — see [`docs/MITRE_ATTACK.md`](docs/MITRE_ATTACK.md)
 - **CI/CD gatekeeper** — `.tatar-kuber.yaml` policy (`fail_on`, `min_score`, `suppress` with expiry) + `gate` command + GitHub Action + SARIF upload to Code Scanning
 - **Reports** — JSON · SARIF 2.1.0 (GitHub/GitLab/Azure) · HTML dashboard (bilingual)
 - **verify-lab** — regression check against an expected-findings baseline
@@ -343,6 +344,7 @@ TATAR-Kuber эдгээрийг **нэг** finding болгож нэгтгэнэ:
 - **Confidence engine** — олон scanner-ийн санал нийлэлт + determinism (Trivy ганц CVE ч HIGH)
 - **Blind-shot engine** — контекстээр severity бууруулна (устгахгүй, ил үлдэнэ)
 - **Тайлбарлагдах risk scoring v1.2.1** — finding бүрийн `risk_factors` (суурь × орчин × ил гарц × итгэл) + cluster `risk_breakdown` (томьёо + топ хувь нэмэгчид)
+- **MITRE ATT&CK for Containers** — finding нь ямар халдлагын техникийг *боломжжуулж* болзошгүйг харуулна (ж: privileged контейнер → T1611 Escape to Host), tactic тус бүрээр **ATT&CK exposure** хураангуйтай. "Илрүүлсэн" биш, "боломжжуулна" хүрээтэй — үз [`docs/MITRE_ATTACK.md`](docs/MITRE_ATTACK.md)
 - **CI/CD gatekeeper** — `.tatar-kuber.yaml` бодлого (`fail_on`, `min_score`, хугацаатай `suppress`) + `gate` команд + GitHub Action + SARIF upload
 - **Reports** — JSON · SARIF 2.1.0 · HTML dashboard (хоёр хэлт)
 - **verify-lab** — expected baseline-тай тулгаж regression шалгах

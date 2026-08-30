@@ -204,6 +204,9 @@ func applyLang(fs []finding.Finding, reg *canonical.Registry, lang string) {
 		if r := ctrl.Remediation.Get(lang); r != "" {
 			fs[i].Remediation = r
 		}
+		if len(ctrl.Attack) > 0 {
+			fs[i].Attack = ctrl.Attack // MITRE ATT&CK: сул тал → боломжтой болгох техник
+		}
 	}
 }
 
