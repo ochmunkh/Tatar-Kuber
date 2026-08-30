@@ -29,6 +29,18 @@
         "type": "object",
         "required": ["scanner","rule_id"],
         "properties": { "scanner": {"type":"string"}, "rule_id": {"type":"string"} }
+    }},
+    "evidence":          { "type": "array", "items": {
+        "type": "object",
+        "properties": { "scanner": {"type":"string"}, "path": {"type":"string"}, "value": {"type":"string"}, "detail": {"type":"string"} }
+    }},
+    "risk_factors":      { "type": "object",
+        "properties": { "base_weight": {"type":"number"}, "asset_context": {"type":"number"}, "exposure": {"type":"number"}, "confidence": {"type":"number"}, "contribution": {"type":"number"} }
+    },
+    "attack":            { "type": "array", "description": "MITRE ATT&CK techniques this weakness MAY ENABLE (exposure, not detection)", "items": {
+        "type": "object",
+        "required": ["technique","tactic"],
+        "properties": { "technique": {"type":"string"}, "name": {"type":"string"}, "tactic": {"type":"string"} }
     }}
   }
 }
