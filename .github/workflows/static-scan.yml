@@ -4,7 +4,7 @@
 # энэ зам огт батлагдаагүй байсан (Checkov live-д unsupported, demo fixture нь
 # гараар бичигдсэн) тул зураглалын зөрүү нуугдаж байв.
 #
-# Энэ workflow нь БОДИТ Checkov ба `trivy config`-ыг өөрийн эмзэг манифест дээр
+# Энэ workflow нь БОДИТ Checkov-ыг өөрийн эмзэг манифест дээр
 # ажиллуулж, гаралтыг tatar-kuber-ээр нэгтгэж, canonical зураглал ажиллаж байгааг
 # шалгана. Scanner шалгалтаа дахин нэрлэх/дугаарлахад энэ job унана.
 name: Static scan (no cluster)
@@ -48,23 +48,24 @@ jobs:
       - name: Install Checkov
         run: pip install --quiet checkov
 
-      - name: Install Trivy
-        run: curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin
-
       - name: Versions
         run: |
           checkov --version
-          trivy --version | head -1
           ./tatar-kuber version
 
       # Бодит scanner гаралтыг цуглуулж raw/ бүтэц болгоно (scan --raw-dir хүлээж авдаг хэлбэр).
+      #
+      # ЗӨВХӨН Checkov: Mode A-д tatar-kuber-ийн дэмждэг static scanner нь одоогоор
+      # Checkov. `trivy config` ажилладаг ч гаралт нь K8s объектын нэрийг тодорхой
+      # талбараар өгдөггүй (зөвхөн файл:мөр ба 5 өөр хэлбэртэй хүний унших Message),
+      # тиймээс файлын хэмжээнд тайлагнавал нэг файл дахь хэд хэдэн ижил зөрчил НЭГ
+      # finding болж нийлэх — дутуу тайлагналт үүснэ. Зөв шийдэл нь манифестыг уншиж
+      # объектыг тодорхойлох (v2). Тэр болтол trivy нь Mode A-д "unsupported".
       - name: Collect real scanner output on examples/vulnerable
         run: |
           mkdir -p raw
           checkov -d examples/vulnerable -o json --compact --quiet > raw/checkov.json || true
-          trivy config examples/vulnerable --format json -q > raw/trivy.json || true
-          printf '{"checkov":"%s","trivy":"%s"}\n' \
-            "$(checkov --version)" "$(trivy --version | head -1 | awk '{print $2}')" > raw/versions.json
+          printf '{"checkov":"%s"}\n' "$(checkov --version)" > raw/versions.json
           echo "--- raw sizes ---"; wc -c raw/*.json
 
       - name: Normalize + report

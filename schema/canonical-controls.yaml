@@ -131,6 +131,8 @@ controls:
   mappings:
     trivy:
     - AVD-KSV0004
+    - AVD-KSV0003
+    - AVD-KSV0106
     kubescape:
     - C-0046
     checkov:
@@ -227,7 +229,8 @@ controls:
   references:
   - CIS-5.7.3
   mappings:
-    trivy: []
+    trivy:
+    - AVD-KSV0118
     kubescape:
     - C-0211
     checkov:
@@ -273,6 +276,8 @@ controls:
     trivy:
     - AVD-KSV0011
     - AVD-KSV0015
+    - AVD-KSV0016
+    - AVD-KSV0018
     kubescape:
     - C-0009
     checkov:
@@ -300,6 +305,7 @@ controls:
   mappings:
     trivy:
     - AVD-KSV0030
+    - AVD-KSV0104
     kubescape:
     - C-0210
     checkov:

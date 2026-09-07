@@ -228,3 +228,52 @@ func TestCheckovMappingsMatchUpstreamMeaning(t *testing.T) {
 		}
 	}
 }
+
+// Trivy-ийн KSV кодууд. Аудитаар зурагдсан 11 нь БҮГД зөв байсан (Popeye 7/10,
+// Checkov 2/18 буруу байсантай харьцуулахад цэвэр) — тэр байдлыг бэхэлж, шинээр
+// батлагдсан 6 кодыг нэмэв. Утгуудыг `trivy config`-ийн бодит гаралтаас (trivy
+// 0.74, Misconfigurations[].Title) авав.
+func TestTrivyMappingsMatchUpstreamMeaning(t *testing.T) {
+	reg, err := Load(regPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := []struct{ code, meaning, control string }{
+		{"KSV-0001", `Can elevate its own privileges`, "TATAR-CON-003"},
+		{"KSV-0003", `Default capabilities: some containers do not drop all`, "TATAR-CON-004"},
+		{"KSV-0004", `Default capabilities: some containers do not drop all`, "TATAR-CON-004"},
+		{"KSV-0009", `Access to host network`, "TATAR-CON-006"},
+		{"KSV-0010", `Access to host PID`, "TATAR-CON-005"},
+		{"KSV-0011", `CPU not limited`, "TATAR-CON-010"},
+		{"KSV-0012", `Runs as root user`, "TATAR-CON-002"},
+		{"KSV-0013", `Image tag ":latest" used`, "TATAR-IMG-003"},
+		{"KSV-0014", `Root file system is not read-only`, "TATAR-CON-009"},
+		{"KSV-0015", `CPU requests not specified`, "TATAR-CON-010"},
+		{"KSV-0016", `Memory requests not specified`, "TATAR-CON-010"},
+		{"KSV-0017", `Privileged`, "TATAR-CON-001"},
+		{"KSV-0018", `Memory not limited`, "TATAR-CON-010"},
+		{"KSV-0030", `Runtime/Default Seccomp profile not set`, "TATAR-CON-011"},
+		{"KSV-0104", `Seccomp policies disabled`, "TATAR-CON-011"},
+		{"KSV-0106", `Container capabilities must only include NET_BIND_SERVICE`, "TATAR-CON-004"},
+		{"KSV-0118", `Default security context configured`, "TATAR-CON-008"},
+	}
+	for _, w := range want {
+		// Бодит Trivy "KSV-0017" (зураастай) гаргадаг, registry-д "AVD-KSV0017" —
+		// NormalizeRuleID хоёуланг нэг түлхүүр болгодгийг мөн шалгаж байна.
+		ids, ok := reg.Resolve("trivy", w.code)
+		if !ok || len(ids) != 1 {
+			t.Errorf("%s (%s): зураглал олдсонгүй/олон (%v)", w.code, w.meaning, ids)
+			continue
+		}
+		if ids[0] != w.control {
+			t.Errorf("%s (%s) -> %s, хүлээсэн %s", w.code, w.meaning, ids[0], w.control)
+		}
+	}
+	// ЗОРИУДААР зураглаагүй: тохирох canonical control байхгүй (v2). Эдгээр нь
+	// зурагдвал утга гуйвна — ж: "UID <= 10000" нь "root эрхээр ажиллах" БИШ.
+	for _, code := range []string{"KSV-0020", "KSV-0021", "KSV-0110"} {
+		if ids, ok := reg.Resolve("trivy", code); ok {
+			t.Errorf("%s зурагдсан (-> %v) — 0020/0021 нь low UID/GID (root БИШ), 0110 нь default namespace; тусдаа control хэрэгтэй (v2)", code, ids)
+		}
+	}
+}

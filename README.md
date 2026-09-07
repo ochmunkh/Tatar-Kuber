@@ -264,6 +264,16 @@ Checkov output, and coverage went from 18 to 28 rules. A new
 [static-scan workflow](.github/workflows/static-scan.yml) runs real Checkov and `trivy config` on the
 repo's own vulnerable manifests every week — **Mode A is now validated too, with no cluster needed.**
 
+**Trivy** was audited the same way against real `trivy config` output: **all 11 of its mappings were
+correct** — the cleanest of the three — and 6 more rules were added from verified meanings, taking it
+to 25. Its adapter did carry one contract bug: `Supports(local)` returned true while `Scan` always
+failed in local mode, so Trivy showed up as `error` in Mode A instead of honestly `unsupported`.
+Adding real local support needs manifest parsing (Trivy's config output names no Kubernetes object,
+only a file and line), so it is a v2 item rather than a half-measure that would under-report.
+
+Scoreboard for the mapping audit: **Popeye 7 of 10 wrong, Checkov 2 of 18, Trivy 0 of 11.** Every
+mapped rule in all three is now pinned by a test against upstream's own definitions.
+
 One more correction came out of reading the first good live report: Popeye's lint level
 (info/warn/error) was overriding each control's **curated** `default_severity`, so a dead Service
 was reported HIGH where the registry deliberately rates it INFO, and a missing probe MEDIUM instead
@@ -518,6 +528,17 @@ digest"*, ямар ч tag-тай image дээр гардаг — ":latest tag" �
 [static-scan workflow](.github/workflows/static-scan.yml) нь бодит Checkov ба `trivy config`-ыг
 өөрийн эмзэг манифест дээр 7 хоног тутам ажиллуулна — **Mode A ч одоо батлагдаж байна, cluster
 шаардахгүйгээр.**
+
+**Trivy**-г мөн ижил аргаар бодит `trivy config` гаралттай тулгав: **11 зураглал бүгд зөв** —
+гурвын хамгийн цэвэр нь — мөн батлагдсан утгаар 6 rule нэмж 25 болгов. Гэхдээ адаптерт нэг
+гэрээний зөрчил байв: `Supports(local)` нь true буцаадаг ч `Scan` нь local-д үргэлж алдаа
+буцаадаг, тиймээс Mode A-д trivy шударгаар "unsupported" гэхийн оронд "error" гэж гарч байв.
+Local-ыг бодитоор дэмжихэд манифестыг парслах шаардлагатай (Trivy-ийн config гаралт нь K8s
+объектын нэрийг өгдөггүй, зөвхөн файл ба мөр), тиймээс дутуу тайлагнах хагас шийдлийн оронд
+v2-ын ажил болгов.
+
+Зураглалын аудитын дүн: **Popeye 10-аас 7 буруу, Checkov 18-аас 2, Trivy 11-ээс 0.** Гурвуулангийн
+зурагдсан rule бүр одоо upstream-ийн өөрийн тодорхойлолттой тулгах тестээр бэхлэгдсэн.
 
 Анхны бүтэн live тайланг уншихад нэг засвар бас гарлаа: Popeye-ийн lint level
 (info/warn/error) нь control бүрийн **curated** `default_severity`-г дарж байсан тул dead Service

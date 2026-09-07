@@ -37,7 +37,16 @@ func (s *Scanner) Version(ctx context.Context) (string, error) {
 	return toolexec.Version(ctx, "trivy", "--version")
 }
 
-func (s *Scanner) Supports(mode scanner.Mode) bool { return true } // local + remote
+// Supports — ЗӨВХӨН remote (Mode B). v1.0.1 хүртэл `true` буцаадаг байсан ч Scan нь
+// local-д үргэлж алдаа буцаадаг байсан: adapter өөрийн гэрээгээ зөрчиж, Mode A-д
+// trivy "error" төлөвтэй гарч байв. Одоо шударгаар "unsupported" гэж тайлагдана.
+//
+// Mode A-д trivy-г нэмэх (v2): `trivy config <dir>` ажилладаг ч гаралт нь K8s
+// объектын нэрийг ТОДОРХОЙ талбараар өгдөггүй — зөвхөн файл:мөр ба хүний унших
+// Message (5 өөр хэлбэртэй) дотор байдаг. Файлын хэмжээнд тайлагнавал нэг файлд
+// байгаа хэд хэдэн ижил зөрчил НЭГ finding болж нийлж, дутуу тайлагнана. Тиймээс
+// зөв шийдэл нь манифестыг өөрөө уншиж объектын нэрийг гаргах — v2-ын ажил.
+func (s *Scanner) Supports(mode scanner.Mode) bool { return mode == scanner.ModeRemote }
 
 // Timeout — image CVE scan удаан тул урт хугацаа өгнө (Tier 1 per-scanner timeout).
 func (s *Scanner) Timeout() time.Duration { return 6 * time.Minute }
