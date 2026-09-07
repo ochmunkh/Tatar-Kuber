@@ -254,6 +254,16 @@ as *Scanner coverage* — keeps raw scanner output as evidence, and the
 produced findings and that at least one finding is corroborated by 2+ scanners.
 A "0 findings" scanner is never silent again.
 
+The same audit was then applied to **Checkov** (the Mode A scanner, never validated before — it does
+not run against a live cluster): 2 of its 18 mappings were wrong. `CKV_K8S_43` is *"Image should use
+digest"*, which fires on **any** tagged image — mapped to ":latest tag" it reported a properly pinned
+`nginx:1.25.3` as using `:latest`. The real `:latest` check, `CKV_K8S_14`, was unmapped. And
+`CKV_K8S_27` is *"Do not expose the docker daemon socket"*, not general hostPath (Checkov has no
+general hostPath check at all). Both are fixed, every remaining mapping was verified against real
+Checkov output, and coverage went from 18 to 28 rules. A new
+[static-scan workflow](.github/workflows/static-scan.yml) runs real Checkov and `trivy config` on the
+repo's own vulnerable manifests every week — **Mode A is now validated too, with no cluster needed.**
+
 One more correction came out of reading the first good live report: Popeye's lint level
 (info/warn/error) was overriding each control's **curated** `default_severity`, so a dead Service
 was reported HIGH where the registry deliberately rates it INFO, and a missing probe MEDIUM instead
@@ -497,6 +507,17 @@ HTML тайланд *Scanner хамрах хүрээ* хэсгээр харуу�
 нотолгоо болгон хадгална, [real-cluster workflow](.github/workflows/real-cluster.yml) одоо
 scanner **тус бүр** finding өгснийг ба ядаж нэг finding 2+ scanner-ээр батлагдсаныг шалгана.
 "0 finding" scanner дахиж хэзээ ч чимээгүй өнгөрөхгүй.
+
+Дараа нь яг ижил аудитыг **Checkov** дээр хийв (Mode A-ийн scanner, өмнө нь огт батлагдаагүй —
+live cluster дээр ажилладаггүй): 18 зураглалын 2 нь буруу байв. `CKV_K8S_43` нь *"Image should use
+digest"*, ямар ч tag-тай image дээр гардаг — ":latest tag" руу зурагдсанаас зөв пиннэсэн
+`nginx:1.25.3`-ыг ":latest ашиглаж байна" гэж тайлагнаж байв. ":latest"-ийн жинхэнэ шалгалт
+`CKV_K8S_14` нь зураглалгүй байсан. Мөн `CKV_K8S_27` нь *"Do not expose the docker daemon socket"*,
+ерөнхий hostPath БИШ (Checkov-д ерөнхий hostPath шалгалт огт байхгүй). Хоёуланг зассан, бусад
+зураглал бүрийг бодит Checkov гаралтаар батлав, хамрах хүрээ 18 -> 28 rule болов. Шинэ
+[static-scan workflow](.github/workflows/static-scan.yml) нь бодит Checkov ба `trivy config`-ыг
+өөрийн эмзэг манифест дээр 7 хоног тутам ажиллуулна — **Mode A ч одоо батлагдаж байна, cluster
+шаардахгүйгээр.**
 
 Анхны бүтэн live тайланг уншихад нэг засвар бас гарлаа: Popeye-ийн lint level
 (info/warn/error) нь control бүрийн **curated** `default_severity`-г дарж байсан тул dead Service

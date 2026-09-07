@@ -64,16 +64,16 @@
 <body>
 <header>
  <h1>TATAR-Kuber Security Report</h1>
- <div class="sub">Кластер: demo-prod · Горим: remote · 2026-09-07T04:51:01Z</div>
+ <div class="sub">Кластер: demo-prod · Горим: remote · 2026-09-07T05:23:46Z</div>
 </header>
 <div class="wrap">
 
  <h2>Гүйцэтгэх хураангуй</h2>
  <div class="cards">
-  <div class="card score"><div class="n">23/100</div><div class="l">Critical</div></div>
+  <div class="card score"><div class="n">19/100</div><div class="l">Critical</div></div>
   <div class="card"><div class="n crit">2</div><div class="l">Critical</div></div>
-  <div class="card"><div class="n high">12</div><div class="l">High</div></div>
-  <div class="card"><div class="n med">29</div><div class="l">Medium</div></div>
+  <div class="card"><div class="n high">18</div><div class="l">High</div></div>
+  <div class="card"><div class="n med">35</div><div class="l">Medium</div></div>
   <div class="card"><div class="n low">21</div><div class="l">Low</div></div>
   <div class="card"><div class="n info">2</div><div class="l">Info</div></div>
   <div class="card"><div class="n">0</div><div class="l">Blind Shot</div></div>
@@ -82,14 +82,14 @@
   <div class="col">
    <h3>Гол эрсдэлүүд — оноо задаргаа</h3>
    <ol>
-   <li>Container image дахь CRITICAL CVE <span class="pen">−18</span> <span class="cc">(4.9%)</span><br><span class="cc">TATAR-IMG-001 · production/deployment/api<br><span class="fx">10 × 1.5 × 1 × 1.2</span></span></li><li>Эрх өсгөлтийг зөвшөөрсөн <span class="pen">−12.6</span> <span class="cc">(3.4%)</span><br><span class="cc">TATAR-CON-003 · production/deployment/root-app<br><span class="fx">7 × 1.5 × 1 × 1.2</span></span></li><li>Эрх нэмэгдүүлсэн (privileged) контейнер <span class="pen">−12.6</span> <span class="cc">(3.4%)</span><br><span class="cc">TATAR-CON-001 · production/deployment/privileged-app<br><span class="fx">7 × 1.5 × 1 × 1.2</span></span></li><li>Host сүлжээ идэвхжсэн <span class="pen">−12.6</span> <span class="cc">(3.4%)</span><br><span class="cc">TATAR-CON-006 · production/deployment/host-ns-app<br><span class="fx">7 × 1.5 × 1 × 1.2</span></span></li><li>Container image дахь HIGH CVE <span class="pen">−12.6</span> <span class="cc">(3.4%)</span><br><span class="cc">TATAR-IMG-002 · production/deployment/api<br><span class="fx">7 × 1.5 × 1 × 1.2</span></span></li>
+   <li>Container image дахь CRITICAL CVE <span class="pen">−18</span> <span class="cc">(3.9%)</span><br><span class="cc">TATAR-IMG-001 · production/deployment/api<br><span class="fx">10 × 1.5 × 1 × 1.2</span></span></li><li>Эрх өсгөлтийг зөвшөөрсөн <span class="pen">−12.6</span> <span class="cc">(2.7%)</span><br><span class="cc">TATAR-CON-003 · production/deployment/root-app<br><span class="fx">7 × 1.5 × 1 × 1.2</span></span></li><li>Аюултай capability нэмсэн <span class="pen">−12.6</span> <span class="cc">(2.7%)</span><br><span class="cc">TATAR-CON-004 · production/deployment/root-app<br><span class="fx">7 × 1.5 × 1 × 1.2</span></span></li><li>Эрх нэмэгдүүлсэн (privileged) контейнер <span class="pen">−12.6</span> <span class="cc">(2.7%)</span><br><span class="cc">TATAR-CON-001 · production/deployment/privileged-app<br><span class="fx">7 × 1.5 × 1 × 1.2</span></span></li><li>Host сүлжээ идэвхжсэн <span class="pen">−12.6</span> <span class="cc">(2.7%)</span><br><span class="cc">TATAR-CON-006 · production/deployment/host-ns-app<br><span class="fx">7 × 1.5 × 1 × 1.2</span></span></li>
    
    </ol>
   </div>
   <div class="col">
    <h3>Зөвлөмж</h3>
    <ul>
-   <li>Base image/багцыг шинэчилж эсвэл patch хийнэ.</li><li>securityContext.allowPrivilegeEscalation=false.</li><li>securityContext.privileged=false болгоно.</li><li>hostNetwork=false.</li><li>Base image/багцыг шинэчилнэ.</li>
+   <li>Base image/багцыг шинэчилж эсвэл patch хийнэ.</li><li>securityContext.allowPrivilegeEscalation=false.</li><li>Шаардлагагүй capability-г drop хийнэ; ALL-ыг drop эхлэлээ.</li><li>securityContext.privileged=false болгоно.</li><li>hostNetwork=false.</li>
    
    </ul>
   </div>
@@ -98,8 +98,8 @@
    <h3>Онооны задаргаа</h3>
    <div class="bd">
     <div class="bdrow"><span>Томьёо</span><code>100/(1+P/100)</code></div>
-    <div class="bdrow"><span>Нийт торгууль (P)</span><b>339.4</b></div>
-    <div class="bdrow"><span>Crit/High/Med</span>329.4</div>
+    <div class="bdrow"><span>Нийт торгууль (P)</span><b>432.8</b></div>
+    <div class="bdrow"><span>Crit/High/Med</span>422.8</div>
     <div class="bdrow"><span>LOW сан</span>37.8 → 10 <span class="cc">(хязгаарлав 10)</span></div>
     <div class="bdrow cc">суурь × орчин × ил гарц × итгэл</div>
    </div>
@@ -109,7 +109,7 @@
   <div class="col">
    <h3>ATT&amp;CK эрсдэл — боломжжуулна</h3>
    <div class="bd">
-    <div class="bdrow"><span>Privilege Escalation</span><b>11</b></div><div class="bdrow"><span>Credential Access</span><b>6</b></div><div class="bdrow"><span>Persistence</span><b>6</b></div><div class="bdrow"><span>Discovery</span><b>1</b></div>
+    <div class="bdrow"><span>Privilege Escalation</span><b>11</b></div><div class="bdrow"><span>Credential Access</span><b>6</b></div><div class="bdrow"><span>Discovery</span><b>6</b></div><div class="bdrow"><span>Persistence</span><b>2</b></div>
    </div>
   </div>
   
@@ -137,8 +137,8 @@
    <td><span class="fbb">checkov</span> <span class="cc">3.2.10</span></td>
    <td><span class="st st-ingested">ingested</span></td>
    <td>—</td>
-   <td>59</td>
-   <td>49 <span class="cc">(19 rule)</span></td>
+   <td>89</td>
+   <td>19 <span class="cc">(9 rule)</span></td>
   </tr><tr>
    <td><span class="fbb">popeye</span> <span class="cc">0.22.1</span></td>
    <td><span class="st st-ingested">ingested</span></td>
@@ -157,7 +157,7 @@
  </div>
 
 
- <h2>Илрүүлэлтүүд (66)</h2>
+ <h2>Илрүүлэлтүүд (78)</h2>
  <table>
   <thead><tr><th>Ноцтой байдал</th><th>Контрол</th><th>Нөөц</th><th>Гарчиг</th><th>Нотолгоо</th><th>Засвар</th><th>Илрүүлсэн</th><th>Итгэл</th></tr></thead>
   <tbody>
@@ -191,6 +191,17 @@
     <td>Эрх өсгөлтийг зөвшөөрсөн</td>
     <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/root-user.yaml:2-20</code></div></td>
     <td class="fix">securityContext.allowPrivilegeEscalation=false.</td>
+    <td><span class="fbb">checkov</span></td>
+    <td class="fb">HIGH<br><span class="pen">−12.6</span></td>
+   </tr>
+  
+   <tr>
+    <td><span class="badge bH">HIGH</span></td>
+    <td>TATAR-CON-004<br><span class="cc">Container Security</span></td>
+    <td>production/deployment/root-app</td>
+    <td>Аюултай capability нэмсэн</td>
+    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/root-user.yaml:2-20</code></div></td>
+    <td class="fix">Шаардлагагүй capability-г drop хийнэ; ALL-ыг drop эхлэлээ.</td>
     <td><span class="fbb">checkov</span></td>
     <td class="fb">HIGH<br><span class="pen">−12.6</span></td>
    </tr>
@@ -252,6 +263,28 @@
   
    <tr>
     <td><span class="badge bH">HIGH</span></td>
+    <td>TATAR-CON-004<br><span class="cc">Container Security</span></td>
+    <td>production/deployment/host-ns-app</td>
+    <td>Аюултай capability нэмсэн</td>
+    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/host-namespaces.yaml:2-19</code></div></td>
+    <td class="fix">Шаардлагагүй capability-г drop хийнэ; ALL-ыг drop эхлэлээ.</td>
+    <td><span class="fbb">checkov</span></td>
+    <td class="fb">HIGH<br><span class="pen">−12.6</span></td>
+   </tr>
+  
+   <tr>
+    <td><span class="badge bH">HIGH</span></td>
+    <td>TATAR-CON-004<br><span class="cc">Container Security</span></td>
+    <td>production/deployment/latest-app</td>
+    <td>Аюултай capability нэмсэн</td>
+    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/latest-tag.yaml:2-16</code></div></td>
+    <td class="fix">Шаардлагагүй capability-г drop хийнэ; ALL-ыг drop эхлэлээ.</td>
+    <td><span class="fbb">checkov</span></td>
+    <td class="fb">HIGH<br><span class="pen">−12.6</span></td>
+   </tr>
+  
+   <tr>
+    <td><span class="badge bH">HIGH</span></td>
     <td>TATAR-CON-003<br><span class="cc">Container Security</span><br><span class="atk" title="Escape to Host · Privilege Escalation (боломжжуулна)">⚔ T1611</span></td>
     <td>production/deployment/secret-env-app</td>
     <td>Эрх өсгөлтийг зөвшөөрсөн</td>
@@ -296,6 +329,28 @@
   
    <tr>
     <td><span class="badge bH">HIGH</span></td>
+    <td>TATAR-CON-004<br><span class="cc">Container Security</span></td>
+    <td>production/deployment/privileged-app</td>
+    <td>Аюултай capability нэмсэн</td>
+    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/privileged.yaml:2-18</code></div></td>
+    <td class="fix">Шаардлагагүй capability-г drop хийнэ; ALL-ыг drop эхлэлээ.</td>
+    <td><span class="fbb">checkov</span></td>
+    <td class="fb">HIGH<br><span class="pen">−12.6</span></td>
+   </tr>
+  
+   <tr>
+    <td><span class="badge bH">HIGH</span></td>
+    <td>TATAR-CON-004<br><span class="cc">Container Security</span></td>
+    <td>production/deployment/secret-env-app</td>
+    <td>Аюултай capability нэмсэн</td>
+    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/secret-env.yaml:2-21</code></div></td>
+    <td class="fix">Шаардлагагүй capability-г drop хийнэ; ALL-ыг drop эхлэлээ.</td>
+    <td><span class="fbb">checkov</span></td>
+    <td class="fb">HIGH<br><span class="pen">−12.6</span></td>
+   </tr>
+  
+   <tr>
+    <td><span class="badge bH">HIGH</span></td>
     <td>TATAR-SEC-001<br><span class="cc">Secret Management</span><br><span class="atk" title="Unsecured Credentials: Container API · Credential Access (боломжжуулна)">⚔ T1552.007</span></td>
     <td>default/pod/worker</td>
     <td>Env хувьсагчид ил гарсан secret</td>
@@ -314,6 +369,17 @@
     <td class="fix">Эрхийг тодорхой resource/verb болгож нарийсгана.</td>
     <td><span class="fbb">checkov</span></td>
     <td class="fb">HIGH<br><span class="pen">−8.4</span></td>
+   </tr>
+  
+   <tr>
+    <td><span class="badge bH">HIGH</span></td>
+    <td>TATAR-RBAC-003<br><span class="cc">RBAC &amp; Authorization</span></td>
+    <td>default/clusterrole/too-powerful</td>
+    <td>Хэт их / эрсдэлтэй эрх</td>
+    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/wildcard-rbac.yaml:2-10</code></div></td>
+    <td class="fix">Least-privilege зарчмаар эрхийг цэвэрлэнэ.</td>
+    <td><span class="fbb">checkov</span></td>
+    <td class="fb">MEDIUM<br><span class="pen">−7</span></td>
    </tr>
   
    <tr>
@@ -340,22 +406,33 @@
   
    <tr>
     <td><span class="badge bM">MEDIUM</span></td>
-    <td>TATAR-SEC-003<br><span class="cc">Secret Management</span><br><span class="atk" title="Steal Application Access Token · Credential Access (боломжжуулна)">⚔ T1528</span></td>
-    <td>production/deployment/latest-app</td>
-    <td>SA token автоматаар холбогдсон</td>
-    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/latest-tag.yaml:2-16</code></div></td>
-    <td class="fix">automountServiceAccountToken=false.</td>
+    <td>TATAR-CON-008<br><span class="cc">Container Security</span></td>
+    <td>production/deployment/privileged-app</td>
+    <td>securityContext дутуу</td>
+    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/privileged.yaml:2-18</code></div></td>
+    <td class="fix">securityContext блок нэмж hardening тохируулна.</td>
     <td><span class="fbb">checkov</span></td>
     <td class="fb">HIGH<br><span class="pen">−5.4</span></td>
    </tr>
   
    <tr>
     <td><span class="badge bM">MEDIUM</span></td>
-    <td>TATAR-IMG-003<br><span class="cc">Image Security</span><br><span class="atk" title="Implant Internal Image · Persistence (боломжжуулна)">⚔ T1525</span></td>
-    <td>production/deployment/privileged-app</td>
-    <td>Image :latest tag ашигласан</td>
-    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/privileged.yaml:2-18</code></div></td>
-    <td class="fix">Тодорхой хувилбар (digest/tag) ашиглана.</td>
+    <td>TATAR-CON-008<br><span class="cc">Container Security</span></td>
+    <td>production/deployment/host-ns-app</td>
+    <td>securityContext дутуу</td>
+    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/host-namespaces.yaml:2-19</code></div></td>
+    <td class="fix">securityContext блок нэмж hardening тохируулна.</td>
+    <td><span class="fbb">checkov</span></td>
+    <td class="fb">HIGH<br><span class="pen">−5.4</span></td>
+   </tr>
+  
+   <tr>
+    <td><span class="badge bM">MEDIUM</span></td>
+    <td>TATAR-SEC-003<br><span class="cc">Secret Management</span><br><span class="atk" title="Steal Application Access Token · Credential Access (боломжжуулна)">⚔ T1528</span></td>
+    <td>production/deployment/latest-app</td>
+    <td>SA token автоматаар холбогдсон</td>
+    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/latest-tag.yaml:2-16</code></div></td>
+    <td class="fix">automountServiceAccountToken=false.</td>
     <td><span class="fbb">checkov</span></td>
     <td class="fb">HIGH<br><span class="pen">−5.4</span></td>
    </tr>
@@ -373,22 +450,22 @@
   
    <tr>
     <td><span class="badge bM">MEDIUM</span></td>
-    <td>TATAR-CON-009<br><span class="cc">Container Security</span></td>
+    <td>TATAR-CON-008<br><span class="cc">Container Security</span></td>
     <td>production/deployment/latest-app</td>
-    <td>Уншихад зориулсан root файлын систем идэвхгүй</td>
+    <td>securityContext дутуу</td>
     <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/latest-tag.yaml:2-16</code></div></td>
-    <td class="fix">securityContext.readOnlyRootFilesystem=true.</td>
+    <td class="fix">securityContext блок нэмж hardening тохируулна.</td>
     <td><span class="fbb">checkov</span></td>
     <td class="fb">HIGH<br><span class="pen">−5.4</span></td>
    </tr>
   
    <tr>
     <td><span class="badge bM">MEDIUM</span></td>
-    <td>TATAR-IMG-003<br><span class="cc">Image Security</span><br><span class="atk" title="Implant Internal Image · Persistence (боломжжуулна)">⚔ T1525</span></td>
-    <td>production/deployment/secret-env-app</td>
-    <td>Image :latest tag ашигласан</td>
-    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/secret-env.yaml:2-21</code></div></td>
-    <td class="fix">Тодорхой хувилбар (digest/tag) ашиглана.</td>
+    <td>TATAR-CON-009<br><span class="cc">Container Security</span></td>
+    <td>production/deployment/latest-app</td>
+    <td>Уншихад зориулсан root файлын систем идэвхгүй</td>
+    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/latest-tag.yaml:2-16</code></div></td>
+    <td class="fix">securityContext.readOnlyRootFilesystem=true.</td>
     <td><span class="fbb">checkov</span></td>
     <td class="fb">HIGH<br><span class="pen">−5.4</span></td>
    </tr>
@@ -527,6 +604,17 @@
   
    <tr>
     <td><span class="badge bM">MEDIUM</span></td>
+    <td>TATAR-CON-008<br><span class="cc">Container Security</span></td>
+    <td>production/deployment/secret-env-app</td>
+    <td>securityContext дутуу</td>
+    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/secret-env.yaml:2-21</code></div></td>
+    <td class="fix">securityContext блок нэмж hardening тохируулна.</td>
+    <td><span class="fbb">checkov</span></td>
+    <td class="fb">HIGH<br><span class="pen">−5.4</span></td>
+   </tr>
+  
+   <tr>
+    <td><span class="badge bM">MEDIUM</span></td>
     <td>TATAR-SEC-003<br><span class="cc">Secret Management</span><br><span class="atk" title="Steal Application Access Token · Credential Access (боломжжуулна)">⚔ T1528</span></td>
     <td>production/deployment/privileged-app</td>
     <td>SA token автоматаар холбогдсон</td>
@@ -560,22 +648,22 @@
   
    <tr>
     <td><span class="badge bM">MEDIUM</span></td>
-    <td>TATAR-CON-009<br><span class="cc">Container Security</span></td>
-    <td>production/deployment/host-ns-app</td>
-    <td>Уншихад зориулсан root файлын систем идэвхгүй</td>
-    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/host-namespaces.yaml:2-19</code></div></td>
-    <td class="fix">securityContext.readOnlyRootFilesystem=true.</td>
+    <td>TATAR-CON-008<br><span class="cc">Container Security</span></td>
+    <td>production/deployment/root-app</td>
+    <td>securityContext дутуу</td>
+    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/root-user.yaml:2-20</code></div></td>
+    <td class="fix">securityContext блок нэмж hardening тохируулна.</td>
     <td><span class="fbb">checkov</span></td>
     <td class="fb">HIGH<br><span class="pen">−5.4</span></td>
    </tr>
   
    <tr>
     <td><span class="badge bM">MEDIUM</span></td>
-    <td>TATAR-IMG-003<br><span class="cc">Image Security</span><br><span class="atk" title="Implant Internal Image · Persistence (боломжжуулна)">⚔ T1525</span></td>
+    <td>TATAR-CON-009<br><span class="cc">Container Security</span></td>
     <td>production/deployment/host-ns-app</td>
-    <td>Image :latest tag ашигласан</td>
+    <td>Уншихад зориулсан root файлын систем идэвхгүй</td>
     <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/host-namespaces.yaml:2-19</code></div></td>
-    <td class="fix">Тодорхой хувилбар (digest/tag) ашиглана.</td>
+    <td class="fix">securityContext.readOnlyRootFilesystem=true.</td>
     <td><span class="fbb">checkov</span></td>
     <td class="fb">HIGH<br><span class="pen">−5.4</span></td>
    </tr>
@@ -615,17 +703,6 @@
   
    <tr>
     <td><span class="badge bM">MEDIUM</span></td>
-    <td>TATAR-IMG-003<br><span class="cc">Image Security</span><br><span class="atk" title="Implant Internal Image · Persistence (боломжжуулна)">⚔ T1525</span></td>
-    <td>production/deployment/root-app</td>
-    <td>Image :latest tag ашигласан</td>
-    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/root-user.yaml:2-20</code></div></td>
-    <td class="fix">Тодорхой хувилбар (digest/tag) ашиглана.</td>
-    <td><span class="fbb">checkov</span></td>
-    <td class="fb">HIGH<br><span class="pen">−5.4</span></td>
-   </tr>
-  
-   <tr>
-    <td><span class="badge bM">MEDIUM</span></td>
     <td>TATAR-CON-002<br><span class="cc">Container Security</span></td>
     <td>production/deployment/secret-env-app</td>
     <td>Root эрхээр ажиллаж буй контейнер</td>
@@ -633,6 +710,61 @@
     <td class="fix">securityContext.runAsNonRoot=true тохируулна.</td>
     <td><span class="fbb">checkov</span></td>
     <td class="fb">HIGH<br><span class="pen">−5.4</span></td>
+   </tr>
+  
+   <tr>
+    <td><span class="badge bM">MEDIUM</span></td>
+    <td>TATAR-NET-001<br><span class="cc">Network Security</span><br><span class="atk" title="Network Service Discovery · Discovery (боломжжуулна)">⚔ T1046</span></td>
+    <td>pod/app-latest-app</td>
+    <td>NetworkPolicy дутуу</td>
+    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/latest-tag.yaml:2-16</code></div></td>
+    <td class="fix">Namespace бүрт NetworkPolicy тодорхойлно.</td>
+    <td><span class="fbb">checkov</span></td>
+    <td class="fb">HIGH<br><span class="pen">−3.6</span></td>
+   </tr>
+  
+   <tr>
+    <td><span class="badge bM">MEDIUM</span></td>
+    <td>TATAR-NET-001<br><span class="cc">Network Security</span><br><span class="atk" title="Network Service Discovery · Discovery (боломжжуулна)">⚔ T1046</span></td>
+    <td>pod/app-root-app</td>
+    <td>NetworkPolicy дутуу</td>
+    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/root-user.yaml:2-20</code></div></td>
+    <td class="fix">Namespace бүрт NetworkPolicy тодорхойлно.</td>
+    <td><span class="fbb">checkov</span></td>
+    <td class="fb">HIGH<br><span class="pen">−3.6</span></td>
+   </tr>
+  
+   <tr>
+    <td><span class="badge bM">MEDIUM</span></td>
+    <td>TATAR-NET-001<br><span class="cc">Network Security</span><br><span class="atk" title="Network Service Discovery · Discovery (боломжжуулна)">⚔ T1046</span></td>
+    <td>pod/app-privileged-app</td>
+    <td>NetworkPolicy дутуу</td>
+    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/privileged.yaml:2-18</code></div></td>
+    <td class="fix">Namespace бүрт NetworkPolicy тодорхойлно.</td>
+    <td><span class="fbb">checkov</span></td>
+    <td class="fb">HIGH<br><span class="pen">−3.6</span></td>
+   </tr>
+  
+   <tr>
+    <td><span class="badge bM">MEDIUM</span></td>
+    <td>TATAR-NET-001<br><span class="cc">Network Security</span><br><span class="atk" title="Network Service Discovery · Discovery (боломжжуулна)">⚔ T1046</span></td>
+    <td>pod/app-secret-env-app</td>
+    <td>NetworkPolicy дутуу</td>
+    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/secret-env.yaml:2-21</code></div></td>
+    <td class="fix">Namespace бүрт NetworkPolicy тодорхойлно.</td>
+    <td><span class="fbb">checkov</span></td>
+    <td class="fb">HIGH<br><span class="pen">−3.6</span></td>
+   </tr>
+  
+   <tr>
+    <td><span class="badge bM">MEDIUM</span></td>
+    <td>TATAR-NET-001<br><span class="cc">Network Security</span><br><span class="atk" title="Network Service Discovery · Discovery (боломжжуулна)">⚔ T1046</span></td>
+    <td>pod/app-host-ns-app</td>
+    <td>NetworkPolicy дутуу</td>
+    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/host-namespaces.yaml:2-19</code></div></td>
+    <td class="fix">Namespace бүрт NetworkPolicy тодорхойлно.</td>
+    <td><span class="fbb">checkov</span></td>
+    <td class="fb">HIGH<br><span class="pen">−3.6</span></td>
    </tr>
   
    <tr>
@@ -895,7 +1027,7 @@
  <div class="grid">
   <div><b>Scanner хувилбар</b><br>checkov 3.2.10<br>kubescape 3.1.4<br>popeye 0.22.1<br>trivy 0.67.2<br></div>
   <div><b>Схем</b><br>Finding v1.0</div>
-  <div><b>Үр дүнгийн hash</b><br>sha256:369a59f3d475a59860955d1f59a8fe37fc98eee8e6a113336bb490baf8cde980</div>
+  <div><b>Үр дүнгийн hash</b><br>sha256:a82578fae350534c09f842127ecf5ca11cf9d7d39d429cdbd46ee47a2fcc365c</div>
   <div><b>Үүсгэсэн</b><br>TATAR-Kuber 1.0.1</div>
   <div><b>Онооны зурвас</b><br>90-100 Excellent<br>70-89 Good<br>50-69 Fair<br>30-49 Poor<br>0-29 Critical</div>
  </div>

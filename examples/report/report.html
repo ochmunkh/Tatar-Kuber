@@ -64,16 +64,16 @@
 <body>
 <header>
  <h1>TATAR-Kuber Security Report</h1>
- <div class="sub">Cluster: demo-prod · Mode: remote · 2026-09-07T04:51:01Z</div>
+ <div class="sub">Cluster: demo-prod · Mode: remote · 2026-09-07T05:23:46Z</div>
 </header>
 <div class="wrap">
 
  <h2>Executive Summary</h2>
  <div class="cards">
-  <div class="card score"><div class="n">23/100</div><div class="l">Critical</div></div>
+  <div class="card score"><div class="n">19/100</div><div class="l">Critical</div></div>
   <div class="card"><div class="n crit">2</div><div class="l">Critical</div></div>
-  <div class="card"><div class="n high">12</div><div class="l">High</div></div>
-  <div class="card"><div class="n med">29</div><div class="l">Medium</div></div>
+  <div class="card"><div class="n high">18</div><div class="l">High</div></div>
+  <div class="card"><div class="n med">35</div><div class="l">Medium</div></div>
   <div class="card"><div class="n low">21</div><div class="l">Low</div></div>
   <div class="card"><div class="n info">2</div><div class="l">Info</div></div>
   <div class="card"><div class="n">0</div><div class="l">Blind Shot</div></div>
@@ -82,14 +82,14 @@
   <div class="col">
    <h3>Top Risks — score breakdown</h3>
    <ol>
-   <li>Critical CVE in container image <span class="pen">−18</span> <span class="cc">(4.9%)</span><br><span class="cc">TATAR-IMG-001 · production/deployment/api<br><span class="fx">10 × 1.5 × 1 × 1.2</span></span></li><li>Allow privilege escalation <span class="pen">−12.6</span> <span class="cc">(3.4%)</span><br><span class="cc">TATAR-CON-003 · production/deployment/root-app<br><span class="fx">7 × 1.5 × 1 × 1.2</span></span></li><li>Privileged container enabled <span class="pen">−12.6</span> <span class="cc">(3.4%)</span><br><span class="cc">TATAR-CON-001 · production/deployment/privileged-app<br><span class="fx">7 × 1.5 × 1 × 1.2</span></span></li><li>Host network enabled <span class="pen">−12.6</span> <span class="cc">(3.4%)</span><br><span class="cc">TATAR-CON-006 · production/deployment/host-ns-app<br><span class="fx">7 × 1.5 × 1 × 1.2</span></span></li><li>High CVE in container image <span class="pen">−12.6</span> <span class="cc">(3.4%)</span><br><span class="cc">TATAR-IMG-002 · production/deployment/api<br><span class="fx">7 × 1.5 × 1 × 1.2</span></span></li>
+   <li>Critical CVE in container image <span class="pen">−18</span> <span class="cc">(3.9%)</span><br><span class="cc">TATAR-IMG-001 · production/deployment/api<br><span class="fx">10 × 1.5 × 1 × 1.2</span></span></li><li>Allow privilege escalation <span class="pen">−12.6</span> <span class="cc">(2.7%)</span><br><span class="cc">TATAR-CON-003 · production/deployment/root-app<br><span class="fx">7 × 1.5 × 1 × 1.2</span></span></li><li>Dangerous capabilities added <span class="pen">−12.6</span> <span class="cc">(2.7%)</span><br><span class="cc">TATAR-CON-004 · production/deployment/root-app<br><span class="fx">7 × 1.5 × 1 × 1.2</span></span></li><li>Privileged container enabled <span class="pen">−12.6</span> <span class="cc">(2.7%)</span><br><span class="cc">TATAR-CON-001 · production/deployment/privileged-app<br><span class="fx">7 × 1.5 × 1 × 1.2</span></span></li><li>Host network enabled <span class="pen">−12.6</span> <span class="cc">(2.7%)</span><br><span class="cc">TATAR-CON-006 · production/deployment/host-ns-app<br><span class="fx">7 × 1.5 × 1 × 1.2</span></span></li>
    
    </ol>
   </div>
   <div class="col">
    <h3>Recommendations</h3>
    <ul>
-   <li>Update the base image/package or apply a patch.</li><li>Set securityContext.allowPrivilegeEscalation=false.</li><li>Set securityContext.privileged=false.</li><li>Set hostNetwork=false.</li><li>Update the base image/package.</li>
+   <li>Update the base image/package or apply a patch.</li><li>Set securityContext.allowPrivilegeEscalation=false.</li><li>Drop unnecessary capabilities; start by dropping ALL.</li><li>Set securityContext.privileged=false.</li><li>Set hostNetwork=false.</li>
    
    </ul>
   </div>
@@ -98,8 +98,8 @@
    <h3>Score breakdown</h3>
    <div class="bd">
     <div class="bdrow"><span>Formula</span><code>100/(1+P/100)</code></div>
-    <div class="bdrow"><span>Total penalty (P)</span><b>339.4</b></div>
-    <div class="bdrow"><span>Crit/High/Med</span>329.4</div>
+    <div class="bdrow"><span>Total penalty (P)</span><b>432.8</b></div>
+    <div class="bdrow"><span>Crit/High/Med</span>422.8</div>
     <div class="bdrow"><span>LOW pool</span>37.8 → 10 <span class="cc">(capped 10)</span></div>
     <div class="bdrow cc">base × context × exposure × confidence</div>
    </div>
@@ -109,7 +109,7 @@
   <div class="col">
    <h3>ATT&amp;CK exposure — may enable</h3>
    <div class="bd">
-    <div class="bdrow"><span>Privilege Escalation</span><b>11</b></div><div class="bdrow"><span>Credential Access</span><b>6</b></div><div class="bdrow"><span>Persistence</span><b>6</b></div><div class="bdrow"><span>Discovery</span><b>1</b></div>
+    <div class="bdrow"><span>Privilege Escalation</span><b>11</b></div><div class="bdrow"><span>Credential Access</span><b>6</b></div><div class="bdrow"><span>Discovery</span><b>6</b></div><div class="bdrow"><span>Persistence</span><b>2</b></div>
    </div>
   </div>
   
@@ -137,8 +137,8 @@
    <td><span class="fbb">checkov</span> <span class="cc">3.2.10</span></td>
    <td><span class="st st-ingested">ingested</span></td>
    <td>—</td>
-   <td>59</td>
-   <td>49 <span class="cc">(19 rule)</span></td>
+   <td>89</td>
+   <td>19 <span class="cc">(9 rule)</span></td>
   </tr><tr>
    <td><span class="fbb">popeye</span> <span class="cc">0.22.1</span></td>
    <td><span class="st st-ingested">ingested</span></td>
@@ -157,7 +157,7 @@
  </div>
 
 
- <h2>Findings (66)</h2>
+ <h2>Findings (78)</h2>
  <table>
   <thead><tr><th>Severity</th><th>Control</th><th>Resource</th><th>Title</th><th>Evidence</th><th>Fix</th><th>Found by</th><th>Conf.</th></tr></thead>
   <tbody>
@@ -191,6 +191,17 @@
     <td>Allow privilege escalation</td>
     <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/root-user.yaml:2-20</code></div></td>
     <td class="fix">Set securityContext.allowPrivilegeEscalation=false.</td>
+    <td><span class="fbb">checkov</span></td>
+    <td class="fb">HIGH<br><span class="pen">−12.6</span></td>
+   </tr>
+  
+   <tr>
+    <td><span class="badge bH">HIGH</span></td>
+    <td>TATAR-CON-004<br><span class="cc">Container Security</span></td>
+    <td>production/deployment/root-app</td>
+    <td>Dangerous capabilities added</td>
+    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/root-user.yaml:2-20</code></div></td>
+    <td class="fix">Drop unnecessary capabilities; start by dropping ALL.</td>
     <td><span class="fbb">checkov</span></td>
     <td class="fb">HIGH<br><span class="pen">−12.6</span></td>
    </tr>
@@ -252,6 +263,28 @@
   
    <tr>
     <td><span class="badge bH">HIGH</span></td>
+    <td>TATAR-CON-004<br><span class="cc">Container Security</span></td>
+    <td>production/deployment/host-ns-app</td>
+    <td>Dangerous capabilities added</td>
+    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/host-namespaces.yaml:2-19</code></div></td>
+    <td class="fix">Drop unnecessary capabilities; start by dropping ALL.</td>
+    <td><span class="fbb">checkov</span></td>
+    <td class="fb">HIGH<br><span class="pen">−12.6</span></td>
+   </tr>
+  
+   <tr>
+    <td><span class="badge bH">HIGH</span></td>
+    <td>TATAR-CON-004<br><span class="cc">Container Security</span></td>
+    <td>production/deployment/latest-app</td>
+    <td>Dangerous capabilities added</td>
+    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/latest-tag.yaml:2-16</code></div></td>
+    <td class="fix">Drop unnecessary capabilities; start by dropping ALL.</td>
+    <td><span class="fbb">checkov</span></td>
+    <td class="fb">HIGH<br><span class="pen">−12.6</span></td>
+   </tr>
+  
+   <tr>
+    <td><span class="badge bH">HIGH</span></td>
     <td>TATAR-CON-003<br><span class="cc">Container Security</span><br><span class="atk" title="Escape to Host · Privilege Escalation (may enable)">⚔ T1611</span></td>
     <td>production/deployment/secret-env-app</td>
     <td>Allow privilege escalation</td>
@@ -296,6 +329,28 @@
   
    <tr>
     <td><span class="badge bH">HIGH</span></td>
+    <td>TATAR-CON-004<br><span class="cc">Container Security</span></td>
+    <td>production/deployment/privileged-app</td>
+    <td>Dangerous capabilities added</td>
+    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/privileged.yaml:2-18</code></div></td>
+    <td class="fix">Drop unnecessary capabilities; start by dropping ALL.</td>
+    <td><span class="fbb">checkov</span></td>
+    <td class="fb">HIGH<br><span class="pen">−12.6</span></td>
+   </tr>
+  
+   <tr>
+    <td><span class="badge bH">HIGH</span></td>
+    <td>TATAR-CON-004<br><span class="cc">Container Security</span></td>
+    <td>production/deployment/secret-env-app</td>
+    <td>Dangerous capabilities added</td>
+    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/secret-env.yaml:2-21</code></div></td>
+    <td class="fix">Drop unnecessary capabilities; start by dropping ALL.</td>
+    <td><span class="fbb">checkov</span></td>
+    <td class="fb">HIGH<br><span class="pen">−12.6</span></td>
+   </tr>
+  
+   <tr>
+    <td><span class="badge bH">HIGH</span></td>
     <td>TATAR-SEC-001<br><span class="cc">Secret Management</span><br><span class="atk" title="Unsecured Credentials: Container API · Credential Access (may enable)">⚔ T1552.007</span></td>
     <td>default/pod/worker</td>
     <td>Secret exposed in environment variable</td>
@@ -314,6 +369,17 @@
     <td class="fix">Narrow permissions to specific resources/verbs.</td>
     <td><span class="fbb">checkov</span></td>
     <td class="fb">HIGH<br><span class="pen">−8.4</span></td>
+   </tr>
+  
+   <tr>
+    <td><span class="badge bH">HIGH</span></td>
+    <td>TATAR-RBAC-003<br><span class="cc">RBAC &amp; Authorization</span></td>
+    <td>default/clusterrole/too-powerful</td>
+    <td>Excessive / risky permissions</td>
+    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/wildcard-rbac.yaml:2-10</code></div></td>
+    <td class="fix">Clean up permissions using least-privilege.</td>
+    <td><span class="fbb">checkov</span></td>
+    <td class="fb">MEDIUM<br><span class="pen">−7</span></td>
    </tr>
   
    <tr>
@@ -340,22 +406,33 @@
   
    <tr>
     <td><span class="badge bM">MEDIUM</span></td>
-    <td>TATAR-SEC-003<br><span class="cc">Secret Management</span><br><span class="atk" title="Steal Application Access Token · Credential Access (may enable)">⚔ T1528</span></td>
-    <td>production/deployment/latest-app</td>
-    <td>Service account token auto-mounted</td>
-    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/latest-tag.yaml:2-16</code></div></td>
-    <td class="fix">Set automountServiceAccountToken=false.</td>
+    <td>TATAR-CON-008<br><span class="cc">Container Security</span></td>
+    <td>production/deployment/privileged-app</td>
+    <td>Missing securityContext</td>
+    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/privileged.yaml:2-18</code></div></td>
+    <td class="fix">Add a securityContext block with hardening settings.</td>
     <td><span class="fbb">checkov</span></td>
     <td class="fb">HIGH<br><span class="pen">−5.4</span></td>
    </tr>
   
    <tr>
     <td><span class="badge bM">MEDIUM</span></td>
-    <td>TATAR-IMG-003<br><span class="cc">Image Security</span><br><span class="atk" title="Implant Internal Image · Persistence (may enable)">⚔ T1525</span></td>
-    <td>production/deployment/privileged-app</td>
-    <td>Image uses :latest tag</td>
-    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/privileged.yaml:2-18</code></div></td>
-    <td class="fix">Use a specific version (digest/tag).</td>
+    <td>TATAR-CON-008<br><span class="cc">Container Security</span></td>
+    <td>production/deployment/host-ns-app</td>
+    <td>Missing securityContext</td>
+    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/host-namespaces.yaml:2-19</code></div></td>
+    <td class="fix">Add a securityContext block with hardening settings.</td>
+    <td><span class="fbb">checkov</span></td>
+    <td class="fb">HIGH<br><span class="pen">−5.4</span></td>
+   </tr>
+  
+   <tr>
+    <td><span class="badge bM">MEDIUM</span></td>
+    <td>TATAR-SEC-003<br><span class="cc">Secret Management</span><br><span class="atk" title="Steal Application Access Token · Credential Access (may enable)">⚔ T1528</span></td>
+    <td>production/deployment/latest-app</td>
+    <td>Service account token auto-mounted</td>
+    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/latest-tag.yaml:2-16</code></div></td>
+    <td class="fix">Set automountServiceAccountToken=false.</td>
     <td><span class="fbb">checkov</span></td>
     <td class="fb">HIGH<br><span class="pen">−5.4</span></td>
    </tr>
@@ -373,22 +450,22 @@
   
    <tr>
     <td><span class="badge bM">MEDIUM</span></td>
-    <td>TATAR-CON-009<br><span class="cc">Container Security</span></td>
+    <td>TATAR-CON-008<br><span class="cc">Container Security</span></td>
     <td>production/deployment/latest-app</td>
-    <td>Read-only root filesystem disabled</td>
+    <td>Missing securityContext</td>
     <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/latest-tag.yaml:2-16</code></div></td>
-    <td class="fix">Set securityContext.readOnlyRootFilesystem=true.</td>
+    <td class="fix">Add a securityContext block with hardening settings.</td>
     <td><span class="fbb">checkov</span></td>
     <td class="fb">HIGH<br><span class="pen">−5.4</span></td>
    </tr>
   
    <tr>
     <td><span class="badge bM">MEDIUM</span></td>
-    <td>TATAR-IMG-003<br><span class="cc">Image Security</span><br><span class="atk" title="Implant Internal Image · Persistence (may enable)">⚔ T1525</span></td>
-    <td>production/deployment/secret-env-app</td>
-    <td>Image uses :latest tag</td>
-    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/secret-env.yaml:2-21</code></div></td>
-    <td class="fix">Use a specific version (digest/tag).</td>
+    <td>TATAR-CON-009<br><span class="cc">Container Security</span></td>
+    <td>production/deployment/latest-app</td>
+    <td>Read-only root filesystem disabled</td>
+    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/latest-tag.yaml:2-16</code></div></td>
+    <td class="fix">Set securityContext.readOnlyRootFilesystem=true.</td>
     <td><span class="fbb">checkov</span></td>
     <td class="fb">HIGH<br><span class="pen">−5.4</span></td>
    </tr>
@@ -527,6 +604,17 @@
   
    <tr>
     <td><span class="badge bM">MEDIUM</span></td>
+    <td>TATAR-CON-008<br><span class="cc">Container Security</span></td>
+    <td>production/deployment/secret-env-app</td>
+    <td>Missing securityContext</td>
+    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/secret-env.yaml:2-21</code></div></td>
+    <td class="fix">Add a securityContext block with hardening settings.</td>
+    <td><span class="fbb">checkov</span></td>
+    <td class="fb">HIGH<br><span class="pen">−5.4</span></td>
+   </tr>
+  
+   <tr>
+    <td><span class="badge bM">MEDIUM</span></td>
     <td>TATAR-SEC-003<br><span class="cc">Secret Management</span><br><span class="atk" title="Steal Application Access Token · Credential Access (may enable)">⚔ T1528</span></td>
     <td>production/deployment/privileged-app</td>
     <td>Service account token auto-mounted</td>
@@ -560,22 +648,22 @@
   
    <tr>
     <td><span class="badge bM">MEDIUM</span></td>
-    <td>TATAR-CON-009<br><span class="cc">Container Security</span></td>
-    <td>production/deployment/host-ns-app</td>
-    <td>Read-only root filesystem disabled</td>
-    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/host-namespaces.yaml:2-19</code></div></td>
-    <td class="fix">Set securityContext.readOnlyRootFilesystem=true.</td>
+    <td>TATAR-CON-008<br><span class="cc">Container Security</span></td>
+    <td>production/deployment/root-app</td>
+    <td>Missing securityContext</td>
+    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/root-user.yaml:2-20</code></div></td>
+    <td class="fix">Add a securityContext block with hardening settings.</td>
     <td><span class="fbb">checkov</span></td>
     <td class="fb">HIGH<br><span class="pen">−5.4</span></td>
    </tr>
   
    <tr>
     <td><span class="badge bM">MEDIUM</span></td>
-    <td>TATAR-IMG-003<br><span class="cc">Image Security</span><br><span class="atk" title="Implant Internal Image · Persistence (may enable)">⚔ T1525</span></td>
+    <td>TATAR-CON-009<br><span class="cc">Container Security</span></td>
     <td>production/deployment/host-ns-app</td>
-    <td>Image uses :latest tag</td>
+    <td>Read-only root filesystem disabled</td>
     <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/host-namespaces.yaml:2-19</code></div></td>
-    <td class="fix">Use a specific version (digest/tag).</td>
+    <td class="fix">Set securityContext.readOnlyRootFilesystem=true.</td>
     <td><span class="fbb">checkov</span></td>
     <td class="fb">HIGH<br><span class="pen">−5.4</span></td>
    </tr>
@@ -615,17 +703,6 @@
   
    <tr>
     <td><span class="badge bM">MEDIUM</span></td>
-    <td>TATAR-IMG-003<br><span class="cc">Image Security</span><br><span class="atk" title="Implant Internal Image · Persistence (may enable)">⚔ T1525</span></td>
-    <td>production/deployment/root-app</td>
-    <td>Image uses :latest tag</td>
-    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/root-user.yaml:2-20</code></div></td>
-    <td class="fix">Use a specific version (digest/tag).</td>
-    <td><span class="fbb">checkov</span></td>
-    <td class="fb">HIGH<br><span class="pen">−5.4</span></td>
-   </tr>
-  
-   <tr>
-    <td><span class="badge bM">MEDIUM</span></td>
     <td>TATAR-CON-002<br><span class="cc">Container Security</span></td>
     <td>production/deployment/secret-env-app</td>
     <td>Container running as root</td>
@@ -633,6 +710,61 @@
     <td class="fix">Set securityContext.runAsNonRoot=true.</td>
     <td><span class="fbb">checkov</span></td>
     <td class="fb">HIGH<br><span class="pen">−5.4</span></td>
+   </tr>
+  
+   <tr>
+    <td><span class="badge bM">MEDIUM</span></td>
+    <td>TATAR-NET-001<br><span class="cc">Network Security</span><br><span class="atk" title="Network Service Discovery · Discovery (may enable)">⚔ T1046</span></td>
+    <td>pod/app-latest-app</td>
+    <td>Missing NetworkPolicy</td>
+    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/latest-tag.yaml:2-16</code></div></td>
+    <td class="fix">Define a NetworkPolicy for each namespace.</td>
+    <td><span class="fbb">checkov</span></td>
+    <td class="fb">HIGH<br><span class="pen">−3.6</span></td>
+   </tr>
+  
+   <tr>
+    <td><span class="badge bM">MEDIUM</span></td>
+    <td>TATAR-NET-001<br><span class="cc">Network Security</span><br><span class="atk" title="Network Service Discovery · Discovery (may enable)">⚔ T1046</span></td>
+    <td>pod/app-root-app</td>
+    <td>Missing NetworkPolicy</td>
+    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/root-user.yaml:2-20</code></div></td>
+    <td class="fix">Define a NetworkPolicy for each namespace.</td>
+    <td><span class="fbb">checkov</span></td>
+    <td class="fb">HIGH<br><span class="pen">−3.6</span></td>
+   </tr>
+  
+   <tr>
+    <td><span class="badge bM">MEDIUM</span></td>
+    <td>TATAR-NET-001<br><span class="cc">Network Security</span><br><span class="atk" title="Network Service Discovery · Discovery (may enable)">⚔ T1046</span></td>
+    <td>pod/app-privileged-app</td>
+    <td>Missing NetworkPolicy</td>
+    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/privileged.yaml:2-18</code></div></td>
+    <td class="fix">Define a NetworkPolicy for each namespace.</td>
+    <td><span class="fbb">checkov</span></td>
+    <td class="fb">HIGH<br><span class="pen">−3.6</span></td>
+   </tr>
+  
+   <tr>
+    <td><span class="badge bM">MEDIUM</span></td>
+    <td>TATAR-NET-001<br><span class="cc">Network Security</span><br><span class="atk" title="Network Service Discovery · Discovery (may enable)">⚔ T1046</span></td>
+    <td>pod/app-secret-env-app</td>
+    <td>Missing NetworkPolicy</td>
+    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/secret-env.yaml:2-21</code></div></td>
+    <td class="fix">Define a NetworkPolicy for each namespace.</td>
+    <td><span class="fbb">checkov</span></td>
+    <td class="fb">HIGH<br><span class="pen">−3.6</span></td>
+   </tr>
+  
+   <tr>
+    <td><span class="badge bM">MEDIUM</span></td>
+    <td>TATAR-NET-001<br><span class="cc">Network Security</span><br><span class="atk" title="Network Service Discovery · Discovery (may enable)">⚔ T1046</span></td>
+    <td>pod/app-host-ns-app</td>
+    <td>Missing NetworkPolicy</td>
+    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/host-namespaces.yaml:2-19</code></div></td>
+    <td class="fix">Define a NetworkPolicy for each namespace.</td>
+    <td><span class="fbb">checkov</span></td>
+    <td class="fb">HIGH<br><span class="pen">−3.6</span></td>
    </tr>
   
    <tr>
@@ -895,7 +1027,7 @@
  <div class="grid">
   <div><b>Scanner Versions</b><br>checkov 3.2.10<br>kubescape 3.1.4<br>popeye 0.22.1<br>trivy 0.67.2<br></div>
   <div><b>Schema</b><br>Finding v1.0</div>
-  <div><b>Result Hash</b><br>sha256:369a59f3d475a59860955d1f59a8fe37fc98eee8e6a113336bb490baf8cde980</div>
+  <div><b>Result Hash</b><br>sha256:a82578fae350534c09f842127ecf5ca11cf9d7d39d429cdbd46ee47a2fcc365c</div>
   <div><b>Generated By</b><br>TATAR-Kuber 1.0.1</div>
   <div><b>Scoring Bands</b><br>90-100 Excellent<br>70-89 Good<br>50-69 Fair<br>30-49 Poor<br>0-29 Critical</div>
  </div>

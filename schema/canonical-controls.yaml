@@ -135,6 +135,9 @@ controls:
     - C-0046
     checkov:
     - CKV_K8S_25
+    - CKV_K8S_28
+    - CKV_K8S_37
+    - CKV_K8S_39
     popeye: []
 - id: TATAR-CON-005
   title:
@@ -207,8 +210,7 @@ controls:
     - AVD-KSV0023
     kubescape:
     - C-0045
-    checkov:
-    - CKV_K8S_27
+    checkov: []
     popeye: []
 - id: TATAR-CON-008
   title:
@@ -228,7 +230,8 @@ controls:
     trivy: []
     kubescape:
     - C-0211
-    checkov: []
+    checkov:
+    - CKV_K8S_29
     popeye: []
 - id: TATAR-CON-009
   title:
@@ -275,6 +278,8 @@ controls:
     checkov:
     - CKV_K8S_10
     - CKV_K8S_11
+    - CKV_K8S_12
+    - CKV_K8S_13
     popeye:
     - POP-106
     - POP-107
@@ -370,7 +375,11 @@ controls:
     kubescape:
     - C-0015
     - C-0031
-    checkov: []
+    checkov:
+    - CKV_K8S_155
+    - CKV_K8S_156
+    - CKV_K8S_157
+    - CKV_K8S_158
     popeye: []
 - id: TATAR-RBAC-004
   title:
@@ -436,7 +445,8 @@ controls:
     - AVD-KSV0038
     kubescape:
     - C-0260
-    checkov: []
+    checkov:
+    - CKV2_K8S_6
     popeye:
     - POP-1204
 - id: TATAR-NET-002
@@ -561,7 +571,7 @@ controls:
     kubescape:
     - C-0075
     checkov:
-    - CKV_K8S_43
+    - CKV_K8S_14
     popeye:
     - POP-100
     - POP-101

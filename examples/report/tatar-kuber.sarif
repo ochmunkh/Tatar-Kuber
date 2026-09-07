@@ -43,6 +43,17 @@
               }
             },
             {
+              "id": "TATAR-CON-004",
+              "name": "Dangerous capabilities added",
+              "shortDescription": {
+                "text": "Dangerous capabilities added"
+              },
+              "properties": {
+                "category": "Container Security",
+                "security-severity": "8.0"
+              }
+            },
+            {
               "id": "TATAR-CON-001",
               "name": "Privileged container enabled",
               "shortDescription": {
@@ -109,6 +120,17 @@
               }
             },
             {
+              "id": "TATAR-RBAC-003",
+              "name": "Excessive / risky permissions",
+              "shortDescription": {
+                "text": "Excessive / risky permissions"
+              },
+              "properties": {
+                "category": "RBAC \u0026 Authorization",
+                "security-severity": "8.0"
+              }
+            },
+            {
               "id": "TATAR-CON-009",
               "name": "Read-only root filesystem disabled",
               "shortDescription": {
@@ -131,6 +153,17 @@
               }
             },
             {
+              "id": "TATAR-CON-008",
+              "name": "Missing securityContext",
+              "shortDescription": {
+                "text": "Missing securityContext"
+              },
+              "properties": {
+                "category": "Container Security",
+                "security-severity": "5.0"
+              }
+            },
+            {
               "id": "TATAR-SEC-003",
               "name": "Service account token auto-mounted",
               "shortDescription": {
@@ -138,17 +171,6 @@
               },
               "properties": {
                 "category": "Secret Management",
-                "security-severity": "5.0"
-              }
-            },
-            {
-              "id": "TATAR-IMG-003",
-              "name": "Image uses :latest tag",
-              "shortDescription": {
-                "text": "Image uses :latest tag"
-              },
-              "properties": {
-                "category": "Image Security",
                 "security-severity": "5.0"
               }
             },
@@ -171,6 +193,17 @@
               },
               "properties": {
                 "category": "Container Security",
+                "security-severity": "5.0"
+              }
+            },
+            {
+              "id": "TATAR-IMG-003",
+              "name": "Image uses :latest tag",
+              "shortDescription": {
+                "text": "Image uses :latest tag"
+              },
+              "properties": {
+                "category": "Image Security",
                 "security-severity": "5.0"
               }
             },
@@ -337,6 +370,33 @@
           }
         },
         {
+          "ruleId": "TATAR-CON-004",
+          "level": "error",
+          "message": {
+            "text": "Dangerous capabilities added — Drop unnecessary capabilities; start by dropping ALL."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/root-app"
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-136338cfcb62"
+          },
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-136338cfcb62"
+          }
+        },
+        {
           "ruleId": "TATAR-CON-001",
           "level": "error",
           "message": {
@@ -472,6 +532,60 @@
           }
         },
         {
+          "ruleId": "TATAR-CON-004",
+          "level": "error",
+          "message": {
+            "text": "Dangerous capabilities added — Drop unnecessary capabilities; start by dropping ALL."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/host-ns-app"
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-57fde9b06751"
+          },
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-57fde9b06751"
+          }
+        },
+        {
+          "ruleId": "TATAR-CON-004",
+          "level": "error",
+          "message": {
+            "text": "Dangerous capabilities added — Drop unnecessary capabilities; start by dropping ALL."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/latest-app"
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-5f9218ba0467"
+          },
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-5f9218ba0467"
+          }
+        },
+        {
           "ruleId": "TATAR-CON-003",
           "level": "error",
           "message": {
@@ -582,6 +696,60 @@
           }
         },
         {
+          "ruleId": "TATAR-CON-004",
+          "level": "error",
+          "message": {
+            "text": "Dangerous capabilities added — Drop unnecessary capabilities; start by dropping ALL."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/privileged-app"
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-b18b8be32e49"
+          },
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-b18b8be32e49"
+          }
+        },
+        {
+          "ruleId": "TATAR-CON-004",
+          "level": "error",
+          "message": {
+            "text": "Dangerous capabilities added — Drop unnecessary capabilities; start by dropping ALL."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/secret-env-app"
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-d226ef48aa1d"
+          },
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-d226ef48aa1d"
+          }
+        },
+        {
           "ruleId": "TATAR-SEC-001",
           "level": "error",
           "message": {
@@ -633,6 +801,33 @@
               "checkov"
             ],
             "tatar_id": "TK-9716b35d5c9f"
+          }
+        },
+        {
+          "ruleId": "TATAR-RBAC-003",
+          "level": "error",
+          "message": {
+            "text": "Excessive / risky permissions — Clean up permissions using least-privilege."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "default/clusterrole/too-powerful"
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-13f175cd7fcc"
+          },
+          "properties": {
+            "blind_shot": false,
+            "confidence": "MEDIUM",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-13f175cd7fcc"
           }
         },
         {
@@ -690,6 +885,60 @@
           }
         },
         {
+          "ruleId": "TATAR-CON-008",
+          "level": "warning",
+          "message": {
+            "text": "Missing securityContext — Add a securityContext block with hardening settings."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/privileged-app"
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-13b2dd676317"
+          },
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-13b2dd676317"
+          }
+        },
+        {
+          "ruleId": "TATAR-CON-008",
+          "level": "warning",
+          "message": {
+            "text": "Missing securityContext — Add a securityContext block with hardening settings."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/host-ns-app"
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-1de41f3015aa"
+          },
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-1de41f3015aa"
+          }
+        },
+        {
           "ruleId": "TATAR-SEC-003",
           "level": "warning",
           "message": {
@@ -714,33 +963,6 @@
               "checkov"
             ],
             "tatar_id": "TK-2681ba7df61b"
-          }
-        },
-        {
-          "ruleId": "TATAR-IMG-003",
-          "level": "warning",
-          "message": {
-            "text": "Image uses :latest tag — Use a specific version (digest/tag)."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "production/deployment/privileged-app"
-                }
-              }
-            }
-          ],
-          "partialFingerprints": {
-            "tatarId/v1": "TK-270b9f4bd915"
-          },
-          "properties": {
-            "blind_shot": false,
-            "confidence": "HIGH",
-            "found_by": [
-              "checkov"
-            ],
-            "tatar_id": "TK-270b9f4bd915"
           }
         },
         {
@@ -771,6 +993,33 @@
           }
         },
         {
+          "ruleId": "TATAR-CON-008",
+          "level": "warning",
+          "message": {
+            "text": "Missing securityContext — Add a securityContext block with hardening settings."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/latest-app"
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-49fd10bac73f"
+          },
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-49fd10bac73f"
+          }
+        },
+        {
           "ruleId": "TATAR-CON-009",
           "level": "warning",
           "message": {
@@ -795,33 +1044,6 @@
               "checkov"
             ],
             "tatar_id": "TK-516c6d9edcb3"
-          }
-        },
-        {
-          "ruleId": "TATAR-IMG-003",
-          "level": "warning",
-          "message": {
-            "text": "Image uses :latest tag — Use a specific version (digest/tag)."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "production/deployment/secret-env-app"
-                }
-              }
-            }
-          ],
-          "partialFingerprints": {
-            "tatarId/v1": "TK-6139b2518fff"
-          },
-          "properties": {
-            "blind_shot": false,
-            "confidence": "HIGH",
-            "found_by": [
-              "checkov"
-            ],
-            "tatar_id": "TK-6139b2518fff"
           }
         },
         {
@@ -1149,6 +1371,33 @@
           }
         },
         {
+          "ruleId": "TATAR-CON-008",
+          "level": "warning",
+          "message": {
+            "text": "Missing securityContext — Add a securityContext block with hardening settings."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/secret-env-app"
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-adafa3db6d93"
+          },
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-adafa3db6d93"
+          }
+        },
+        {
           "ruleId": "TATAR-SEC-003",
           "level": "warning",
           "message": {
@@ -1230,6 +1479,33 @@
           }
         },
         {
+          "ruleId": "TATAR-CON-008",
+          "level": "warning",
+          "message": {
+            "text": "Missing securityContext — Add a securityContext block with hardening settings."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/deployment/root-app"
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-c9d2c4a5f566"
+          },
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-c9d2c4a5f566"
+          }
+        },
+        {
           "ruleId": "TATAR-CON-009",
           "level": "warning",
           "message": {
@@ -1254,33 +1530,6 @@
               "checkov"
             ],
             "tatar_id": "TK-ca93aca05b29"
-          }
-        },
-        {
-          "ruleId": "TATAR-IMG-003",
-          "level": "warning",
-          "message": {
-            "text": "Image uses :latest tag — Use a specific version (digest/tag)."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "production/deployment/host-ns-app"
-                }
-              }
-            }
-          ],
-          "partialFingerprints": {
-            "tatarId/v1": "TK-cd623492fa3b"
-          },
-          "properties": {
-            "blind_shot": false,
-            "confidence": "HIGH",
-            "found_by": [
-              "checkov"
-            ],
-            "tatar_id": "TK-cd623492fa3b"
           }
         },
         {
@@ -1365,33 +1614,6 @@
           }
         },
         {
-          "ruleId": "TATAR-IMG-003",
-          "level": "warning",
-          "message": {
-            "text": "Image uses :latest tag — Use a specific version (digest/tag)."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "production/deployment/root-app"
-                }
-              }
-            }
-          ],
-          "partialFingerprints": {
-            "tatarId/v1": "TK-eaf694f91047"
-          },
-          "properties": {
-            "blind_shot": false,
-            "confidence": "HIGH",
-            "found_by": [
-              "checkov"
-            ],
-            "tatar_id": "TK-eaf694f91047"
-          }
-        },
-        {
           "ruleId": "TATAR-CON-002",
           "level": "warning",
           "message": {
@@ -1416,6 +1638,141 @@
               "checkov"
             ],
             "tatar_id": "TK-ee582c898d28"
+          }
+        },
+        {
+          "ruleId": "TATAR-NET-001",
+          "level": "warning",
+          "message": {
+            "text": "Missing NetworkPolicy — Define a NetworkPolicy for each namespace."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "pod/app-latest-app"
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-274cae99f523"
+          },
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-274cae99f523"
+          }
+        },
+        {
+          "ruleId": "TATAR-NET-001",
+          "level": "warning",
+          "message": {
+            "text": "Missing NetworkPolicy — Define a NetworkPolicy for each namespace."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "pod/app-root-app"
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-30d71de77ed3"
+          },
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-30d71de77ed3"
+          }
+        },
+        {
+          "ruleId": "TATAR-NET-001",
+          "level": "warning",
+          "message": {
+            "text": "Missing NetworkPolicy — Define a NetworkPolicy for each namespace."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "pod/app-privileged-app"
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-945b588f85be"
+          },
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-945b588f85be"
+          }
+        },
+        {
+          "ruleId": "TATAR-NET-001",
+          "level": "warning",
+          "message": {
+            "text": "Missing NetworkPolicy — Define a NetworkPolicy for each namespace."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "pod/app-secret-env-app"
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-a45df52da489"
+          },
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-a45df52da489"
+          }
+        },
+        {
+          "ruleId": "TATAR-NET-001",
+          "level": "warning",
+          "message": {
+            "text": "Missing NetworkPolicy — Define a NetworkPolicy for each namespace."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "pod/app-host-ns-app"
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-ba5a2bd17401"
+          },
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "checkov"
+            ],
+            "tatar_id": "TK-ba5a2bd17401"
           }
         },
         {

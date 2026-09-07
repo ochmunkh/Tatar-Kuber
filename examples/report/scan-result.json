@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "metadata": {
-    "scan_id": "5602d8ffaa304b66fd0e99cdb3293979",
+    "scan_id": "23fd3ef449e660c2731d38e6ff4a49e5",
     "cluster_name": "demo-prod",
     "scan_mode": "remote",
     "lang": "en",
@@ -32,29 +32,19 @@
         "status": "ingested",
         "version": "3.2.10",
         "raw_bytes": 41403,
-        "findings": 59,
+        "findings": 89,
         "unmapped_rules": [
           "CKV2_K8S_1",
           "CKV2_K8S_2",
           "CKV2_K8S_3",
           "CKV2_K8S_4",
           "CKV2_K8S_5",
-          "CKV2_K8S_6",
-          "CKV_K8S_12",
-          "CKV_K8S_13",
-          "CKV_K8S_14",
-          "CKV_K8S_155",
-          "CKV_K8S_156",
-          "CKV_K8S_157",
-          "CKV_K8S_158",
-          "CKV_K8S_28",
-          "CKV_K8S_29",
           "CKV_K8S_30",
-          "CKV_K8S_37",
           "CKV_K8S_40",
-          "CKV_K8S_42"
+          "CKV_K8S_42",
+          "CKV_K8S_43"
         ],
-        "unmapped_count": 49
+        "unmapped_count": 19
       },
       {
         "scanner": "popeye",
@@ -64,9 +54,9 @@
         "findings": 6
       }
     ],
-    "started_at": "2026-09-07T04:51:01Z",
-    "finished_at": "2026-09-07T04:51:01Z",
-    "result_hash": "sha256:369a59f3d475a59860955d1f59a8fe37fc98eee8e6a113336bb490baf8cde980",
+    "started_at": "2026-09-07T05:23:46Z",
+    "finished_at": "2026-09-07T05:23:46Z",
+    "result_hash": "sha256:a82578fae350534c09f842127ecf5ca11cf9d7d39d429cdbd46ee47a2fcc365c",
     "inventory": {
       "ClusterRoles": 27,
       "Deployments": 31,
@@ -80,18 +70,18 @@
   "summary": {
     "counts": {
       "CRITICAL": 2,
-      "HIGH": 12,
+      "HIGH": 18,
       "INFO": 2,
       "LOW": 21,
-      "MEDIUM": 29
+      "MEDIUM": 35
     },
     "blind_shot": 0,
-    "risk_score": 23,
+    "risk_score": 19,
     "risk_band": "Critical",
-    "total_findings": 66,
+    "total_findings": 78,
     "risk_breakdown": {
-      "total_penalty": 339.4,
-      "high_penalty": 329.4,
+      "total_penalty": 432.8,
+      "high_penalty": 422.8,
       "low_penalty_raw": 37.8,
       "low_penalty_capped": 10,
       "low_pool_cap": 10,
@@ -104,7 +94,7 @@
           "resource": "deployment/api",
           "severity": "CRITICAL",
           "contribution": 18,
-          "share": 4.9
+          "share": 3.9
         },
         {
           "id": "TK-099acce09622",
@@ -112,7 +102,15 @@
           "resource": "deployment/root-app",
           "severity": "HIGH",
           "contribution": 12.6,
-          "share": 3.4
+          "share": 2.7
+        },
+        {
+          "id": "TK-136338cfcb62",
+          "canonical_control": "TATAR-CON-004",
+          "resource": "deployment/root-app",
+          "severity": "HIGH",
+          "contribution": 12.6,
+          "share": 2.7
         },
         {
           "id": "TK-31cdabe90e87",
@@ -120,7 +118,7 @@
           "resource": "deployment/privileged-app",
           "severity": "HIGH",
           "contribution": 12.6,
-          "share": 3.4
+          "share": 2.7
         },
         {
           "id": "TK-3d236fda3600",
@@ -128,15 +126,7 @@
           "resource": "deployment/host-ns-app",
           "severity": "HIGH",
           "contribution": 12.6,
-          "share": 3.4
-        },
-        {
-          "id": "TK-41b7549616ee",
-          "canonical_control": "TATAR-IMG-002",
-          "resource": "deployment/api",
-          "severity": "HIGH",
-          "contribution": 12.6,
-          "share": 3.4
+          "share": 2.7
         }
       ]
     }
@@ -175,8 +165,8 @@
         "contribution": 18
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "references": [
         "CVE-2024-0001",
         "https://avd.aquasec.com/nvd/cve-2024-0001"
@@ -220,8 +210,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "kubescape",
@@ -268,12 +258,57 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
           "rule_id": "CKV_K8S_20"
+        }
+      ]
+    },
+    {
+      "id": "TK-136338cfcb62",
+      "canonical_control": "TATAR-CON-004",
+      "resource": "deployment/root-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "HIGH",
+      "original_severity": "HIGH",
+      "title": "Dangerous capabilities added",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/root-user.yaml:2-20"
+        }
+      ],
+      "remediation": "Drop unnecessary capabilities; start by dropping ALL.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 12.6,
+      "risk_factors": {
+        "base_weight": 7,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 12.6
+      },
+      "status": "OPEN",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_28"
+        },
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_37"
         }
       ]
     },
@@ -316,8 +351,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -364,8 +399,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -406,8 +441,8 @@
         "contribution": 12.6
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "references": [
         "CVE-2024-0002",
         "https://avd.aquasec.com/nvd/cve-2024-0002"
@@ -458,8 +493,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -506,12 +541,102 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
           "rule_id": "CKV_K8S_20"
+        }
+      ]
+    },
+    {
+      "id": "TK-57fde9b06751",
+      "canonical_control": "TATAR-CON-004",
+      "resource": "deployment/host-ns-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "HIGH",
+      "original_severity": "HIGH",
+      "title": "Dangerous capabilities added",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/host-namespaces.yaml:2-19"
+        }
+      ],
+      "remediation": "Drop unnecessary capabilities; start by dropping ALL.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 12.6,
+      "risk_factors": {
+        "base_weight": 7,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 12.6
+      },
+      "status": "OPEN",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_28"
+        },
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_37"
+        }
+      ]
+    },
+    {
+      "id": "TK-5f9218ba0467",
+      "canonical_control": "TATAR-CON-004",
+      "resource": "deployment/latest-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "HIGH",
+      "original_severity": "HIGH",
+      "title": "Dangerous capabilities added",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/latest-tag.yaml:2-16"
+        }
+      ],
+      "remediation": "Drop unnecessary capabilities; start by dropping ALL.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 12.6,
+      "risk_factors": {
+        "base_weight": 7,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 12.6
+      },
+      "status": "OPEN",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_28"
+        },
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_37"
         }
       ]
     },
@@ -554,8 +679,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -608,8 +733,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "references": [
         "https://avd.aquasec.com/misconfig/ksv017",
         "https://docs.prismacloud.io/en/enterprise-edition/policy-reference/kubernetes-policies/kubernetes-policy-index/bc-k8s-15"
@@ -668,8 +793,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -716,12 +841,102 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
           "rule_id": "CKV_K8S_17"
+        }
+      ]
+    },
+    {
+      "id": "TK-b18b8be32e49",
+      "canonical_control": "TATAR-CON-004",
+      "resource": "deployment/privileged-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "HIGH",
+      "original_severity": "HIGH",
+      "title": "Dangerous capabilities added",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/privileged.yaml:2-18"
+        }
+      ],
+      "remediation": "Drop unnecessary capabilities; start by dropping ALL.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 12.6,
+      "risk_factors": {
+        "base_weight": 7,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 12.6
+      },
+      "status": "OPEN",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_28"
+        },
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_37"
+        }
+      ]
+    },
+    {
+      "id": "TK-d226ef48aa1d",
+      "canonical_control": "TATAR-CON-004",
+      "resource": "deployment/secret-env-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "HIGH",
+      "original_severity": "HIGH",
+      "title": "Dangerous capabilities added",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/secret-env.yaml:2-21"
+        }
+      ],
+      "remediation": "Drop unnecessary capabilities; start by dropping ALL.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 12.6,
+      "risk_factors": {
+        "base_weight": 7,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 12.6
+      },
+      "status": "OPEN",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_28"
+        },
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_37"
         }
       ]
     },
@@ -764,8 +979,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "trivy",
@@ -812,12 +1027,65 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
           "rule_id": "CKV_K8S_49"
+        }
+      ]
+    },
+    {
+      "id": "TK-13f175cd7fcc",
+      "canonical_control": "TATAR-RBAC-003",
+      "resource": "clusterrole/too-powerful",
+      "namespace": "default",
+      "type": "rbac",
+      "category": "RBAC \u0026 Authorization",
+      "severity": "HIGH",
+      "original_severity": "HIGH",
+      "title": "Excessive / risky permissions",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/wildcard-rbac.yaml:2-10"
+        }
+      ],
+      "remediation": "Clean up permissions using least-privilege.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "MEDIUM",
+      "blind_shot": false,
+      "risk_contribution": 7,
+      "risk_factors": {
+        "base_weight": 7,
+        "asset_context": 1,
+        "exposure": 1,
+        "confidence": 1,
+        "contribution": 7
+      },
+      "status": "OPEN",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_155"
+        },
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_156"
+        },
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_157"
+        },
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_158"
         }
       ]
     },
@@ -853,8 +1121,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -895,12 +1163,94 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "popeye",
           "rule_id": "POP-300"
+        }
+      ]
+    },
+    {
+      "id": "TK-13b2dd676317",
+      "canonical_control": "TATAR-CON-008",
+      "resource": "deployment/privileged-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Missing securityContext",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/privileged.yaml:2-18"
+        }
+      ],
+      "remediation": "Add a securityContext block with hardening settings.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 5.4,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 5.4
+      },
+      "status": "OPEN",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_29"
+        }
+      ]
+    },
+    {
+      "id": "TK-1de41f3015aa",
+      "canonical_control": "TATAR-CON-008",
+      "resource": "deployment/host-ns-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Missing securityContext",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/host-namespaces.yaml:2-19"
+        }
+      ],
+      "remediation": "Add a securityContext block with hardening settings.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 5.4,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 5.4
+      },
+      "status": "OPEN",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_29"
         }
       ]
     },
@@ -943,60 +1293,12 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
           "rule_id": "CKV_K8S_38"
-        }
-      ]
-    },
-    {
-      "id": "TK-270b9f4bd915",
-      "canonical_control": "TATAR-IMG-003",
-      "resource": "deployment/privileged-app",
-      "namespace": "production",
-      "type": "misconfiguration",
-      "category": "Image Security",
-      "severity": "MEDIUM",
-      "original_severity": "MEDIUM",
-      "title": "Image uses :latest tag",
-      "description": "",
-      "evidence": [
-        {
-          "scanner": "checkov",
-          "path": "/lab/broken/privileged.yaml:2-18"
-        }
-      ],
-      "remediation": "Use a specific version (digest/tag).",
-      "found_by": [
-        "checkov"
-      ],
-      "confidence": "HIGH",
-      "blind_shot": false,
-      "risk_contribution": 5.4,
-      "risk_factors": {
-        "base_weight": 3,
-        "asset_context": 1.5,
-        "exposure": 1,
-        "confidence": 1.2,
-        "contribution": 5.4
-      },
-      "attack": [
-        {
-          "technique": "T1525",
-          "name": "Implant Internal Image",
-          "tactic": "Persistence"
-        }
-      ],
-      "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
-      "raw_refs": [
-        {
-          "scanner": "checkov",
-          "rule_id": "CKV_K8S_43"
         }
       ]
     },
@@ -1039,12 +1341,53 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
           "rule_id": "CKV_K8S_38"
+        }
+      ]
+    },
+    {
+      "id": "TK-49fd10bac73f",
+      "canonical_control": "TATAR-CON-008",
+      "resource": "deployment/latest-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Missing securityContext",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/latest-tag.yaml:2-16"
+        }
+      ],
+      "remediation": "Add a securityContext block with hardening settings.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 5.4,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 5.4
+      },
+      "status": "OPEN",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_29"
         }
       ]
     },
@@ -1080,60 +1423,12 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
           "rule_id": "CKV_K8S_22"
-        }
-      ]
-    },
-    {
-      "id": "TK-6139b2518fff",
-      "canonical_control": "TATAR-IMG-003",
-      "resource": "deployment/secret-env-app",
-      "namespace": "production",
-      "type": "misconfiguration",
-      "category": "Image Security",
-      "severity": "MEDIUM",
-      "original_severity": "MEDIUM",
-      "title": "Image uses :latest tag",
-      "description": "",
-      "evidence": [
-        {
-          "scanner": "checkov",
-          "path": "/lab/broken/secret-env.yaml:2-21"
-        }
-      ],
-      "remediation": "Use a specific version (digest/tag).",
-      "found_by": [
-        "checkov"
-      ],
-      "confidence": "HIGH",
-      "blind_shot": false,
-      "risk_contribution": 5.4,
-      "risk_factors": {
-        "base_weight": 3,
-        "asset_context": 1.5,
-        "exposure": 1,
-        "confidence": 1.2,
-        "contribution": 5.4
-      },
-      "attack": [
-        {
-          "technique": "T1525",
-          "name": "Implant Internal Image",
-          "tactic": "Persistence"
-        }
-      ],
-      "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
-      "raw_refs": [
-        {
-          "scanner": "checkov",
-          "rule_id": "CKV_K8S_43"
         }
       ]
     },
@@ -1169,8 +1464,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1210,8 +1505,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1251,8 +1546,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1292,8 +1587,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1333,8 +1628,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1374,8 +1669,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1415,8 +1710,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1456,8 +1751,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "trivy",
@@ -1497,8 +1792,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1545,12 +1840,12 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
-          "rule_id": "CKV_K8S_43"
+          "rule_id": "CKV_K8S_14"
         }
       ]
     },
@@ -1593,8 +1888,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1634,12 +1929,53 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
           "rule_id": "CKV_K8S_31"
+        }
+      ]
+    },
+    {
+      "id": "TK-adafa3db6d93",
+      "canonical_control": "TATAR-CON-008",
+      "resource": "deployment/secret-env-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Missing securityContext",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/secret-env.yaml:2-21"
+        }
+      ],
+      "remediation": "Add a securityContext block with hardening settings.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 5.4,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 5.4
+      },
+      "status": "OPEN",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_29"
         }
       ]
     },
@@ -1682,8 +2018,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1724,8 +2060,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "kubescape",
@@ -1765,12 +2101,53 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
           "rule_id": "CKV_K8S_31"
+        }
+      ]
+    },
+    {
+      "id": "TK-c9d2c4a5f566",
+      "canonical_control": "TATAR-CON-008",
+      "resource": "deployment/root-app",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Missing securityContext",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/root-user.yaml:2-20"
+        }
+      ],
+      "remediation": "Add a securityContext block with hardening settings.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 5.4,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 5.4
+      },
+      "status": "OPEN",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_29"
         }
       ]
     },
@@ -1806,60 +2183,12 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
           "rule_id": "CKV_K8S_22"
-        }
-      ]
-    },
-    {
-      "id": "TK-cd623492fa3b",
-      "canonical_control": "TATAR-IMG-003",
-      "resource": "deployment/host-ns-app",
-      "namespace": "production",
-      "type": "misconfiguration",
-      "category": "Image Security",
-      "severity": "MEDIUM",
-      "original_severity": "MEDIUM",
-      "title": "Image uses :latest tag",
-      "description": "",
-      "evidence": [
-        {
-          "scanner": "checkov",
-          "path": "/lab/broken/host-namespaces.yaml:2-19"
-        }
-      ],
-      "remediation": "Use a specific version (digest/tag).",
-      "found_by": [
-        "checkov"
-      ],
-      "confidence": "HIGH",
-      "blind_shot": false,
-      "risk_contribution": 5.4,
-      "risk_factors": {
-        "base_weight": 3,
-        "asset_context": 1.5,
-        "exposure": 1,
-        "confidence": 1.2,
-        "contribution": 5.4
-      },
-      "attack": [
-        {
-          "technique": "T1525",
-          "name": "Implant Internal Image",
-          "tactic": "Persistence"
-        }
-      ],
-      "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
-      "raw_refs": [
-        {
-          "scanner": "checkov",
-          "rule_id": "CKV_K8S_43"
         }
       ]
     },
@@ -1895,8 +2224,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1943,8 +2272,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1993,60 +2322,12 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "popeye",
           "rule_id": "POP-101"
-        }
-      ]
-    },
-    {
-      "id": "TK-eaf694f91047",
-      "canonical_control": "TATAR-IMG-003",
-      "resource": "deployment/root-app",
-      "namespace": "production",
-      "type": "misconfiguration",
-      "category": "Image Security",
-      "severity": "MEDIUM",
-      "original_severity": "MEDIUM",
-      "title": "Image uses :latest tag",
-      "description": "",
-      "evidence": [
-        {
-          "scanner": "checkov",
-          "path": "/lab/broken/root-user.yaml:2-20"
-        }
-      ],
-      "remediation": "Use a specific version (digest/tag).",
-      "found_by": [
-        "checkov"
-      ],
-      "confidence": "HIGH",
-      "blind_shot": false,
-      "risk_contribution": 5.4,
-      "risk_factors": {
-        "base_weight": 3,
-        "asset_context": 1.5,
-        "exposure": 1,
-        "confidence": 1.2,
-        "contribution": 5.4
-      },
-      "attack": [
-        {
-          "technique": "T1525",
-          "name": "Implant Internal Image",
-          "tactic": "Persistence"
-        }
-      ],
-      "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
-      "raw_refs": [
-        {
-          "scanner": "checkov",
-          "rule_id": "CKV_K8S_43"
         }
       ]
     },
@@ -2082,12 +2363,247 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
           "rule_id": "CKV_K8S_23"
+        }
+      ]
+    },
+    {
+      "id": "TK-274cae99f523",
+      "canonical_control": "TATAR-NET-001",
+      "resource": "pod/app-latest-app",
+      "type": "network",
+      "category": "Network Security",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Missing NetworkPolicy",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/latest-tag.yaml:2-16"
+        }
+      ],
+      "remediation": "Define a NetworkPolicy for each namespace.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 3.6,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 3.6
+      },
+      "attack": [
+        {
+          "technique": "T1046",
+          "name": "Network Service Discovery",
+          "tactic": "Discovery"
+        }
+      ],
+      "status": "OPEN",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV2_K8S_6"
+        }
+      ]
+    },
+    {
+      "id": "TK-30d71de77ed3",
+      "canonical_control": "TATAR-NET-001",
+      "resource": "pod/app-root-app",
+      "type": "network",
+      "category": "Network Security",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Missing NetworkPolicy",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/root-user.yaml:2-20"
+        }
+      ],
+      "remediation": "Define a NetworkPolicy for each namespace.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 3.6,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 3.6
+      },
+      "attack": [
+        {
+          "technique": "T1046",
+          "name": "Network Service Discovery",
+          "tactic": "Discovery"
+        }
+      ],
+      "status": "OPEN",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV2_K8S_6"
+        }
+      ]
+    },
+    {
+      "id": "TK-945b588f85be",
+      "canonical_control": "TATAR-NET-001",
+      "resource": "pod/app-privileged-app",
+      "type": "network",
+      "category": "Network Security",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Missing NetworkPolicy",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/privileged.yaml:2-18"
+        }
+      ],
+      "remediation": "Define a NetworkPolicy for each namespace.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 3.6,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 3.6
+      },
+      "attack": [
+        {
+          "technique": "T1046",
+          "name": "Network Service Discovery",
+          "tactic": "Discovery"
+        }
+      ],
+      "status": "OPEN",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV2_K8S_6"
+        }
+      ]
+    },
+    {
+      "id": "TK-a45df52da489",
+      "canonical_control": "TATAR-NET-001",
+      "resource": "pod/app-secret-env-app",
+      "type": "network",
+      "category": "Network Security",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Missing NetworkPolicy",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/secret-env.yaml:2-21"
+        }
+      ],
+      "remediation": "Define a NetworkPolicy for each namespace.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 3.6,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 3.6
+      },
+      "attack": [
+        {
+          "technique": "T1046",
+          "name": "Network Service Discovery",
+          "tactic": "Discovery"
+        }
+      ],
+      "status": "OPEN",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV2_K8S_6"
+        }
+      ]
+    },
+    {
+      "id": "TK-ba5a2bd17401",
+      "canonical_control": "TATAR-NET-001",
+      "resource": "pod/app-host-ns-app",
+      "type": "network",
+      "category": "Network Security",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Missing NetworkPolicy",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "checkov",
+          "path": "/lab/broken/host-namespaces.yaml:2-19"
+        }
+      ],
+      "remediation": "Define a NetworkPolicy for each namespace.",
+      "found_by": [
+        "checkov"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 3.6,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 3.6
+      },
+      "attack": [
+        {
+          "technique": "T1046",
+          "name": "Network Service Discovery",
+          "tactic": "Discovery"
+        }
+      ],
+      "status": "OPEN",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
+      "raw_refs": [
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV2_K8S_6"
         }
       ]
     },
@@ -2123,8 +2639,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2164,8 +2680,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2174,6 +2690,14 @@
         {
           "scanner": "checkov",
           "rule_id": "CKV_K8S_11"
+        },
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_12"
+        },
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_13"
         }
       ]
     },
@@ -2209,8 +2733,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2250,8 +2774,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2291,8 +2815,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2332,8 +2856,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2375,8 +2899,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "popeye",
@@ -2418,8 +2942,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "popeye",
@@ -2459,8 +2983,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2500,8 +3024,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2510,6 +3034,14 @@
         {
           "scanner": "checkov",
           "rule_id": "CKV_K8S_11"
+        },
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_12"
+        },
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_13"
         }
       ]
     },
@@ -2545,8 +3077,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2586,8 +3118,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2596,6 +3128,14 @@
         {
           "scanner": "checkov",
           "rule_id": "CKV_K8S_11"
+        },
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_12"
+        },
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_13"
         }
       ]
     },
@@ -2631,8 +3171,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2672,8 +3212,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2713,8 +3253,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2754,8 +3294,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2795,8 +3335,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2836,8 +3376,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2846,6 +3386,14 @@
         {
           "scanner": "checkov",
           "rule_id": "CKV_K8S_11"
+        },
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_12"
+        },
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_13"
         }
       ]
     },
@@ -2881,8 +3429,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2922,8 +3470,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2932,6 +3480,14 @@
         {
           "scanner": "checkov",
           "rule_id": "CKV_K8S_11"
+        },
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_12"
+        },
+        {
+          "scanner": "checkov",
+          "rule_id": "CKV_K8S_13"
         }
       ]
     },
@@ -2967,8 +3523,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -3008,8 +3564,8 @@
         "contribution": 0
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "popeye",
@@ -3049,8 +3605,8 @@
         "contribution": 0
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:51:01Z",
-      "last_seen": "2026-09-07T04:51:01Z",
+      "first_seen": "2026-09-07T05:23:46Z",
+      "last_seen": "2026-09-07T05:23:46Z",
       "raw_refs": [
         {
           "scanner": "popeye",

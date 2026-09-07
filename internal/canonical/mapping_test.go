@@ -149,3 +149,82 @@ func TestPopeyeMappingsMatchUpstreamMeaning(t *testing.T) {
 		}
 	}
 }
+
+// Checkov-ийн CKV ID-ууд ч мөн адил: ID нь тогтвортой боловч тухайн ID ЯГ ЮУ
+// шалгадаг нь registry-д бичсэн canonical control-той таарах ёстой. v1.0.1-ийн
+// аудитаар 18 зураглалын 2 нь зөрсөн:
+//
+//	CKV_K8S_43 = "Image should use digest" (ямар ч tag-тай image дээр гарна)
+//	  -> IMG-003 ":latest tag" гэж зурагдсан. Зөв пиннэсэн nginx:1.25.3 ч
+//	     ":latest ашиглаж байна" гэж тайлагдах false positive байв.
+//	     ":latest"-ийн жинхэнэ шалгалт нь CKV_K8S_14.
+//	CKV_K8S_27 = "Do not expose the docker daemon socket to containers"
+//	  -> CON-007 "Host filesystem mounted (hostPath)" гэж зурагдсан. Checkov-д
+//	     ерөнхий hostPath шалгалт БАЙХГҮЙ (Trivy/Kubescape хамардаг).
+//
+// Утгуудыг checkov 3.3-ийн бодит гаралт ба шалгалтын эх кодоос (жишээ:
+// resource/k8s/ImageTagFixed.py) батлав.
+func TestCheckovMappingsMatchUpstreamMeaning(t *testing.T) {
+	reg, err := Load(regPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := []struct{ code, meaning, control string }{
+		{"CKV_K8S_8", `Liveness Probe Should be Configured`, "TATAR-OPS-002"},
+		{"CKV_K8S_9", `Readiness Probe Should be Configured`, "TATAR-OPS-001"},
+		{"CKV_K8S_10", `CPU requests should be set`, "TATAR-CON-010"},
+		{"CKV_K8S_11", `CPU limits should be set`, "TATAR-CON-010"},
+		{"CKV_K8S_12", `Memory requests should be set`, "TATAR-CON-010"},
+		{"CKV_K8S_13", `Memory limits should be set`, "TATAR-CON-010"},
+		{"CKV_K8S_14", `Image Tag should be fixed - not latest or blank`, "TATAR-IMG-003"},
+		{"CKV_K8S_15", `Image Pull Policy should be Always`, "TATAR-OPS-005"},
+		{"CKV_K8S_16", `Container should not be privileged`, "TATAR-CON-001"},
+		{"CKV_K8S_17", `Containers should not share the host process ID namespace`, "TATAR-CON-005"},
+		{"CKV_K8S_19", `Containers should not share the host network namespace`, "TATAR-CON-006"},
+		{"CKV_K8S_20", `Containers should not run with allowPrivilegeEscalation`, "TATAR-CON-003"},
+		{"CKV_K8S_22", `Use read-only filesystem for containers where possible`, "TATAR-CON-009"},
+		{"CKV_K8S_23", `Minimize the admission of root containers`, "TATAR-CON-002"},
+		{"CKV_K8S_25", `Minimize the admission of containers with added capability`, "TATAR-CON-004"},
+		{"CKV_K8S_28", `Minimize the admission of containers with the NET_RAW capability`, "TATAR-CON-004"},
+		{"CKV_K8S_29", `Apply security context to your pods and containers`, "TATAR-CON-008"},
+		{"CKV_K8S_31", `Ensure that the seccomp profile is set to docker/default or runtime/default`, "TATAR-CON-011"},
+		{"CKV_K8S_35", `Prefer using secrets as files over secrets as environment variables`, "TATAR-SEC-001"},
+		{"CKV_K8S_37", `Minimize the admission of containers with capabilities assigned`, "TATAR-CON-004"},
+		{"CKV_K8S_38", `Ensure that Service Account Tokens are only mounted where necessary`, "TATAR-SEC-003"},
+		{"CKV_K8S_39", `Do not use the CAP_SYS_ADMIN linux capability`, "TATAR-CON-004"},
+		{"CKV_K8S_49", `Minimize wildcard use in Roles and ClusterRoles`, "TATAR-RBAC-002"},
+		{"CKV_K8S_155", `Minimize ClusterRoles that grant control over validating or mutating admission webhook configurations`, "TATAR-RBAC-003"},
+		{"CKV_K8S_156", `Minimize ClusterRoles that grant permissions to approve CertificateSigningRequests`, "TATAR-RBAC-003"},
+		{"CKV_K8S_157", `Minimize Roles and ClusterRoles that grant permissions to bind RoleBindings or ClusterRoleBindings`, "TATAR-RBAC-003"},
+		{"CKV_K8S_158", `Minimize Roles and ClusterRoles that grant permissions to escalate Roles or ClusterRoles`, "TATAR-RBAC-003"},
+		{"CKV2_K8S_6", `Minimize the admission of pods which lack an associated NetworkPolicy`, "TATAR-NET-001"},
+	}
+	for _, w := range want {
+		ids, ok := reg.Resolve("checkov", w.code)
+		if !ok || len(ids) != 1 {
+			t.Errorf("%s (%s): зураглал олдсонгүй/олон (%v)", w.code, w.meaning, ids)
+			continue
+		}
+		if ids[0] != w.control {
+			t.Errorf("%s (%s) -> %s, хүлээсэн %s", w.code, w.meaning, ids[0], w.control)
+		}
+	}
+	// Буруу байсан хоёр ID дахин зурагдаж болохгүй.
+	for _, bad := range []string{"CKV_K8S_43", "CKV_K8S_27"} {
+		if ids, ok := reg.Resolve("checkov", bad); ok {
+			t.Errorf("%s дахин зурагдсан (-> %v). 43=digest (:latest БИШ), 27=docker socket (hostPath БИШ) — v2-д тусдаа control", bad, ids)
+		}
+	}
+	// Зураглагдсан CKV код бүр дээрх жагсаалтад байх ёстой.
+	known := map[string]bool{}
+	for _, w := range want {
+		known[w.code] = true
+	}
+	for _, c := range reg.Controls {
+		for _, code := range c.Mappings["checkov"] {
+			if !known[code] {
+				t.Errorf("%s: %s зураглагдсан ч утга батлагдаагүй — checkov-ийн бодит гаралт/эх кодоос шалгаж тестэд нэм", c.ID, code)
+			}
+		}
+	}
+}

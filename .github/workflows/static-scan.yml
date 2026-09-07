@@ -1,0 +1,116 @@
+# Mode A (манифест шалгах) — CLUSTER ШААРДАХГҮЙ батлалт.
+# Consulting-ийн бодит хэрэглээ ихэвчлэн энэ зам: үйлчлүүлэгчийн cluster-т нэвтрэх
+# эрх авахаас нь тэдний манифест/Helm chart-ыг шалгах нь бодитой байдаг. v1.0.0-д
+# энэ зам огт батлагдаагүй байсан (Checkov live-д unsupported, demo fixture нь
+# гараар бичигдсэн) тул зураглалын зөрүү нуугдаж байв.
+#
+# Энэ workflow нь БОДИТ Checkov ба `trivy config`-ыг өөрийн эмзэг манифест дээр
+# ажиллуулж, гаралтыг tatar-kuber-ээр нэгтгэж, canonical зураглал ажиллаж байгааг
+# шалгана. Scanner шалгалтаа дахин нэрлэх/дугаарлахад энэ job унана.
+name: Static scan (no cluster)
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches: [master, main]
+    paths:
+      - "internal/scanner/**"
+      - "internal/canonical/**"
+      - "internal/normalizer/**"
+      - "schema/canonical-controls.yaml"
+      - "examples/vulnerable/**"
+      - ".github/workflows/static-scan.yml"
+  schedule:
+    - cron: "30 6 * * 1" # 7 хоног тутам — scanner хувилбар шинэчлэгдэхэд зөрүүг барина
+
+permissions:
+  contents: read
+
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "stable"
+          cache: true
+
+      - name: Build tatar-kuber
+        run: go build -o tatar-kuber ./cmd/tatar-kuber
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Checkov
+        run: pip install --quiet checkov
+
+      - name: Install Trivy
+        run: curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin
+
+      - name: Versions
+        run: |
+          checkov --version
+          trivy --version | head -1
+          ./tatar-kuber version
+
+      # Бодит scanner гаралтыг цуглуулж raw/ бүтэц болгоно (scan --raw-dir хүлээж авдаг хэлбэр).
+      - name: Collect real scanner output on examples/vulnerable
+        run: |
+          mkdir -p raw
+          checkov -d examples/vulnerable -o json --compact --quiet > raw/checkov.json || true
+          trivy config examples/vulnerable --format json -q > raw/trivy.json || true
+          printf '{"checkov":"%s","trivy":"%s"}\n' \
+            "$(checkov --version)" "$(trivy --version | head -1 | awk '{print $2}')" > raw/versions.json
+          echo "--- raw sizes ---"; wc -c raw/*.json
+
+      - name: Normalize + report
+        run: |
+          ./tatar-kuber scan --raw-dir raw --cluster static-ci -o out
+          ./tatar-kuber report --input out/scan-result.json -o html  --out out/report.html
+          ./tatar-kuber report --input out/scan-result.json -o sarif --out out/tatar-kuber.sarif
+
+      - name: Upload artifacts (raw evidence + reports)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: static-scan-report
+          path: |
+            raw/
+            out/
+
+      # Checkov нь Mode A-ийн гол scanner. 0 finding эсвэл зураглал эвдэрсэн бол унана.
+      - name: Assert Checkov mapping actually works
+        run: |
+          echo "----- scanner_runs -----"
+          jq -r '.metadata.scanner_runs[] | "\(.scanner)\t\(.status)\tfindings=\(.findings)\tunmapped=\(.unmapped_count // 0)\t\(.error // "")"' out/scan-result.json
+          FAIL=0
+          N="$(jq -r '.metadata.scanner_runs[] | select(.scanner=="checkov") | .findings' out/scan-result.json)"
+          ST="$(jq -r '.metadata.scanner_runs[] | select(.scanner=="checkov") | .status' out/scan-result.json)"
+          if [ "$ST" != "ingested" ] || [ "${N:-0}" -lt 10 ]; then
+            echo "::error::checkov: status=$ST findings=${N:-0} — бодит Checkov гаралт normalize хийгдэх ЁСТОЙ"
+            FAIL=1
+          fi
+          # Эмзэг манифест дээр заавал гарах control-ууд (зураглал бүтэн эсэхийн баталгаа).
+          for c in TATAR-CON-001 TATAR-CON-003 TATAR-CON-005 TATAR-CON-006 TATAR-CON-010 TATAR-IMG-003; do
+            if ! jq -e --arg c "$c" '.findings[] | select(.canonical_control==$c) | select(.found_by | index("checkov"))' out/scan-result.json >/dev/null; then
+              echo "::error::Checkov $c-ийг илрүүлээгүй — CKV зураглал эвдэрсэн байж болзошгүй"
+              FAIL=1
+            fi
+          done
+          # :latest нь CKV_K8S_14-ээр гарах ёстой. CKV_K8S_43 (digest) нь :latest БИШ —
+          # v1.0.1-д тэр зөрүү false positive үүсгэж байсан тул дахин зурагдаж болохгүй.
+          if jq -e '.findings[] | .raw_refs[]? | select(.scanner=="checkov") | select(.rule_id=="CKV_K8S_43" or .rule_id=="CKV_K8S_27")' out/scan-result.json >/dev/null; then
+            echo "::error::CKV_K8S_43 (digest) эсвэл CKV_K8S_27 (docker socket) дахин зурагдсан — утга зөрж байна"
+            FAIL=1
+          fi
+          exit $FAIL
+
+      # Зураглалгүй rule-уудыг ил гаргана (унагахгүй) — coverage-ийн ажлын дараалал.
+      - name: Report unmapped rules (informational)
+        run: |
+          jq -r '.metadata.scanner_runs[] | select((.unmapped_count // 0) > 0)
+                 | "\(.scanner): \(.unmapped_count) илрүүлэлт, \(.unmapped_rules | length) rule\n  \(.unmapped_rules | join(", "))"' out/scan-result.json
