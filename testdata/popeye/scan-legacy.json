@@ -25,7 +25,7 @@
         "sanitizer": "pods",
         "gvr": "v1/pods",
         "issues": {
-          "production/api-7d8": [
+          "production/latest-app-598c4dc6b8-ldjqq": [
             { "group": "container-x", "level": 2, "message": "[POP-101] Image tagged \"latest\" in use" },
             { "group": "container-x", "level": 2, "message": "[POP-106] No resources requests/limits defined" },
             { "group": "container-x", "level": 2, "message": "[POP-102] No probes defined" },

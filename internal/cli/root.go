@@ -8,7 +8,7 @@ import (
 )
 
 // Version — build-time-д тохируулагдана (-ldflags).
-var Version = "1.0.1-dev"
+var Version = "1.0.2-dev"
 
 const usage = `TATAR-Kuber — Kubernetes security posture assessment framework
 

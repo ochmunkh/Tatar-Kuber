@@ -25,6 +25,7 @@ func cmdScan(args []string) int {
 	registry := fs.String("registry", "", "canonical-controls.yaml зам")
 	lang := fs.String("lang", "en", "тайлангийн хэл: en | mn")
 	noRaw := fs.Bool("no-raw", false, "live scan-д scanner-уудын түүхий гаралтыг <out>/raw/ дотор ХАДГАЛАХГҮЙ (default: хадгална — нотолгоо)")
+	noRollup := fs.Bool("no-rollup", false, "Pod хэмжээний finding-ийг эзэмшигч controller руу ЗӨӨХГҮЙ (default: зөөнө — нэг зөрчил нэг удаа тоологдоно)")
 	_ = fs.Parse(args)
 
 	regPath, err := resolveRegistry(*registry)
@@ -50,12 +51,13 @@ func cmdScan(args []string) int {
 			fmt.Fprintln(os.Stderr, "алдаа:", err)
 			return 2
 		}
-		r, err := p.Process(raws, orchestrator.Meta{ClusterName: *cluster, ScanMode: mode, Lang: *lang, Inventory: inv})
+		r, err := p.Process(raws, orchestrator.Meta{ClusterName: *cluster, ScanMode: mode, Lang: *lang, Inventory: inv, NoRollup: *noRollup})
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "алдаа:", err)
 			return 2
 		}
 		warnRuns(r.Metadata.ScannerRuns)
+		reportRollup(r.Metadata.Rollup)
 		return writeResult(r, *outDir)
 	}
 
@@ -81,12 +83,13 @@ func cmdScan(args []string) int {
 		}
 	}
 
-	r, err := p.Process(raws, orchestrator.Meta{ClusterName: *cluster, ScanMode: mode, Lang: *lang, Runs: runs})
+	r, err := p.Process(raws, orchestrator.Meta{ClusterName: *cluster, ScanMode: mode, Lang: *lang, Runs: runs, NoRollup: *noRollup})
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "алдаа:", err)
 		return 2
 	}
 	warnRuns(r.Metadata.ScannerRuns)
+	reportRollup(r.Metadata.Rollup)
 	if len(raws) == 0 {
 		fmt.Fprintln(os.Stderr, "анхаар: ямар ч scanner ажиллаагүй (scanner binary суулгасан эсэхээ `tatar-kuber doctor`-оор шалгана уу). Offline горим: --raw-dir")
 	}
@@ -113,6 +116,15 @@ func warnRuns(runs []finding.ScannerRun) {
 	for _, msg := range orchestrator.Problems(runs) {
 		fmt.Fprintln(os.Stderr, "анхаар:", msg)
 	}
+}
+
+// reportRollup — Pod -> controller зөөлтийг stderr-т мэдэгдэнэ. Тоо буурсан нь
+// "асуудал арилсан" гэсэн үг биш тул чимээгүй байж болохгүй.
+func reportRollup(r *finding.RollupInfo) {
+	if r == nil || r.Moved == 0 {
+		return
+	}
+	fmt.Fprintf(os.Stderr, "rollup: %d pod-хэмжээний finding эзэмшигч controller руу зөөгдлөө (%d pod) — нэг зөрчил нэг удаа тоологдоно; болиулах: --no-rollup\n", r.Moved, len(r.Pods))
 }
 
 // saveRaw — raw scanner гаралтыг <dir>/<scanner>.json, хувилбаруудыг versions.json болгон бичнэ.

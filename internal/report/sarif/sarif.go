@@ -5,6 +5,9 @@ package sarif
 import (
 	"encoding/json"
 	"io"
+	"regexp"
+	"strconv"
+	"strings"
 
 	"github.com/ochmunkh/tatar-kuber/internal/finding"
 )
@@ -24,11 +27,44 @@ type sarifRule struct {
 type sarifArtifact struct {
 	URI string `json:"uri"`
 }
+type sarifRegion struct {
+	StartLine int `json:"startLine,omitempty"`
+	EndLine   int `json:"endLine,omitempty"`
+}
 type sarifLocation struct {
 	PhysicalLocation struct {
 		ArtifactLocation sarifArtifact `json:"artifactLocation"`
+		Region           *sarifRegion  `json:"region,omitempty"`
 	} `json:"physicalLocation"`
 }
+
+// filePath — evidence дундаас БОДИТ файлын зам:мөрийг олно (ж:
+// "examples/vulnerable/workload.yaml:15-22"). Checkov ба Trivy config нь
+// манифестын зам/мөрийг өгдөг тул SARIF-д түүнийг тавибал GitHub нь PR дээр
+// ЯГ ТЭР МӨРИЙГ тэмдэглэнэ. Олдохгүй бол (live scan-д файл байхгүй) "" буцаана
+// — тэр үед объектын нэрийг pseudo-URI болгон хэрэглэнэ.
+var filePathRe = regexp.MustCompile(`^(.+\.(?:ya?ml|json|tf|tpl))(?::(\d+)(?:-(\d+))?)?$`)
+
+func filePath(f finding.Finding) (uri string, region *sarifRegion) {
+	for _, e := range f.Evidence {
+		m := filePathRe.FindStringSubmatch(e.Path)
+		if m == nil {
+			continue
+		}
+		uri = strings.TrimPrefix(m[1], "/")
+		if m[2] != "" {
+			r := &sarifRegion{}
+			r.StartLine, _ = strconv.Atoi(m[2])
+			if m[3] != "" {
+				r.EndLine, _ = strconv.Atoi(m[3])
+			}
+			region = r
+		}
+		return uri, region
+	}
+	return "", nil
+}
+
 type sarifResult struct {
 	RuleID              string            `json:"ruleId"`
 	Level               string            `json:"level"`
@@ -114,11 +150,16 @@ func Render(w io.Writer, res finding.ScanResult) error {
 			})
 		}
 		loc := sarifLocation{}
-		uri := f.Resource
-		if f.Namespace != "" {
-			uri = f.Namespace + "/" + f.Resource
+		uri, region := filePath(f)
+		if uri == "" {
+			// Live scan — файл байхгүй тул объектыг заана.
+			uri = f.Resource
+			if f.Namespace != "" {
+				uri = f.Namespace + "/" + f.Resource
+			}
 		}
 		loc.PhysicalLocation.ArtifactLocation = sarifArtifact{URI: uri}
+		loc.PhysicalLocation.Region = region
 		run.Results = append(run.Results, sarifResult{
 			RuleID:    f.CanonicalControl,
 			Level:     level(f.Severity),

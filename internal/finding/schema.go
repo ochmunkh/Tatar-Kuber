@@ -156,10 +156,19 @@ type Metadata struct {
 	TatarVersion    string            `json:"tatar_version"`
 	ScannerVersions map[string]string `json:"scanner_versions"`
 	ScannerRuns     []ScannerRun      `json:"scanner_runs,omitempty"` // scanner бүрийн бодит үр дүн (шударга тайлан)
+	Rollup          *RollupInfo       `json:"rollup,omitempty"`       // Pod -> controller зөөлтийн хураангуй
 	StartedAt       string            `json:"started_at"`
 	FinishedAt      string            `json:"finished_at"`
 	ResultHash      string            `json:"result_hash"`
 	Inventory       map[string]int    `json:"inventory,omitempty"` // cluster объектын тоо (сонголт)
+}
+
+// RollupInfo — Pod хэмжээний finding-ийг эзэмшигч controller руу зөөсөн тухай.
+// Аудитад ил байх ёстой: тоо буурсан нь "асуудал арилсан" гэсэн үг биш,
+// "нэг зөрчил нэг удаа тоологдож байна" гэсэн үг.
+type RollupInfo struct {
+	Moved int      `json:"moved"`          // зөөгдсөн finding-ийн тоо
+	Pods  []string `json:"pods,omitempty"` // зөөгдсөн өвөрмөц pod-ууд
 }
 
 // ScannerRun — нэг scanner-ийн энэ scan дахь бодит явц. "Scanner суусан" гэдэг

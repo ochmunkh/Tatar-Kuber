@@ -53,3 +53,28 @@ func TestDetectAssetContext(t *testing.T) {
 		}
 	}
 }
+
+// namespace нэрийг ТОКЕНООР тааруулах ёстой. v1.0.2 хүртэл strings.Contains
+// ашигласнаас "non-prod" нь production (1.5x) гэж үнэлэгдэж, dev namespace-ийн
+// эрсдэлийг ~87%-иар хөөрөгдөж байв.
+func TestDetectAssetContext_TokenMatching(t *testing.T) {
+	cases := map[string]float64{
+		// production
+		"prod": CtxProduction, "production": CtxProduction, "prd": CtxProduction,
+		"prod-eu-1": CtxProduction, "app-production": CtxProduction, "live": CtxProduction,
+		// development
+		"dev": CtxDevelopment, "staging": CtxDevelopment, "qa": CtxDevelopment,
+		"uat": CtxDevelopment, "test": CtxDevelopment, "sandbox": CtxDevelopment,
+		// үгүйсгэсэн prod — dev гэж үзнэ
+		"non-prod": CtxDevelopment, "pre-prod": CtxDevelopment, "nonprod": CtxDevelopment,
+		"preprod": CtxDevelopment, "test-prod-clone": CtxDevelopment,
+		// дэд мөрийн санамсаргүй таарал — Unknown байх ёстой
+		"reproduction": CtxUnknown, "device": CtxUnknown, "devops": CtxUnknown,
+		"aqua": CtxUnknown, "kube-system": CtxUnknown, "default": CtxUnknown, "": CtxUnknown,
+	}
+	for ns, want := range cases {
+		if got := DetectAssetContext(ns); got != want {
+			t.Errorf("DetectAssetContext(%q) = %.1f, want %.1f", ns, got, want)
+		}
+	}
+}

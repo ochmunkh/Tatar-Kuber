@@ -55,6 +55,16 @@ func cmdGate(args []string) int {
 	}
 
 	r := pol.Evaluate(res, time.Now())
+	// Suppression-ууд хүчинтэй canonical control руу заасан эсэхийг registry-тэй тулгана.
+	if regPath, err := resolveRegistry(""); err == nil {
+		if reg, err := loadRegistry(regPath); err == nil {
+			known := map[string]bool{}
+			for _, c := range reg.Controls {
+				known[c.ID] = true
+			}
+			r.UnknownRules = pol.UnknownControls(known)
+		}
+	}
 
 	fmt.Printf("TATAR-Kuber gate — fail_on=%s  score=%d", r.FailOn, r.Score)
 	if r.MinScore > 0 {
@@ -67,6 +77,25 @@ func cmdGate(args []string) int {
 	}
 	for _, s := range r.ExpiredRules {
 		fmt.Fprintf(os.Stderr, "анхаар: suppression '%s' хугацаа дууссан (%s) — дахин идэвхжсэнгүй\n", s.Control, s.Expires)
+	}
+	for _, s := range r.UnknownRules {
+		fmt.Fprintf(os.Stderr, "анхаар: suppression '%s' canonical registry-д БАЙХГҮЙ control руу заасан — бичиглэлийн алдаа байж магадгүй\n", s.Control)
+	}
+	// Танигдахгүй control-ууд дээр "тохироогүй" гэж давхар анхааруулахгүй —
+	// шалтгаан аль хэдийн хэлэгдсэн.
+	unknown := map[string]bool{}
+	for _, s := range r.UnknownRules {
+		unknown[s.Control] = true
+	}
+	for _, s := range r.UnusedRules {
+		if unknown[s.Control] {
+			continue
+		}
+		scope := s.Control
+		if s.Resource != "" {
+			scope += " " + s.Resource
+		}
+		fmt.Fprintf(os.Stderr, "анхаар: suppression '%s' ямар ч олдворт тохироогүй — асуудал зассан эсвэл resource дахин нэрлэгдсэн байж магадгүй (хуучирсан дүрмийг устгана уу)\n", scope)
 	}
 
 	if len(r.Violations) > 0 {

@@ -103,6 +103,23 @@ func (s Suppression) expired(now time.Time) bool {
 	return now.After(t.Add(24 * time.Hour)) // тухайн өдрийг оруулж тооцно
 }
 
+// UnknownControls — canonical registry-д БАЙХГҮЙ control руу заасан suppression-ууд.
+// Бичиглэлийн алдаатай дүрэм нь хэзээ ч тохирохгүй тул "хүлээн зөвшөөрсөн
+// эрсдэл" гэж бүртгэсэн зүйл бодитоор хамгаалагдаагүй байхад анзаарагдахгүй.
+// Registry нь policy пакетад хамаарахгүй тул known-ыг гаднаас (CLI) дамжуулна.
+func (p Policy) UnknownControls(known map[string]bool) []Suppression {
+	if len(known) == 0 {
+		return nil
+	}
+	var out []Suppression
+	for _, s := range p.Suppress {
+		if s.Control != "" && !known[s.Control] {
+			out = append(out, s)
+		}
+	}
+	return out
+}
+
 // Result — gate-ийн шийдвэр.
 type Result struct {
 	Passed        bool
@@ -112,6 +129,8 @@ type Result struct {
 	Suppressed    []finding.Finding // suppress хийгдсэн олдворууд
 	ExpiredRules  []Suppression     // хугацаа дууссан suppression (анхааруулга)
 	InvalidRules  []Suppression     // буруу форматтай expires
+	UnusedRules   []Suppression     // ямар ч finding-д тохироогүй (хуучирсан дүрэм — аудитын эрсдэл)
+	UnknownRules  []Suppression     // canonical registry-д байхгүй control руу заасан
 	Score         int
 	MinScore      int
 	ScoreViolated bool
@@ -137,11 +156,13 @@ func (p Policy) Evaluate(res finding.ScanResult, now time.Time) Result {
 		active = append(active, s)
 	}
 
+	used := make([]bool, len(active))
 	for _, f := range res.Findings {
 		suppressed := false
-		for _, s := range active {
+		for i, s := range active {
 			if s.matches(f) {
 				suppressed = true
+				used[i] = true
 				break
 			}
 		}
@@ -151,6 +172,15 @@ func (p Policy) Evaluate(res finding.ScanResult, now time.Time) Result {
 		}
 		if finding.Rank(f.Severity) >= out.Threshold {
 			out.Violations = append(out.Violations, f)
+		}
+	}
+	// Ямар ч finding-д тохироогүй suppression — resource дахин нэрлэгдсэн, эсвэл
+	// асуудал зассан байж болно. Аль ч тохиолдолд ЧИМЭЭГҮЙ байж болохгүй:
+	// хуучирсан дүрэм нь дараа өөр finding-ийг санамсаргүй хаах эрсдэлтэй, мөн
+	// "хүлээн зөвшөөрсөн эрсдэл" гэсэн бүртгэл бодит биш болсныг харуулна.
+	for i, s := range active {
+		if !used[i] {
+			out.UnusedRules = append(out.UnusedRules, s)
 		}
 	}
 

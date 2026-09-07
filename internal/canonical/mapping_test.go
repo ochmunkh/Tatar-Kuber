@@ -1,6 +1,9 @@
 package canonical
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 const regPath = "../../schema/canonical-controls.yaml"
 
@@ -379,5 +382,36 @@ func TestKubescapeMappingsMatchUpstreamMeaning(t *testing.T) {
 				t.Errorf("%s: %s зураглагдсан ч утга батлагдаагүй — kubescape каталогоос шалгаж тестэд нэм", c.ID, code)
 			}
 		}
+	}
+}
+
+// blind_shot_rules нь severity-г БУУРУУЛДАГ тул буруу дүрэм эрсдэлийг чимээгүй
+// нуудаг. Load нь дараах гурван тохиолдолд УНАХ ёстой.
+func TestBlindShotRuleValidation(t *testing.T) {
+	base := `schema_version: '1.0'
+controls:
+- id: TATAR-CON-001
+  title: {en: x, mn: x}
+  category: c
+  type: misconfiguration
+  default_severity: HIGH
+  mappings: {trivy: [AVD-KSV0017]}
+  blind_shot_rules:
+  - %s
+`
+	cases := []struct{ name, rule string }{
+		{"сонгуургүй", `reason: "why"` + "\n    downgrade_to: INFO"},
+		{"буруу downgrade_to", `namespace: kube-system` + "\n    reason: \"why\"\n    downgrade_to: LOWW"},
+		{"reason байхгүй", `namespace: kube-system` + "\n    downgrade_to: INFO"},
+	}
+	for _, c := range cases {
+		if _, err := LoadBytes([]byte(fmt.Sprintf(base, c.rule))); err == nil {
+			t.Errorf("%s: Load унах ёстой байсан", c.name)
+		}
+	}
+	// Бүрэн дүрэм ажиллах ёстой.
+	ok := fmt.Sprintf(base, `namespace: kube-system`+"\n    resource_match: calico-node\n    reason: \"known CNI\"\n    downgrade_to: INFO")
+	if _, err := LoadBytes([]byte(ok)); err != nil {
+		t.Errorf("хүчинтэй дүрэм унасан: %v", err)
 	}
 }

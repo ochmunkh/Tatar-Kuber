@@ -103,6 +103,9 @@ func LoadBytes(data []byte) (*Registry, error) {
 	return &r, nil
 }
 
+// validSeverity — blind_shot_rules.downgrade_to-д зөвшөөрөгдөх утгууд.
+var validSeverity = map[string]bool{"CRITICAL": true, "HIGH": true, "MEDIUM": true, "LOW": true, "INFO": true}
+
 func (r *Registry) buildIndex() error {
 	r.index = map[string]map[string][]string{}
 	seen := map[string]bool{}
@@ -111,6 +114,26 @@ func (r *Registry) buildIndex() error {
 			return fmt.Errorf("давхардсан canonical ID: %s", c.ID)
 		}
 		seen[c.ID] = true
+
+		// blind_shot_rules-ийг ХАТУУ шалгана. Blind shot нь severity-г БУУРУУЛДАГ
+		// тул буруу дүрэм нь эрсдэлийг чимээгүй нуудаг — аудитын хэрэгсэлд
+		// хамгийн хортой төрлийн алдаа.
+		for i, b := range c.BlindShotRules {
+			// Сонгуургүй дүрэм нь тухайн control-ийн БҮХ finding-ийг хаа сайгүй
+			// бууруулна. Бичихдээ талбар мартвал чимээгүй бүрэн хамрах хүрээ болно.
+			if b.Namespace == "" && b.ResourceMatch == "" {
+				return fmt.Errorf("%s blind_shot_rules[%d]: namespace эсвэл resource_match-ийн аль нэг ЗААВАЛ байх ёстой "+
+					"(сонгуургүй дүрэм тухайн control-ийн бүх finding-ийг хаа сайгүй бууруулна)", c.ID, i)
+			}
+			if b.DowngradeTo != "" && !validSeverity[b.DowngradeTo] {
+				return fmt.Errorf("%s blind_shot_rules[%d]: downgrade_to='%s' танигдсангүй "+
+					"(CRITICAL|HIGH|MEDIUM|LOW|INFO). Танигдахгүй утга нь хүчингүй severity үүсгэж "+
+					"эрэмбэ ба тайлангийн тоог эвднэ", c.ID, i, b.DowngradeTo)
+			}
+			if b.Reason == "" {
+				return fmt.Errorf("%s blind_shot_rules[%d]: reason ЗААВАЛ (аудитын мөр — юуг яагаад бууруулсныг тайланд харуулна)", c.ID, i)
+			}
+		}
 		for scanner, rules := range c.Mappings {
 			if r.index[scanner] == nil {
 				r.index[scanner] = map[string][]string{}

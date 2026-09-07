@@ -85,7 +85,8 @@ type labels struct {
 	Findings, Severity, Control, Resource, Title, Evidence, Fix, FoundBy, Conf,
 	ScannerVersions, Schema, ResultHash, GeneratedBy, ScoringBands, References,
 	ScoreBreakdown, Formula, Penalty, HighPool, LowPool, Capped, FactorsHint,
-	AttackExposure, MayEnable, ScannerCoverage, ScannerCoverageHint, Status, Duration, RawFindings, Unmapped string
+	AttackExposure, MayEnable, ScannerCoverage, ScannerCoverageHint, Status, Duration,
+	RawFindings, Unmapped, RollupNote string
 }
 
 var labelsEN = labels{
@@ -102,6 +103,7 @@ var labelsEN = labels{
 	AttackExposure: "ATT&CK exposure — may enable", MayEnable: "may enable",
 	ScannerCoverage: "Scanner coverage", ScannerCoverageHint: "what each scanner actually contributed to this scan — a failed or empty scanner is shown, never hidden",
 	Status: "Status", Duration: "Duration", RawFindings: "Raw findings", Unmapped: "Unmapped rules",
+	RollupNote: "Pod-scoped findings rolled up to their owning controller, so one misconfiguration is counted once",
 }
 
 var labelsMN = labels{
@@ -118,6 +120,7 @@ var labelsMN = labels{
 	AttackExposure: "ATT&CK эрсдэл — боломжжуулна", MayEnable: "боломжжуулна",
 	ScannerCoverage: "Scanner хамрах хүрээ", ScannerCoverageHint: "scanner бүр энэ scan-д бодитоор юу өгснийг харуулна — унасан/хоосон scanner нуугдахгүй",
 	Status: "Төлөв", Duration: "Хугацаа", RawFindings: "Түүхий finding", Unmapped: "Зураглалгүй rule",
+	RollupNote: "Pod хэмжээний finding эзэмшигч controller руу зөөгдсөн — нэг зөрчил нэг удаа тоологдоно",
 }
 
 func pickLabels(lang string) labels {
@@ -337,6 +340,7 @@ const dashboard = `<!DOCTYPE html>
   </tr>{{end}}
   </tbody>
  </table>
+ {{with .Metadata.Rollup}}<div class="cc" style="margin:-10px 0 16px">↳ <b>{{.Moved}}</b> — {{$.L.RollupNote}} ({{len .Pods}} pod){{end}}</div>
 {{end}}
 
 {{if .Metadata.Inventory}}

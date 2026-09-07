@@ -82,3 +82,27 @@ func TestEvaluate_CleanPasses(t *testing.T) {
 		t.Errorf("цэвэр (зөвхөн LOW) unasan: %+v", r.Reasons)
 	}
 }
+
+// Ямар ч finding-д тохироогүй suppression ил гарах ёстой: хуучирсан дүрэм нь
+// "хүлээн зөвшөөрсөн эрсдэл"-ийн бүртгэлийг бодит бус болгож, дараа өөр
+// finding-ийг санамсаргүй хааж мэднэ.
+func TestEvaluate_ReportsUnusedSuppression(t *testing.T) {
+	res := finding.ScanResult{Findings: []finding.Finding{
+		{CanonicalControl: "TATAR-CON-001", Resource: "deployment/api", Severity: finding.SeverityHigh},
+	}}
+	p := Policy{FailOn: "high", Suppress: []Suppression{
+		{Control: "TATAR-CON-001", Resource: "deployment/api", Reason: "accepted"}, // тохирно
+		{Control: "TATAR-CON-001", Resource: "deployment/gone", Reason: "stale"},   // тохирохгүй
+		{Control: "TATAR-NET-001", Reason: "stale too"},                            // тохирохгүй
+	}}
+	r := p.Evaluate(res, time.Now())
+	if len(r.Suppressed) != 1 {
+		t.Errorf("Suppressed=%d, want 1", len(r.Suppressed))
+	}
+	if len(r.UnusedRules) != 2 {
+		t.Fatalf("UnusedRules=%d, want 2: %+v", len(r.UnusedRules), r.UnusedRules)
+	}
+	if !r.Passed {
+		t.Errorf("suppress хийгдсэн тул gate давах ёстой: %v", r.Reasons)
+	}
+}

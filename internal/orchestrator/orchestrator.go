@@ -17,10 +17,11 @@ import (
 	"github.com/ochmunkh/tatar-kuber/internal/dedup"
 	"github.com/ochmunkh/tatar-kuber/internal/finding"
 	"github.com/ochmunkh/tatar-kuber/internal/risk"
+	"github.com/ochmunkh/tatar-kuber/internal/rollup"
 	"github.com/ochmunkh/tatar-kuber/internal/scanner"
 )
 
-const tatarVersion = "1.0.1"
+const tatarVersion = "1.0.2"
 
 // Pipeline — scanner-агностик цөм.
 type Pipeline struct {
@@ -51,6 +52,7 @@ type Meta struct {
 	Lang        string               // тайлангийн хэл: en (default) | mn
 	Inventory   map[string]int       // cluster объектын тоо (сонголт)
 	Runs        []finding.ScannerRun // Collect-оос ирсэн scanner явц (сонголт; Process баяжуулна)
+	NoRollup    bool                 // true бол Pod -> controller зөөлтийг хийхгүй
 }
 
 // timeoutHinter — adapter өөрийн зөвлөмж timeout-оо илэрхийлж болно (сонголт).
@@ -216,7 +218,14 @@ func (p *Pipeline) Process(raws []scanner.RawResult, m Meta) (finding.ScanResult
 		all = append(all, fs...)
 	}
 
-	deduped := dedup.Deduplicate(all, p.reg)
+	// Pod хэмжээний finding-ийг эзэмшигч controller руу зөөнө (dedup-аас ӨМНӨ):
+	// нэг pod template-ийн зөрчил Popeye-д pod, Trivy/Kubescape-д deployment
+	// болж хоёр удаа тоологдож, эрсдэлийн оноог хөөрөгддөг.
+	rolled, rl := all, rollup.Result{}
+	if !m.NoRollup {
+		rolled, rl = rollup.Apply(all)
+	}
+	deduped := dedup.Deduplicate(rolled, p.reg)
 	shot := blindshot.Apply(deduped, p.reg)
 	scored, score, band, breakdown := risk.ApplyScores(shot)
 	sortBySeverity(scored) // Critical -> High -> Medium -> Low -> Info (тайланд эрэмбэ)
@@ -247,6 +256,9 @@ func (p *Pipeline) Process(raws []scanner.RawResult, m Meta) (finding.ScanResult
 	res.Metadata.ResultHash = resultHash(scored)
 	res.Metadata.Inventory = m.Inventory
 	res.Metadata.ScannerRuns = runs
+	if rl.Moved > 0 {
+		res.Metadata.Rollup = &finding.RollupInfo{Moved: rl.Moved, Pods: rl.Pods}
+	}
 	return res, nil
 }
 
