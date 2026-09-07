@@ -7,8 +7,8 @@
 ![Output](https://img.shields.io/badge/output-JSON%20%C2%B7%20SARIF%20%C2%B7%20HTML-1F6F54)
 [![CI](https://github.com/ochmunkh/Tatar-Kuber/actions/workflows/ci.yml/badge.svg)](https://github.com/ochmunkh/Tatar-Kuber/actions/workflows/ci.yml)
 [![Real cluster](https://github.com/ochmunkh/Tatar-Kuber/actions/workflows/real-cluster.yml/badge.svg)](https://github.com/ochmunkh/Tatar-Kuber/actions/workflows/real-cluster.yml)
-![Tests](https://img.shields.io/badge/tests-14%20packages%20green-brightgreen)
-![Release](https://img.shields.io/badge/release-v1.0.0-brightgreen)
+![Tests](https://img.shields.io/badge/tests-16%20packages%20green-brightgreen)
+![Release](https://img.shields.io/badge/release-v1.0.2-brightgreen)
 
 **Kubernetes security posture assessment framework — one command, four scanners, one standard report.**
 
@@ -16,8 +16,6 @@ TATAR-Kuber runs **Trivy · Kubescape · Checkov · Popeye**, unifies their outp
 **canonical control model**, de-duplicates it (so "3 scanners found 1 issue" instead of
 "3 findings"), scores risk, and produces a single report — **JSON / SARIF / HTML**, in
 **English or Mongolian** — that engineers, auditors and CISOs can all read.
-
-**Author:** Enkhbat.O — Security Analyst
 
 ```bash
 tatar-kuber scan   --kubeconfig ~/.kube/config -o out      # or: --raw-dir ./raw  (offline)
@@ -198,14 +196,14 @@ sources → scanners (parallel) → normalize → canonical + dedup → blind-sh
 
 ```bash
 go build ./...
-go test ./...          # 14 packages, all green
-./scripts/build.sh 1.0.0
+go test ./...          # 16 packages, all green
+./scripts/build.sh 1.0.2
 ```
 
 ## CLI
 
 ```
-tatar-kuber scan        --kubeconfig | --context | -f | --raw-dir  [--namespace ns1,ns2] [--lang en|mn] [--no-raw]
+tatar-kuber scan        --kubeconfig | --context | -f | --raw-dir  [--namespace ns1,ns2] [--lang en|mn] [--no-raw] [--no-rollup]
                         # live scan keeps raw scanner output in <out>/raw/ (evidence; re-ingestable via --raw-dir)
 tatar-kuber report      -o json | sarif | html  [--fail-on HIGH]
 tatar-kuber gate        --input scan-result.json [--policy .tatar-kuber.yaml] [--fail-on high] [--min-score N]
@@ -234,8 +232,9 @@ Adapter Interface, 04 Severity & Risk Scoring, 05 CLI Spec, 06 Repository Struct
 
 ## Status
 
-**v1.0.1** — Live Mode B (parallel adapters) · explainable risk · CI/CD gatekeeper
-(policy + GitHub Action + SARIF) · goreleaser + brew/curl/Docker · **scanner coverage report**.
+**v1.0.2** — Live Mode B (parallel adapters) · explainable risk · CI/CD gatekeeper
+(policy + GitHub Action + SARIF) · goreleaser + brew/curl/Docker · **scanner coverage report** ·
+**Pod → controller rollup**.
 
 **Honesty note (v1.0.1).** Auditing the v1.0.0 live run showed that all 11 findings came from
 Kubescape alone: Trivy was silently contributing nothing (real Trivy emits `AVD-KSV-0017`, the
@@ -296,6 +295,32 @@ was reported HIGH where the registry deliberately rates it INFO, and a missing p
 of LOW — inflating both the report and the risk score. A linter's log level is not a security
 severity; adapters now set severity only when the scanner supplies a real one (Trivy AVD/CVE,
 Checkov), and Popeye's level is kept in the evidence instead.
+
+**v1.0.2 — the numbers stop being inflated.** Scanners report the *same* issue at different object
+levels: Trivy k8s and Kubescape check the **workload** (`deployment/api`), while Popeye runs its
+`deployments` and `pods` linters separately and so reports one pod-template violation twice — and a
+5-replica Deployment reports it five more times. One misconfiguration became six findings, and the
+risk score followed. `internal/rollup` now moves pod-scoped findings onto their owning controller
+*before* dedup, so they merge normally.
+
+It does not guess. Without a cluster connection there are no `ownerReferences` to read, so a
+finding is only moved when **all** of these hold: a controller-level finding for the *same*
+canonical control already exists in that scan (no object is invented), it is in the same namespace,
+and the pod's name is the controller's name plus a suffix that matches what Kubernetes actually
+generates — the discriminator being `rand.SafeEncodeString`'s **vowel-free** alphabet
+(`bcdfghjklmnpqrstvwxz2456789`), so `api-598c4dc6b8-ldjqq` is a pod of `api` but `api-canary` is a
+different workload. Longest controller name wins. Nothing is lost: every moved pod is kept in the
+finding's evidence as `pod/<name>`, the move count and pod list are published in `metadata.rollup`
+and printed in the report, and `--no-rollup` turns it off entirely.
+
+Three smaller correctness fixes came with it. Asset context used `strings.Contains`, so the
+namespace `non-production` matched `prod` and was scored as production (1.3×) — matching is now
+token-based, and `nonprod` / `preprod` resolve to dev. Blind-shot rules are validated at registry
+load (a rule with no selector, an invalid `downgrade_to` or a missing reason is a hard error rather
+than a silently dead rule). Suppressions that never matched anything, and policy rules naming a
+control that does not exist, are now reported instead of hiding a typo. SARIF findings that carry a
+file path now emit a real file:line location, so GitHub Code Scanning annotates the right line.
+
 Where it's headed — v2 (audit-grade PDF + compliance mapping + trending), v3 (continuous +
 dashboard): see the [**Roadmap**](ROADMAP.md).
 
@@ -326,7 +351,7 @@ Please keep `go test ./...` green and read the [Code of Conduct](CODE_OF_CONDUCT
 
 ## Contact
 
-**Author:** Enkhbat Oyunbayar — Security Analyst · Ulaanbaatar
+**Author:** Enkhbat Oyunbayar — Security Analyst
 
 [![Facebook](https://img.shields.io/badge/Facebook-Enkhbat%20Oyunbayar-1877F2?logo=facebook&logoColor=white)](https://www.facebook.com/enkhbat.o/)
 [![GitHub](https://img.shields.io/badge/GitHub-ochmunkh-181717?logo=github&logoColor=white)](https://github.com/ochmunkh)
@@ -345,8 +370,6 @@ TATAR-Kuber нь **Trivy · Kubescape · Checkov · Popeye**-ийг ажиллу
 нэг **canonical control загвар** руу нэгтгэж, давхардлыг арилгаж ("3 scanner нэг асуудал
 олсон" — 3 finding биш), эрсдэлийг үнэлж, нэг тайлан гаргана — **JSON / SARIF / HTML**,
 **англи эсвэл монгол** хэлээр. Инженер / auditor / CISO бүгд ойлгоно.
-
-**Зохиогч:** Enkhbat.O — Security Analyst
 
 ### Давхардлыг арилгах жишээ (`3 finding → 1`)
 
@@ -477,7 +500,7 @@ tatar-kuber report --input out/scan-result.json -o html --out report.html
 ### CLI командууд
 
 ```
-tatar-kuber scan        --kubeconfig | --context | -f | --raw-dir  [--namespace ns1,ns2] [--lang en|mn] [--no-raw]
+tatar-kuber scan        --kubeconfig | --context | -f | --raw-dir  [--namespace ns1,ns2] [--lang en|mn] [--no-raw] [--no-rollup]
                         # live scan нь scanner-уудын түүхий гаралтыг <out>/raw/-д хадгална (нотолгоо; --raw-dir-ээр дахин боловсруулна)
 tatar-kuber report      -o json | sarif | html  [--fail-on HIGH]
 tatar-kuber gate        --input scan-result.json [--policy .tatar-kuber.yaml] [--fail-on high] [--min-score N]
@@ -498,8 +521,8 @@ docker run --rm -v "$PWD:/work" -w /work ghcr.io/ochmunkh/tatar-kuber:latest sca
 
 ```bash
 go build ./...
-go test ./...          # 14 багц, бүгд ногоон
-./scripts/build.sh 1.0.0
+go test ./...          # 16 багц, бүгд ногоон
+./scripts/build.sh 1.0.2
 ```
 
 ### Баримт бичиг
@@ -514,8 +537,9 @@ Adapter Interface, 04 Severity & Risk Scoring, 05 CLI Spec, 06 Repository Struct
 
 ### Төлөв
 
-**v1.0.1** — Live Mode B (parallel adapters) · тайлбарлагдах эрсдэл · CI/CD gatekeeper
-(бодлого + GitHub Action + SARIF) · goreleaser + brew/curl/Docker · **scanner хамрах хүрээний тайлан**.
+**v1.0.2** — Live Mode B (parallel adapters) · тайлбарлагдах эрсдэл · CI/CD gatekeeper
+(бодлого + GitHub Action + SARIF) · goreleaser + brew/curl/Docker · **scanner хамрах хүрээний тайлан** ·
+**Pod → controller rollup**.
 
 **Шударга тэмдэглэл (v1.0.1).** v1.0.0-ийн live run-ыг аудит хийхэд 11 finding бүгд зөвхөн
 Kubescape-ээс ирсэн нь тогтоогдсон: Trivy чимээгүй юу ч өгөөгүй (бодит Trivy `AVD-KSV-0017`
@@ -578,6 +602,32 @@ Trivy 11-ээс 0.** Дөрвүүлэнгийн зурагдсан rule бүр �
 болж тайлан болон эрсдэлийн онооны хоёуланг хөөрөгдөж байв. Линтерийн log-level нь аюулгүй
 байдлын severity биш: adapter-ууд одоо зөвхөн scanner бодит severity өгсөн үед (Trivy AVD/CVE,
 Checkov) л түүнийг ашиглана, Popeye-ийн level нь нотолгоо дотор үлдэнэ.
+
+**v1.0.2 — тоо хөөрөгдөхөө болив.** Scanner-ууд НЭГ асуудлыг өөр өөр объектын хэмжээнд
+тайлагнадаг: Trivy k8s ба Kubescape нь **workload**-ыг (`deployment/api`) шалгана, харин Popeye нь
+`deployments` ба `pods` linter-ээ тус тусад ажиллуулдаг тул pod template-ийн нэг зөрчлийг хоёр удаа
+гаргана — 5 replica-тай Deployment бол дээр нь бас 5 удаа. Нэг misconfiguration зургаан finding
+болж, эрсдэлийн оноо ч дагаж хөөрдөг. Одоо `internal/rollup` нь pod хэмжээний finding-ийг
+эзэмшигч controller руу dedup-аас ӨМНӨ зөөх тул тэд хэвийн нэгдэнэ.
+
+Таамаглал БИШ. Cluster-т холбогдохгүй тул `ownerReferences` уншигдахгүй, тиймээс зөвхөн **бүх**
+нөхцөл хангагдсан үед зөөнө: тухайн canonical control дээр controller хэмжээний finding ЯГ ТЭР scan
+дотор аль хэдийн байгаа (объект зохиохгүй), ижил namespace, мөн pod-ийн нэр нь controller-ийн нэр
+дээр Kubernetes-ийн БОДИТООР үүсгэдэг дагавар нэмсэн хэлбэртэй байх — гол шалгуур нь
+`rand.SafeEncodeString`-ийн **эгшиггүй** алфавит (`bcdfghjklmnpqrstvwxz2456789`), тиймээс
+`api-598c4dc6b8-ldjqq` бол `api`-ийн pod, харин `api-canary` бол өөр workload. Хэд хэдэн
+тохирвол нэр нь хамгийн урт нь сонгогдоно. Юу ч алдагдахгүй: зөөгдсөн pod бүр finding-ийн
+нотолгоонд `pod/<нэр>` болж хадгалагдана, зөөлтийн тоо ба pod-ын жагсаалт `metadata.rollup`-д
+гарч тайланд хэвлэгдэнэ, `--no-rollup`-аар бүрэн болино.
+
+Хамт нь гурван жижиг зөв байдлын засвар орлоо. Asset context нь `strings.Contains` хэрэглэдэг тул
+`non-production` namespace нь `prod`-той таарч production (1.3×) гэж үнэлэгдэж байв — одоо
+token-оор тулгана, `nonprod` / `preprod` нь dev болно. Blind-shot rule-ууд registry уншихад
+шалгагдана (selector байхгүй, `downgrade_to` буруу, эсвэл шалтгаан дутуу rule нь чимээгүй үхсэн
+rule болохын оронд хатуу алдаа). Юунд ч таараагүй suppression, мөн байхгүй control-ыг нэрлэсэн
+бодлогын rule нь одоо мэдээлэгдэнэ — үсгийн алдаа нуугдахгүй. Файлын зам агуулсан SARIF finding
+одоо бодит file:line орон зайг гаргах тул GitHub Code Scanning зөв мөр дээр тэмдэглэнэ.
+
 Хаашаа явж байгаа — v2 (аудитын PDF + compliance mapping + trending), v3 (тасралтгүй +
 dashboard): [**Замын зураг**](ROADMAP.md)-г үз.
 
@@ -602,7 +652,7 @@ dashboard): [**Замын зураг**](ROADMAP.md)-г үз.
 
 ### Холбоо барих
 
-**Зохиогч:** Enkhbat Oyunbayar — Security Analyst · Улаанбаатар
+**Зохиогч:** Enkhbat Oyunbayar — Security Analyst
 
 [![Facebook](https://img.shields.io/badge/Facebook-Enkhbat%20Oyunbayar-1877F2?logo=facebook&logoColor=white)](https://www.facebook.com/enkhbat.o/)
 [![GitHub](https://img.shields.io/badge/GitHub-ochmunkh-181717?logo=github&logoColor=white)](https://github.com/ochmunkh)

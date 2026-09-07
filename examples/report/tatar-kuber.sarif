@@ -6,7 +6,7 @@
       "tool": {
         "driver": {
           "name": "TATAR-Kuber",
-          "version": "1.0.1",
+          "version": "1.0.2",
           "informationUri": "https://github.com/ochmunkh/tatar-kuber",
           "rules": [
             {
@@ -142,17 +142,6 @@
               }
             },
             {
-              "id": "TATAR-RBAC-005",
-              "name": "Default service account in use",
-              "shortDescription": {
-                "text": "Default service account in use"
-              },
-              "properties": {
-                "category": "RBAC \u0026 Authorization",
-                "security-severity": "5.0"
-              }
-            },
-            {
               "id": "TATAR-CON-008",
               "name": "Missing securityContext",
               "shortDescription": {
@@ -215,6 +204,17 @@
               },
               "properties": {
                 "category": "Network Security",
+                "security-severity": "5.0"
+              }
+            },
+            {
+              "id": "TATAR-RBAC-005",
+              "name": "Default service account in use",
+              "shortDescription": {
+                "text": "Default service account in use"
+              },
+              "properties": {
+                "category": "RBAC \u0026 Authorization",
                 "security-severity": "5.0"
               }
             },
@@ -352,7 +352,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/root-app"
+                  "uri": "lab/broken/root-user.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 20
                 }
               }
             }
@@ -379,7 +383,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/root-app"
+                  "uri": "lab/broken/root-user.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 20
                 }
               }
             }
@@ -406,7 +414,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/privileged-app"
+                  "uri": "lab/broken/privileged.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 18
                 }
               }
             }
@@ -433,7 +445,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/host-ns-app"
+                  "uri": "lab/broken/host-namespaces.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 19
                 }
               }
             }
@@ -487,7 +503,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/latest-app"
+                  "uri": "lab/broken/latest-tag.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 16
                 }
               }
             }
@@ -514,7 +534,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/privileged-app"
+                  "uri": "lab/broken/privileged.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 18
                 }
               }
             }
@@ -541,7 +565,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/host-ns-app"
+                  "uri": "lab/broken/host-namespaces.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 19
                 }
               }
             }
@@ -568,7 +596,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/latest-app"
+                  "uri": "lab/broken/latest-tag.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 16
                 }
               }
             }
@@ -595,7 +627,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/secret-env-app"
+                  "uri": "lab/broken/secret-env.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 21
                 }
               }
             }
@@ -622,7 +658,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/api"
+                  "uri": "lab/broken/api.yaml"
+                },
+                "region": {
+                  "startLine": 1,
+                  "endLine": 22
                 }
               }
             }
@@ -651,7 +691,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/host-ns-app"
+                  "uri": "lab/broken/host-namespaces.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 19
                 }
               }
             }
@@ -678,7 +722,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/host-ns-app"
+                  "uri": "lab/broken/host-namespaces.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 19
                 }
               }
             }
@@ -705,7 +753,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/privileged-app"
+                  "uri": "lab/broken/privileged.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 18
                 }
               }
             }
@@ -732,7 +784,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/secret-env-app"
+                  "uri": "lab/broken/secret-env.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 21
                 }
               }
             }
@@ -786,7 +842,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "default/clusterrole/too-powerful"
+                  "uri": "lab/broken/wildcard-rbac.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 10
                 }
               }
             }
@@ -813,7 +873,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "default/clusterrole/too-powerful"
+                  "uri": "lab/broken/wildcard-rbac.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 10
                 }
               }
             }
@@ -840,7 +904,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/privileged-app"
+                  "uri": "lab/broken/privileged.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 18
                 }
               }
             }
@@ -858,33 +926,6 @@
           }
         },
         {
-          "ruleId": "TATAR-RBAC-005",
-          "level": "warning",
-          "message": {
-            "text": "Default service account in use — Create a dedicated least-privilege SA per workload."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "production/pod/api-7d8"
-                }
-              }
-            }
-          ],
-          "partialFingerprints": {
-            "tatarId/v1": "TK-1128ca969582"
-          },
-          "properties": {
-            "blind_shot": false,
-            "confidence": "HIGH",
-            "found_by": [
-              "popeye"
-            ],
-            "tatar_id": "TK-1128ca969582"
-          }
-        },
-        {
           "ruleId": "TATAR-CON-008",
           "level": "warning",
           "message": {
@@ -894,7 +935,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/privileged-app"
+                  "uri": "lab/broken/privileged.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 18
                 }
               }
             }
@@ -921,7 +966,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/host-ns-app"
+                  "uri": "lab/broken/host-namespaces.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 19
                 }
               }
             }
@@ -948,7 +997,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/latest-app"
+                  "uri": "lab/broken/latest-tag.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 16
                 }
               }
             }
@@ -975,7 +1028,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/host-ns-app"
+                  "uri": "lab/broken/host-namespaces.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 19
                 }
               }
             }
@@ -1002,7 +1059,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/latest-app"
+                  "uri": "lab/broken/latest-tag.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 16
                 }
               }
             }
@@ -1029,7 +1090,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/latest-app"
+                  "uri": "lab/broken/latest-tag.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 16
                 }
               }
             }
@@ -1056,7 +1121,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/secret-env-app"
+                  "uri": "lab/broken/secret-env.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 21
                 }
               }
             }
@@ -1083,7 +1152,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/privileged-app"
+                  "uri": "lab/broken/privileged.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 18
                 }
               }
             }
@@ -1110,7 +1183,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/privileged-app"
+                  "uri": "lab/broken/privileged.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 18
                 }
               }
             }
@@ -1137,7 +1214,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/root-app"
+                  "uri": "lab/broken/root-user.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 20
                 }
               }
             }
@@ -1164,7 +1245,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/host-ns-app"
+                  "uri": "lab/broken/host-namespaces.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 19
                 }
               }
             }
@@ -1191,7 +1276,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/latest-app"
+                  "uri": "lab/broken/latest-tag.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 16
                 }
               }
             }
@@ -1218,7 +1307,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/root-app"
+                  "uri": "lab/broken/root-user.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 20
                 }
               }
             }
@@ -1272,7 +1365,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/secret-env-app"
+                  "uri": "lab/broken/secret-env.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 21
                 }
               }
             }
@@ -1299,7 +1396,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/latest-app"
+                  "uri": "lab/broken/latest-tag.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 16
                 }
               }
             }
@@ -1311,7 +1412,8 @@
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
-              "checkov"
+              "checkov",
+              "popeye"
             ],
             "tatar_id": "TK-a5de8cd35166"
           }
@@ -1326,7 +1428,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/root-app"
+                  "uri": "lab/broken/root-user.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 20
                 }
               }
             }
@@ -1353,7 +1459,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/host-ns-app"
+                  "uri": "lab/broken/host-namespaces.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 19
                 }
               }
             }
@@ -1380,7 +1490,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/secret-env-app"
+                  "uri": "lab/broken/secret-env.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 21
                 }
               }
             }
@@ -1407,7 +1521,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/privileged-app"
+                  "uri": "lab/broken/privileged.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 18
                 }
               }
             }
@@ -1461,7 +1579,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/root-app"
+                  "uri": "lab/broken/root-user.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 20
                 }
               }
             }
@@ -1488,7 +1610,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/root-app"
+                  "uri": "lab/broken/root-user.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 20
                 }
               }
             }
@@ -1515,7 +1641,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/host-ns-app"
+                  "uri": "lab/broken/host-namespaces.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 19
                 }
               }
             }
@@ -1542,7 +1672,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/latest-app"
+                  "uri": "lab/broken/latest-tag.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 16
                 }
               }
             }
@@ -1569,7 +1703,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/secret-env-app"
+                  "uri": "lab/broken/secret-env.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 21
                 }
               }
             }
@@ -1587,22 +1725,22 @@
           }
         },
         {
-          "ruleId": "TATAR-IMG-003",
+          "ruleId": "TATAR-RBAC-005",
           "level": "warning",
           "message": {
-            "text": "Image uses :latest tag — Use a specific version (digest/tag)."
+            "text": "Default service account in use — Create a dedicated least-privilege SA per workload."
           },
           "locations": [
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/pod/api-7d8"
+                  "uri": "production/pod/latest-app-598c4dc6b8-ldjqq"
                 }
               }
             }
           ],
           "partialFingerprints": {
-            "tatarId/v1": "TK-e204cf95d5fe"
+            "tatarId/v1": "TK-e22e1d586ba2"
           },
           "properties": {
             "blind_shot": false,
@@ -1610,7 +1748,7 @@
             "found_by": [
               "popeye"
             ],
-            "tatar_id": "TK-e204cf95d5fe"
+            "tatar_id": "TK-e22e1d586ba2"
           }
         },
         {
@@ -1623,7 +1761,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/secret-env-app"
+                  "uri": "lab/broken/secret-env.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 21
                 }
               }
             }
@@ -1650,7 +1792,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "pod/app-latest-app"
+                  "uri": "lab/broken/latest-tag.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 16
                 }
               }
             }
@@ -1677,7 +1823,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "pod/app-root-app"
+                  "uri": "lab/broken/root-user.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 20
                 }
               }
             }
@@ -1704,7 +1854,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "pod/app-privileged-app"
+                  "uri": "lab/broken/privileged.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 18
                 }
               }
             }
@@ -1731,7 +1885,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "pod/app-secret-env-app"
+                  "uri": "lab/broken/secret-env.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 21
                 }
               }
             }
@@ -1758,7 +1916,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "pod/app-host-ns-app"
+                  "uri": "lab/broken/host-namespaces.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 19
                 }
               }
             }
@@ -1785,7 +1947,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/root-app"
+                  "uri": "lab/broken/root-user.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 20
                 }
               }
             }
@@ -1812,7 +1978,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/secret-env-app"
+                  "uri": "lab/broken/secret-env.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 21
                 }
               }
             }
@@ -1839,7 +2009,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/host-ns-app"
+                  "uri": "lab/broken/host-namespaces.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 19
                 }
               }
             }
@@ -1866,7 +2040,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/secret-env-app"
+                  "uri": "lab/broken/secret-env.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 21
                 }
               }
             }
@@ -1893,7 +2071,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/secret-env-app"
+                  "uri": "lab/broken/secret-env.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 21
                 }
               }
             }
@@ -1920,7 +2102,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/privileged-app"
+                  "uri": "lab/broken/privileged.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 18
                 }
               }
             }
@@ -1938,60 +2124,6 @@
           }
         },
         {
-          "ruleId": "TATAR-CON-010",
-          "level": "note",
-          "message": {
-            "text": "Missing CPU/memory limits — Set resources.limits.cpu and .memory."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "production/pod/api-7d8"
-                }
-              }
-            }
-          ],
-          "partialFingerprints": {
-            "tatarId/v1": "TK-2fdd9b42905f"
-          },
-          "properties": {
-            "blind_shot": false,
-            "confidence": "HIGH",
-            "found_by": [
-              "popeye"
-            ],
-            "tatar_id": "TK-2fdd9b42905f"
-          }
-        },
-        {
-          "ruleId": "TATAR-OPS-001",
-          "level": "note",
-          "message": {
-            "text": "Missing readiness probe — Add a readinessProbe."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "production/pod/api-7d8"
-                }
-              }
-            }
-          ],
-          "partialFingerprints": {
-            "tatarId/v1": "TK-4a7a7eed92c4"
-          },
-          "properties": {
-            "blind_shot": false,
-            "confidence": "HIGH",
-            "found_by": [
-              "popeye"
-            ],
-            "tatar_id": "TK-4a7a7eed92c4"
-          }
-        },
-        {
           "ruleId": "TATAR-OPS-005",
           "level": "note",
           "message": {
@@ -2001,7 +2133,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/privileged-app"
+                  "uri": "lab/broken/privileged.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 18
                 }
               }
             }
@@ -2028,7 +2164,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/privileged-app"
+                  "uri": "lab/broken/privileged.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 18
                 }
               }
             }
@@ -2055,7 +2195,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/privileged-app"
+                  "uri": "lab/broken/privileged.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 18
                 }
               }
             }
@@ -2082,7 +2226,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/root-app"
+                  "uri": "lab/broken/root-user.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 20
                 }
               }
             }
@@ -2109,7 +2257,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/host-ns-app"
+                  "uri": "lab/broken/host-namespaces.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 19
                 }
               }
             }
@@ -2136,7 +2288,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/latest-app"
+                  "uri": "lab/broken/latest-tag.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 16
                 }
               }
             }
@@ -2163,7 +2319,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/root-app"
+                  "uri": "lab/broken/root-user.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 20
                 }
               }
             }
@@ -2190,7 +2350,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/latest-app"
+                  "uri": "lab/broken/latest-tag.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 16
                 }
               }
             }
@@ -2202,7 +2366,8 @@
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
-              "checkov"
+              "checkov",
+              "popeye"
             ],
             "tatar_id": "TK-c4c3a4ebaadc"
           }
@@ -2217,7 +2382,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/host-ns-app"
+                  "uri": "lab/broken/host-namespaces.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 19
                 }
               }
             }
@@ -2244,7 +2413,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/latest-app"
+                  "uri": "lab/broken/latest-tag.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 16
                 }
               }
             }
@@ -2256,7 +2429,8 @@
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
-              "checkov"
+              "checkov",
+              "popeye"
             ],
             "tatar_id": "TK-d83cf4dbcadb"
           }
@@ -2271,7 +2445,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/secret-env-app"
+                  "uri": "lab/broken/secret-env.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 21
                 }
               }
             }
@@ -2298,7 +2476,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/host-ns-app"
+                  "uri": "lab/broken/host-namespaces.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 19
                 }
               }
             }
@@ -2325,7 +2507,11 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/deployment/root-app"
+                  "uri": "lab/broken/root-user.yaml"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 20
                 }
               }
             }

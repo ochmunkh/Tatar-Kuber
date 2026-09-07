@@ -46,6 +46,18 @@ same audit method was turned on the mapping registry itself.
   runs real Checkov weekly; the real-cluster workflow now asserts **each** scanner individually.
 - **Curated severity wins** — a linter's log level no longer overrides a control's
   `default_severity`; adapters set severity only when the scanner gives a real security rating.
+- **Pod → controller rollup** (v1.0.2) — Popeye lints a Pod while Trivy/Kubescape lint its
+  Deployment, so one pod-template violation was counted twice (and once per replica). Pod-scoped
+  findings are now moved onto their owning controller *before* dedup. No cluster call, no guessing:
+  a controller-level finding for the same canonical control must already exist in the same
+  namespace, and the pod name must be that controller's name plus a suffix from
+  `rand.SafeEncodeString`'s vowel-free alphabet — so `api-598c4dc6b8-ldjqq` rolls up to `api`,
+  `api-canary` does not. Moved pods stay in the evidence, counts appear in `metadata.rollup`, and
+  `--no-rollup` disables it.
+- **Correctness fixes** (v1.0.2) — namespace asset context is token-matched (`non-production` is no
+  longer scored as production), blind-shot rules are validated at registry load, never-matched
+  suppressions and policy rules naming unknown controls are reported, and SARIF findings with a
+  file path emit a real file:line location.
 
 ---
 
@@ -70,8 +82,6 @@ Theme: **make it the tool a security auditor reaches for.**
 - **Object-aware Mode A for Trivy** — `trivy config` works on manifests but names no Kubernetes
   object (only file:line plus a prose message in five shapes), so file-scoped reporting would
   merge several identical violations in one file into one finding. Needs manifest parsing.
-- **Pod ↔ owner rollup** — the same issue is currently counted twice when Popeye lints a Pod and
-  Trivy/Kubescape lint its Deployment. Needs `ownerReferences` resolution.
 - **Scan trending / diff** — compare two scans (the schema already carries `result_hash` and
   finding IDs): new / fixed / regressed findings, and score delta over time.
 - **5th scanner adapter** — prove the pluggable promise and deepen coverage (candidates:
@@ -163,6 +173,18 @@ v1.0.0-ийн бодит live run-ыг аудит хийхэд 11 finding бүг
   ажиллуулна; real-cluster workflow одоо scanner **тус бүрийг** шалгана.
 - **Curated severity дийлнэ** — линтерийн log-level нь control-ийн `default_severity`-г дарахаа
   болив; adapter нь зөвхөн scanner бодит аюулгүй байдлын үнэлгээ өгсөн үед severity тавина.
+- **Pod → controller rollup** (v1.0.2) — Popeye нь Pod-ыг, Trivy/Kubescape нь түүний Deployment-ыг
+  шалгадаг тул pod template-ийн нэг зөрчил хоёр удаа (replica тутамд бас нэг удаа) тоологдож байв.
+  Одоо pod хэмжээний finding нь dedup-аас ӨМНӨ эзэмшигч controller руу зөөгдөнө. Cluster руу
+  хандахгүй, таамаглахгүй: тухайн canonical control дээр ижил namespace-д controller хэмжээний
+  finding аль хэдийн байх ёстой, мөн pod-ийн нэр нь тэр controller-ийн нэр дээр
+  `rand.SafeEncodeString`-ийн эгшиггүй алфавитын дагавар нэмсэн байх ёстой — тиймээс
+  `api-598c4dc6b8-ldjqq` нь `api` руу зөөгдөнө, `api-canary` зөөгдөхгүй. Зөөгдсөн pod нотолгоонд
+  үлдэнэ, тоо нь `metadata.rollup`-д гарна, `--no-rollup`-аар болино.
+- **Зөв байдлын засварууд** (v1.0.2) — namespace-ийн asset context token-оор тулгагдана
+  (`non-production` нь production гэж үнэлэгдэхээ болив), blind-shot rule нь registry уншихад
+  шалгагдана, юунд ч таараагүй suppression ба байхгүй control нэрлэсэн бодлогын rule мэдээлэгдэнэ,
+  файлын зам агуулсан SARIF finding нь бодит file:line гаргана.
 
 ---
 
@@ -180,8 +202,6 @@ v1.0.0-ийн бодит live run-ыг аудит хийхэд 11 finding бүг
   нэрийг өгдөггүй (зөвхөн файл:мөр ба 5 хэлбэртэй проз мессеж), тиймээс файлын хэмжээнд
   тайлагнавал нэг файл дахь хэд хэдэн ижил зөрчил нэг finding болж нийлнэ. Манифестыг парслах
   шаардлагатай.
-- **Pod ↔ эзэмшигч rollup** — Popeye нь Pod-ыг, Trivy/Kubescape нь түүний Deployment-ыг
-  шалгадаг тул нэг асуудал хоёр удаа тоологдож байна. `ownerReferences` шийдэх шаардлагатай.
 - **Зураглалын хийдлүүд** (v1.0.2 аудитаар илэрсэн, тайлан бүрт ил): `TATAR-NET-004`-д ямар ч
   scanner rule зурагдаагүй; тохирох control байхгүйн улмаас зориудаар зураглаагүй — Trivy
   `KSV-0020/0021`, `KSV-0110`; Kubescape `C-0079`, `C-0055`, `C-0054`; Checkov `CKV_K8S_40`,

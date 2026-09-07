@@ -64,7 +64,7 @@
 <body>
 <header>
  <h1>TATAR-Kuber Security Report</h1>
- <div class="sub">Cluster: demo-prod · Mode: remote · 2026-09-07T10:39:36Z</div>
+ <div class="sub">Cluster: demo-prod · Mode: remote · 2026-09-07T11:25:39Z</div>
 </header>
 <div class="wrap">
 
@@ -73,8 +73,8 @@
   <div class="card score"><div class="n">19/100</div><div class="l">Critical</div></div>
   <div class="card"><div class="n crit">2</div><div class="l">Critical</div></div>
   <div class="card"><div class="n high">18</div><div class="l">High</div></div>
-  <div class="card"><div class="n med">35</div><div class="l">Medium</div></div>
-  <div class="card"><div class="n low">21</div><div class="l">Low</div></div>
+  <div class="card"><div class="n med">34</div><div class="l">Medium</div></div>
+  <div class="card"><div class="n low">19</div><div class="l">Low</div></div>
   <div class="card"><div class="n info">2</div><div class="l">Info</div></div>
   <div class="card"><div class="n">0</div><div class="l">Blind Shot</div></div>
  </div>
@@ -82,7 +82,7 @@
   <div class="col">
    <h3>Top Risks — score breakdown</h3>
    <ol>
-   <li>Critical CVE in container image <span class="pen">−18</span> <span class="cc">(3.9%)</span><br><span class="cc">TATAR-IMG-001 · production/deployment/api<br><span class="fx">10 × 1.5 × 1 × 1.2</span></span></li><li>Allow privilege escalation <span class="pen">−12.6</span> <span class="cc">(2.7%)</span><br><span class="cc">TATAR-CON-003 · production/deployment/root-app<br><span class="fx">7 × 1.5 × 1 × 1.2</span></span></li><li>Dangerous capabilities added <span class="pen">−12.6</span> <span class="cc">(2.7%)</span><br><span class="cc">TATAR-CON-004 · production/deployment/root-app<br><span class="fx">7 × 1.5 × 1 × 1.2</span></span></li><li>Privileged container enabled <span class="pen">−12.6</span> <span class="cc">(2.7%)</span><br><span class="cc">TATAR-CON-001 · production/deployment/privileged-app<br><span class="fx">7 × 1.5 × 1 × 1.2</span></span></li><li>Host network enabled <span class="pen">−12.6</span> <span class="cc">(2.7%)</span><br><span class="cc">TATAR-CON-006 · production/deployment/host-ns-app<br><span class="fx">7 × 1.5 × 1 × 1.2</span></span></li>
+   <li>Critical CVE in container image <span class="pen">−18</span> <span class="cc">(4%)</span><br><span class="cc">TATAR-IMG-001 · production/deployment/api<br><span class="fx">10 × 1.5 × 1 × 1.2</span></span></li><li>Allow privilege escalation <span class="pen">−12.6</span> <span class="cc">(2.8%)</span><br><span class="cc">TATAR-CON-003 · production/deployment/root-app<br><span class="fx">7 × 1.5 × 1 × 1.2</span></span></li><li>Dangerous capabilities added <span class="pen">−12.6</span> <span class="cc">(2.8%)</span><br><span class="cc">TATAR-CON-004 · production/deployment/root-app<br><span class="fx">7 × 1.5 × 1 × 1.2</span></span></li><li>Privileged container enabled <span class="pen">−12.6</span> <span class="cc">(2.8%)</span><br><span class="cc">TATAR-CON-001 · production/deployment/privileged-app<br><span class="fx">7 × 1.5 × 1 × 1.2</span></span></li><li>Host network enabled <span class="pen">−12.6</span> <span class="cc">(2.8%)</span><br><span class="cc">TATAR-CON-006 · production/deployment/host-ns-app<br><span class="fx">7 × 1.5 × 1 × 1.2</span></span></li>
    
    </ol>
   </div>
@@ -98,9 +98,9 @@
    <h3>Score breakdown</h3>
    <div class="bd">
     <div class="bdrow"><span>Formula</span><code>100/(1+P/100)</code></div>
-    <div class="bdrow"><span>Total penalty (P)</span><b>432.8</b></div>
-    <div class="bdrow"><span>Crit/High/Med</span>422.8</div>
-    <div class="bdrow"><span>LOW pool</span>37.8 → 10 <span class="cc">(capped 10)</span></div>
+    <div class="bdrow"><span>Total penalty (P)</span><b>427.4</b></div>
+    <div class="bdrow"><span>Crit/High/Med</span>417.4</div>
+    <div class="bdrow"><span>LOW pool</span>34.2 → 10 <span class="cc">(capped 10)</span></div>
     <div class="bdrow cc">base × context × exposure × confidence</div>
    </div>
   </div>
@@ -109,7 +109,7 @@
   <div class="col">
    <h3>ATT&amp;CK exposure — may enable</h3>
    <div class="bd">
-    <div class="bdrow"><span>Privilege Escalation</span><b>11</b></div><div class="bdrow"><span>Credential Access</span><b>6</b></div><div class="bdrow"><span>Discovery</span><b>6</b></div><div class="bdrow"><span>Persistence</span><b>2</b></div>
+    <div class="bdrow"><span>Privilege Escalation</span><b>11</b></div><div class="bdrow"><span>Credential Access</span><b>6</b></div><div class="bdrow"><span>Discovery</span><b>6</b></div><div class="bdrow"><span>Persistence</span><b>1</b></div>
    </div>
   </div>
   
@@ -148,6 +148,7 @@
   </tr>
   </tbody>
  </table>
+ <div class="cc" style="margin:-10px 0 16px">↳ <b>3</b> — Pod-scoped findings rolled up to their owning controller, so one misconfiguration is counted once (1 pod)</div>
 
 
 
@@ -157,7 +158,7 @@
  </div>
 
 
- <h2>Findings (78)</h2>
+ <h2>Findings (75)</h2>
  <table>
   <thead><tr><th>Severity</th><th>Control</th><th>Resource</th><th>Title</th><th>Evidence</th><th>Fix</th><th>Found by</th><th>Conf.</th></tr></thead>
   <tbody>
@@ -395,17 +396,6 @@
   
    <tr>
     <td><span class="badge bM">MEDIUM</span></td>
-    <td>TATAR-RBAC-005<br><span class="cc">RBAC &amp; Authorization</span></td>
-    <td>production/pod/api-7d8</td>
-    <td>Default service account in use</td>
-    <td class="ev"><div class="evrow"><span class="evs">popeye</span> Uses &#34;default&#34; ServiceAccount <span class="evv">(popeye warning)</span></div></td>
-    <td class="fix">Create a dedicated least-privilege SA per workload.</td>
-    <td><span class="fbb">popeye</span></td>
-    <td class="fb">HIGH<br><span class="pen">−5.4</span></td>
-   </tr>
-  
-   <tr>
-    <td><span class="badge bM">MEDIUM</span></td>
     <td>TATAR-CON-008<br><span class="cc">Container Security</span></td>
     <td>production/deployment/privileged-app</td>
     <td>Missing securityContext</td>
@@ -574,9 +564,9 @@
     <td>TATAR-IMG-003<br><span class="cc">Image Security</span><br><span class="atk" title="Implant Internal Image · Persistence (may enable)">⚔ T1525</span></td>
     <td>production/deployment/latest-app</td>
     <td>Image uses :latest tag</td>
-    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/latest-tag.yaml:2-16</code></div></td>
+    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/latest-tag.yaml:2-16</code></div><div class="evrow"><span class="evs">popeye</span> <code>container-x</code>Image tagged &#34;latest&#34; in use <span class="evv">(popeye warning)</span></div><div class="evrow"><span class="evs">popeye</span> <code>pod/latest-app-598c4dc6b8-ldjqq</code>rolled up to deployment/latest-app</div></td>
     <td class="fix">Use a specific version (digest/tag).</td>
-    <td><span class="fbb">checkov</span></td>
+    <td><span class="fbb">checkov</span><span class="sep"> • </span><span class="fbb">popeye</span></td>
     <td class="fb">HIGH<br><span class="pen">−5.4</span></td>
    </tr>
   
@@ -692,11 +682,11 @@
   
    <tr>
     <td><span class="badge bM">MEDIUM</span></td>
-    <td>TATAR-IMG-003<br><span class="cc">Image Security</span><br><span class="atk" title="Implant Internal Image · Persistence (may enable)">⚔ T1525</span></td>
-    <td>production/pod/api-7d8</td>
-    <td>Image uses :latest tag</td>
-    <td class="ev"><div class="evrow"><span class="evs">popeye</span> <code>container-x</code>Image tagged &#34;latest&#34; in use <span class="evv">(popeye warning)</span></div></td>
-    <td class="fix">Use a specific version (digest/tag).</td>
+    <td>TATAR-RBAC-005<br><span class="cc">RBAC &amp; Authorization</span></td>
+    <td>production/pod/latest-app-598c4dc6b8-ldjqq</td>
+    <td>Default service account in use</td>
+    <td class="ev"><div class="evrow"><span class="evs">popeye</span> Uses &#34;default&#34; ServiceAccount <span class="evv">(popeye warning)</span></div></td>
+    <td class="fix">Create a dedicated least-privilege SA per workload.</td>
     <td><span class="fbb">popeye</span></td>
     <td class="fb">HIGH<br><span class="pen">−5.4</span></td>
    </tr>
@@ -835,28 +825,6 @@
   
    <tr>
     <td><span class="badge bL">LOW</span></td>
-    <td>TATAR-CON-010<br><span class="cc">Container Security</span></td>
-    <td>production/pod/api-7d8</td>
-    <td>Missing CPU/memory limits</td>
-    <td class="ev"><div class="evrow"><span class="evs">popeye</span> <code>container-x</code>No resources requests/limits defined <span class="evv">(popeye warning)</span></div></td>
-    <td class="fix">Set resources.limits.cpu and .memory.</td>
-    <td><span class="fbb">popeye</span></td>
-    <td class="fb">HIGH<br><span class="pen">−1.8</span></td>
-   </tr>
-  
-   <tr>
-    <td><span class="badge bL">LOW</span></td>
-    <td>TATAR-OPS-001<br><span class="cc">Operational Health</span></td>
-    <td>production/pod/api-7d8</td>
-    <td>Missing readiness probe</td>
-    <td class="ev"><div class="evrow"><span class="evs">popeye</span> <code>container-x</code>No probes defined <span class="evv">(popeye warning)</span></div></td>
-    <td class="fix">Add a readinessProbe.</td>
-    <td><span class="fbb">popeye</span></td>
-    <td class="fb">HIGH<br><span class="pen">−1.8</span></td>
-   </tr>
-  
-   <tr>
-    <td><span class="badge bL">LOW</span></td>
     <td>TATAR-OPS-005<br><span class="cc">Operational Health</span></td>
     <td>production/deployment/privileged-app</td>
     <td>imagePullPolicy not set correctly</td>
@@ -937,9 +905,9 @@
     <td>TATAR-OPS-001<br><span class="cc">Operational Health</span></td>
     <td>production/deployment/latest-app</td>
     <td>Missing readiness probe</td>
-    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/latest-tag.yaml:2-16</code></div></td>
+    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/latest-tag.yaml:2-16</code></div><div class="evrow"><span class="evs">popeye</span> <code>container-x</code>No probes defined <span class="evv">(popeye warning)</span></div><div class="evrow"><span class="evs">popeye</span> <code>pod/latest-app-598c4dc6b8-ldjqq</code>rolled up to deployment/latest-app</div></td>
     <td class="fix">Add a readinessProbe.</td>
-    <td><span class="fbb">checkov</span></td>
+    <td><span class="fbb">checkov</span><span class="sep"> • </span><span class="fbb">popeye</span></td>
     <td class="fb">HIGH<br><span class="pen">−1.8</span></td>
    </tr>
   
@@ -959,9 +927,9 @@
     <td>TATAR-CON-010<br><span class="cc">Container Security</span></td>
     <td>production/deployment/latest-app</td>
     <td>Missing CPU/memory limits</td>
-    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/latest-tag.yaml:2-16</code></div></td>
+    <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/latest-tag.yaml:2-16</code></div><div class="evrow"><span class="evs">popeye</span> <code>container-x</code>No resources requests/limits defined <span class="evv">(popeye warning)</span></div><div class="evrow"><span class="evs">popeye</span> <code>pod/latest-app-598c4dc6b8-ldjqq</code>rolled up to deployment/latest-app</div></td>
     <td class="fix">Set resources.limits.cpu and .memory.</td>
-    <td><span class="fbb">checkov</span></td>
+    <td><span class="fbb">checkov</span><span class="sep"> • </span><span class="fbb">popeye</span></td>
     <td class="fb">HIGH<br><span class="pen">−1.8</span></td>
    </tr>
   
@@ -1027,8 +995,8 @@
  <div class="grid">
   <div><b>Scanner Versions</b><br>checkov 3.2.10<br>kubescape 3.1.4<br>popeye 0.22.1<br>trivy 0.67.2<br></div>
   <div><b>Schema</b><br>Finding v1.0</div>
-  <div><b>Result Hash</b><br>sha256:a82578fae350534c09f842127ecf5ca11cf9d7d39d429cdbd46ee47a2fcc365c</div>
-  <div><b>Generated By</b><br>TATAR-Kuber 1.0.1</div>
+  <div><b>Result Hash</b><br>sha256:c887c5d96de4e6df3f92691840c967e212515219213f4f225e50f6862c597b6a</div>
+  <div><b>Generated By</b><br>TATAR-Kuber 1.0.2</div>
   <div><b>Scoring Bands</b><br>90-100 Excellent<br>70-89 Good<br>50-69 Fair<br>30-49 Poor<br>0-29 Critical</div>
  </div>
 </footer>
