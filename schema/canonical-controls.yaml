@@ -2,6 +2,18 @@
 # TATAR Canonical Control Registry v1.0 (bilingual: en/mn)
 # title, remediation нь {en, mn}. Get(lang) нь lang->en->аль нэг руу fallback хийнэ.
 # Canonical ID = IMMUTABLE CONTRACT. scanner rule ID-ууд PROVISIONAL.
+#
+# default_severity нь CURATED — энэ бол бүтээгдэхүүний гол хөрөнгө. Adapter нь
+# зөвхөн scanner-ийн БОДИТ аюулгүй байдлын severity (Trivy AVD/CVE, Checkov)
+# байгаа үед л дарж бичнэ. Линтерийн log-level (popeye info/warn/error) severity
+# БИШ — popeye severity дамжуулдаггүй тул эдгээр control-ууд энд бичсэн
+# зэрэглэлээрээ тайлагдана.
+#
+# ⚠ scanner rule ID нэмэх/солихдоо тухайн код нь upstream-д ЯГ ЮУ гэсэн үг
+# болохыг батал. Popeye-ийн POP кодын утга хувилбар хооронд өөрчлөгддөг
+# (0.22-д POP-101=":latest", POP-106="resources/limits"); v1.0.0-д 10 зураглалын
+# 7 нь зөрж, буруу control тайлагнах эрсдэл байсан. Popeye кодуудыг
+# internal/canonical TestPopeyeMappingsMatchUpstreamMeaning тест бэхэлдэг.
 
 schema_version: '1.0'
 last_updated: '2026-09-07'

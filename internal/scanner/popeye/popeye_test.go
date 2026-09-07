@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/ochmunkh/tatar-kuber/internal/canonical"
+	"github.com/ochmunkh/tatar-kuber/internal/finding"
 	"github.com/ochmunkh/tatar-kuber/internal/scanner"
 )
 
@@ -78,6 +79,52 @@ func TestSingular(t *testing.T) {
 	for in, want := range cases {
 		if got := singular(in); got != want {
 			t.Errorf("singular(%q)=%q want %q", in, got, want)
+		}
+	}
+}
+
+// Popeye-ийн lint level (info/warn/error) нь АЮУЛГҮЙ БАЙДЛЫН severity биш тул
+// canonical control-ийн curated default_severity-г дарах ЁСГҮЙ. v1.0.1-ээс өмнө
+// дардаг байсан тул dead service HIGH (registry: INFO), missing probe MEDIUM
+// (LOW) болж, аудитын тайлан болон эрсдэлийн оноо гуйвж байв.
+func TestLintLevelDoesNotOverrideCuratedSeverity(t *testing.T) {
+	reg, err := canonical.Load("../../../schema/canonical-controls.yaml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	// popeye level=3 (error) — хамгийн ноцтой lint зэрэглэл.
+	raw := []byte(`{"popeye":{"sections":[
+	 {"linter":"services","gvr":"v1/services","issues":{"prod/dead-svc":[
+	   {"group":"__root__","level":3,"message":"[POP-1100] No pods match service selector"}]}},
+	 {"linter":"pods","gvr":"v1/pods","issues":{"prod/p1":[
+	   {"group":"c1","level":3,"message":"[POP-102] No probes defined"},
+	   {"group":"c1","level":3,"message":"[POP-106] No resources requests/limits defined"}]}}
+	]}}`)
+	s := New(reg.NewResolver())
+	findings, err := s.Normalize(scanner.RawResult{Scanner: "popeye", Format: "json", Data: raw})
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := map[string]finding.Severity{
+		"TATAR-OPS-003": finding.SeverityInfo, // orphan service — зориудаар INFO
+		"TATAR-OPS-001": finding.SeverityLow,  // missing readiness probe
+		"TATAR-CON-010": finding.SeverityLow,  // missing CPU/memory limits
+	}
+	if len(findings) != len(want) {
+		t.Fatalf("findings=%d, want %d", len(findings), len(want))
+	}
+	for _, f := range findings {
+		w, ok := want[f.CanonicalControl]
+		if !ok {
+			t.Errorf("санамсаргүй control %s", f.CanonicalControl)
+			continue
+		}
+		if f.Severity != w {
+			t.Errorf("%s severity=%s, want %s (canonical default_severity дийлэх ёстой; popeye level=3)", f.CanonicalControl, f.Severity, w)
+		}
+		// lint level нь нотолгоонд ил үлдэх ёстой (мэдээлэл алдагдахгүй).
+		if len(f.Evidence) != 1 || f.Evidence[0].Value != "popeye error" {
+			t.Errorf("%s evidence=%+v, popeye level-ийг хадгалах ёстой", f.CanonicalControl, f.Evidence)
 		}
 	}
 }

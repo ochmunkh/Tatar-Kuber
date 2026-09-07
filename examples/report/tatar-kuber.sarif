@@ -153,39 +153,6 @@
               }
             },
             {
-              "id": "TATAR-CON-010",
-              "name": "Missing CPU/memory limits",
-              "shortDescription": {
-                "text": "Missing CPU/memory limits"
-              },
-              "properties": {
-                "category": "Container Security",
-                "security-severity": "5.0"
-              }
-            },
-            {
-              "id": "TATAR-OPS-003",
-              "name": "Orphan / dead service (no endpoints)",
-              "shortDescription": {
-                "text": "Orphan / dead service (no endpoints)"
-              },
-              "properties": {
-                "category": "Operational Health",
-                "security-severity": "5.0"
-              }
-            },
-            {
-              "id": "TATAR-OPS-001",
-              "name": "Missing readiness probe",
-              "shortDescription": {
-                "text": "Missing readiness probe"
-              },
-              "properties": {
-                "category": "Operational Health",
-                "security-severity": "5.0"
-              }
-            },
-            {
               "id": "TATAR-CON-011",
               "name": "Default seccomp profile not set",
               "shortDescription": {
@@ -230,6 +197,17 @@
               }
             },
             {
+              "id": "TATAR-CON-010",
+              "name": "Missing CPU/memory limits",
+              "shortDescription": {
+                "text": "Missing CPU/memory limits"
+              },
+              "properties": {
+                "category": "Container Security",
+                "security-severity": "3.0"
+              }
+            },
+            {
               "id": "TATAR-OPS-002",
               "name": "Missing liveness probe",
               "shortDescription": {
@@ -241,6 +219,28 @@
               }
             },
             {
+              "id": "TATAR-OPS-001",
+              "name": "Missing readiness probe",
+              "shortDescription": {
+                "text": "Missing readiness probe"
+              },
+              "properties": {
+                "category": "Operational Health",
+                "security-severity": "3.0"
+              }
+            },
+            {
+              "id": "TATAR-OPS-003",
+              "name": "Orphan / dead service (no endpoints)",
+              "shortDescription": {
+                "text": "Orphan / dead service (no endpoints)"
+              },
+              "properties": {
+                "category": "Operational Health",
+                "security-severity": "0.0"
+              }
+            },
+            {
               "id": "TATAR-OPS-004",
               "name": "Unused ConfigMap / Secret",
               "shortDescription": {
@@ -248,7 +248,7 @@
               },
               "properties": {
                 "category": "Operational Health",
-                "security-severity": "3.0"
+                "security-severity": "0.0"
               }
             }
           ]
@@ -768,87 +768,6 @@
               "checkov"
             ],
             "tatar_id": "TK-2a5ed40b070f"
-          }
-        },
-        {
-          "ruleId": "TATAR-CON-010",
-          "level": "warning",
-          "message": {
-            "text": "Missing CPU/memory limits — Set resources.limits.cpu and .memory."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "production/pod/api-7d8"
-                }
-              }
-            }
-          ],
-          "partialFingerprints": {
-            "tatarId/v1": "TK-2fdd9b42905f"
-          },
-          "properties": {
-            "blind_shot": false,
-            "confidence": "HIGH",
-            "found_by": [
-              "popeye"
-            ],
-            "tatar_id": "TK-2fdd9b42905f"
-          }
-        },
-        {
-          "ruleId": "TATAR-OPS-003",
-          "level": "warning",
-          "message": {
-            "text": "Orphan / dead service (no endpoints) — Delete the service or fix its selector."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "production/service/orphan-svc"
-                }
-              }
-            }
-          ],
-          "partialFingerprints": {
-            "tatarId/v1": "TK-45802dee62f8"
-          },
-          "properties": {
-            "blind_shot": false,
-            "confidence": "HIGH",
-            "found_by": [
-              "popeye"
-            ],
-            "tatar_id": "TK-45802dee62f8"
-          }
-        },
-        {
-          "ruleId": "TATAR-OPS-001",
-          "level": "warning",
-          "message": {
-            "text": "Missing readiness probe — Add a readinessProbe."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "production/pod/api-7d8"
-                }
-              }
-            }
-          ],
-          "partialFingerprints": {
-            "tatarId/v1": "TK-4a7a7eed92c4"
-          },
-          "properties": {
-            "blind_shot": false,
-            "confidence": "HIGH",
-            "found_by": [
-              "popeye"
-            ],
-            "tatar_id": "TK-4a7a7eed92c4"
           }
         },
         {
@@ -1662,22 +1581,22 @@
           }
         },
         {
-          "ruleId": "TATAR-OPS-004",
+          "ruleId": "TATAR-CON-010",
           "level": "note",
           "message": {
-            "text": "Unused ConfigMap / Secret — Delete the unused object."
+            "text": "Missing CPU/memory limits — Set resources.limits.cpu and .memory."
           },
           "locations": [
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "production/configmap/unused-cm"
+                  "uri": "production/pod/api-7d8"
                 }
               }
             }
           ],
           "partialFingerprints": {
-            "tatarId/v1": "TK-497ef288eeed"
+            "tatarId/v1": "TK-2fdd9b42905f"
           },
           "properties": {
             "blind_shot": false,
@@ -1685,7 +1604,34 @@
             "found_by": [
               "popeye"
             ],
-            "tatar_id": "TK-497ef288eeed"
+            "tatar_id": "TK-2fdd9b42905f"
+          }
+        },
+        {
+          "ruleId": "TATAR-OPS-001",
+          "level": "note",
+          "message": {
+            "text": "Missing readiness probe — Add a readinessProbe."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/pod/api-7d8"
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-4a7a7eed92c4"
+          },
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "popeye"
+            ],
+            "tatar_id": "TK-4a7a7eed92c4"
           }
         },
         {
@@ -2037,6 +1983,60 @@
               "checkov"
             ],
             "tatar_id": "TK-f46eb13ab024"
+          }
+        },
+        {
+          "ruleId": "TATAR-OPS-003",
+          "level": "note",
+          "message": {
+            "text": "Orphan / dead service (no endpoints) — Delete the service or fix its selector."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/service/orphan-svc"
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-45802dee62f8"
+          },
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "popeye"
+            ],
+            "tatar_id": "TK-45802dee62f8"
+          }
+        },
+        {
+          "ruleId": "TATAR-OPS-004",
+          "level": "note",
+          "message": {
+            "text": "Unused ConfigMap / Secret — Delete the unused object."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/configmap/unused-cm"
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-497ef288eeed"
+          },
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "popeye"
+            ],
+            "tatar_id": "TK-497ef288eeed"
           }
         }
       ]

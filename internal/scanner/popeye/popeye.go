@@ -127,17 +127,25 @@ func (r popReport) groups() []popGroup {
 
 var popCode = regexp.MustCompile(`\[(POP-\d+)\]`)
 
-// levelSeverity — Popeye level -> TATAR severity (Doc #4 §2).
-func levelSeverity(l int) string {
+// levelName — Popeye-ийн lint level-ийн хүний уншиж болох нэр (нотолгоонд).
+//
+// ЧУХАЛ: Popeye-ийн level нь LINTER-ийн зэрэглэл (info/warn/error), АЮУЛГҮЙ
+// БАЙДЛЫН severity БИШ. Тиймээс үүнийг finding-ийн severity болгож
+// хөрвүүлэхээ БОЛИВ — canonical control-ийн curated default_severity дийлнэ
+// (registry бол бүтээгдэхүүний гол хөрөнгө; линтерийн log-level түүнийг дарах
+// нь аудитын тайланг гуйвуулна). Ж: dead service нь popeye-д level=3 (error)
+// боловч TATAR-OPS-003 нь зориудаар INFO; missing probe нь level=2 боловч
+// TATAR-OPS-001 нь LOW. Level нь evidence дотор ил үлдэнэ.
+func levelName(l int) string {
 	switch l {
 	case 3:
-		return "HIGH"
+		return "error"
 	case 2:
-		return "MEDIUM"
+		return "warning"
 	case 1:
-		return "LOW"
+		return "info"
 	default:
-		return "INFO"
+		return "ok"
 	}
 }
 
@@ -162,10 +170,16 @@ func (s *Scanner) Normalize(raw scanner.RawResult) ([]finding.Finding, error) {
 					continue // POP код олдсонгүй
 				}
 				code := m[1]
-				ctx := canonical.ResolverContext{ResourceKind: kind, Namespace: ns, Severity: levelSeverity(iss.Level)}
+				// group нь контейнерын нэр эсвэл "__root__" (объектын хэмжээнд).
+				group := iss.Group
+				if group == "__root__" {
+					group = ""
+				}
+				ctx := canonical.ResolverContext{ResourceKind: kind, Namespace: ns, Detail: group}
 				detail := strings.TrimSpace(popCode.ReplaceAllString(iss.Message, ""))
-				evs := []finding.Evidence{{Scanner: "popeye", Detail: detail}}
-				meta := normalizer.Meta{Resource: resource, Namespace: ns, Evidence: evs, Severity: levelSeverity(iss.Level)}
+				evs := []finding.Evidence{{Scanner: "popeye", Path: group, Detail: detail, Value: "popeye " + levelName(iss.Level)}}
+				// Severity ЗОРИУДААР дамжуулаагүй — canonical default_severity дийлнэ (дээрх levelName-ийг үз).
+				meta := normalizer.Meta{Resource: resource, Namespace: ns, Evidence: evs}
 				if f, ok := normalizer.Build(s.resolver, "popeye", code, ctx, meta, s.now); ok {
 					out = append(out, f)
 				}

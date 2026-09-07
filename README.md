@@ -253,6 +253,13 @@ as *Scanner coverage* — keeps raw scanner output as evidence, and the
 [real-cluster workflow](.github/workflows/real-cluster.yml) now asserts **each** scanner
 produced findings and that at least one finding is corroborated by 2+ scanners.
 A "0 findings" scanner is never silent again.
+
+One more correction came out of reading the first good live report: Popeye's lint level
+(info/warn/error) was overriding each control's **curated** `default_severity`, so a dead Service
+was reported HIGH where the registry deliberately rates it INFO, and a missing probe MEDIUM instead
+of LOW — inflating both the report and the risk score. A linter's log level is not a security
+severity; adapters now set severity only when the scanner supplies a real one (Trivy AVD/CVE,
+Checkov), and Popeye's level is kept in the evidence instead.
 Where it's headed — v2 (audit-grade PDF + compliance mapping + trending), v3 (continuous +
 dashboard): see the [**Roadmap**](ROADMAP.md).
 
@@ -490,6 +497,13 @@ HTML тайланд *Scanner хамрах хүрээ* хэсгээр харуу�
 нотолгоо болгон хадгална, [real-cluster workflow](.github/workflows/real-cluster.yml) одоо
 scanner **тус бүр** finding өгснийг ба ядаж нэг finding 2+ scanner-ээр батлагдсаныг шалгана.
 "0 finding" scanner дахиж хэзээ ч чимээгүй өнгөрөхгүй.
+
+Анхны бүтэн live тайланг уншихад нэг засвар бас гарлаа: Popeye-ийн lint level
+(info/warn/error) нь control бүрийн **curated** `default_severity`-г дарж байсан тул dead Service
+нь registry-д зориудаар INFO гэж үнэлэгдсэн байхад HIGH, missing probe нь LOW байхад MEDIUM
+болж тайлан болон эрсдэлийн онооны хоёуланг хөөрөгдөж байв. Линтерийн log-level нь аюулгүй
+байдлын severity биш: adapter-ууд одоо зөвхөн scanner бодит severity өгсөн үед (Trivy AVD/CVE,
+Checkov) л түүнийг ашиглана, Popeye-ийн level нь нотолгоо дотор үлдэнэ.
 Хаашаа явж байгаа — v2 (аудитын PDF + compliance mapping + trending), v3 (тасралтгүй +
 dashboard): [**Замын зураг**](ROADMAP.md)-г үз.
 

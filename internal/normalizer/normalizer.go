@@ -17,8 +17,13 @@ type Meta struct {
 	Description string
 	Evidence    []finding.Evidence // асуудал яг хаана (scanner бүрээр)
 	Remediation string
-	Severity    string // scanner-ийн severity (хоосон бол canonical default)
-	References  []string
+	// Severity — ЗӨВХӨН тухайн scanner нь бодит АЮУЛГҮЙ БАЙДЛЫН severity өгдөг
+	// үед тохируулна (ж: Trivy AVD/CVE severity, Checkov severity). Линтерийн
+	// log-level (popeye-ийн info/warn/error) severity БИШ — түүнийг дамжуулбал
+	// canonical control-ийн curated default_severity дарагдаж, тайлан гуйвна.
+	// Хоосон бол canonical default_severity ашиглагдана.
+	Severity   string
+	References []string
 }
 
 // Build — нэг илрүүлэлтийг canonical-аар баяжуулж Finding болгоно.

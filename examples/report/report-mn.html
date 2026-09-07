@@ -64,25 +64,25 @@
 <body>
 <header>
  <h1>TATAR-Kuber Security Report</h1>
- <div class="sub">Кластер: demo-prod · Горим: remote · 2026-09-07T04:41:52Z</div>
+ <div class="sub">Кластер: demo-prod · Горим: remote · 2026-09-07T04:51:01Z</div>
 </header>
 <div class="wrap">
 
  <h2>Гүйцэтгэх хураангуй</h2>
  <div class="cards">
-  <div class="card score"><div class="n">22/100</div><div class="l">Critical</div></div>
+  <div class="card score"><div class="n">23/100</div><div class="l">Critical</div></div>
   <div class="card"><div class="n crit">2</div><div class="l">Critical</div></div>
   <div class="card"><div class="n high">12</div><div class="l">High</div></div>
-  <div class="card"><div class="n med">32</div><div class="l">Medium</div></div>
-  <div class="card"><div class="n low">20</div><div class="l">Low</div></div>
-  <div class="card"><div class="n info">0</div><div class="l">Info</div></div>
+  <div class="card"><div class="n med">29</div><div class="l">Medium</div></div>
+  <div class="card"><div class="n low">21</div><div class="l">Low</div></div>
+  <div class="card"><div class="n info">2</div><div class="l">Info</div></div>
   <div class="card"><div class="n">0</div><div class="l">Blind Shot</div></div>
  </div>
  <div class="exec">
   <div class="col">
    <h3>Гол эрсдэлүүд — оноо задаргаа</h3>
    <ol>
-   <li>Container image дахь CRITICAL CVE <span class="pen">−18</span> <span class="cc">(4.7%)</span><br><span class="cc">TATAR-IMG-001 · production/deployment/api<br><span class="fx">10 × 1.5 × 1 × 1.2</span></span></li><li>Эрх өсгөлтийг зөвшөөрсөн <span class="pen">−12.6</span> <span class="cc">(3.3%)</span><br><span class="cc">TATAR-CON-003 · production/deployment/root-app<br><span class="fx">7 × 1.5 × 1 × 1.2</span></span></li><li>Эрх нэмэгдүүлсэн (privileged) контейнер <span class="pen">−12.6</span> <span class="cc">(3.3%)</span><br><span class="cc">TATAR-CON-001 · production/deployment/privileged-app<br><span class="fx">7 × 1.5 × 1 × 1.2</span></span></li><li>Host сүлжээ идэвхжсэн <span class="pen">−12.6</span> <span class="cc">(3.3%)</span><br><span class="cc">TATAR-CON-006 · production/deployment/host-ns-app<br><span class="fx">7 × 1.5 × 1 × 1.2</span></span></li><li>Container image дахь HIGH CVE <span class="pen">−12.6</span> <span class="cc">(3.3%)</span><br><span class="cc">TATAR-IMG-002 · production/deployment/api<br><span class="fx">7 × 1.5 × 1 × 1.2</span></span></li>
+   <li>Container image дахь CRITICAL CVE <span class="pen">−18</span> <span class="cc">(4.9%)</span><br><span class="cc">TATAR-IMG-001 · production/deployment/api<br><span class="fx">10 × 1.5 × 1 × 1.2</span></span></li><li>Эрх өсгөлтийг зөвшөөрсөн <span class="pen">−12.6</span> <span class="cc">(3.4%)</span><br><span class="cc">TATAR-CON-003 · production/deployment/root-app<br><span class="fx">7 × 1.5 × 1 × 1.2</span></span></li><li>Эрх нэмэгдүүлсэн (privileged) контейнер <span class="pen">−12.6</span> <span class="cc">(3.4%)</span><br><span class="cc">TATAR-CON-001 · production/deployment/privileged-app<br><span class="fx">7 × 1.5 × 1 × 1.2</span></span></li><li>Host сүлжээ идэвхжсэн <span class="pen">−12.6</span> <span class="cc">(3.4%)</span><br><span class="cc">TATAR-CON-006 · production/deployment/host-ns-app<br><span class="fx">7 × 1.5 × 1 × 1.2</span></span></li><li>Container image дахь HIGH CVE <span class="pen">−12.6</span> <span class="cc">(3.4%)</span><br><span class="cc">TATAR-IMG-002 · production/deployment/api<br><span class="fx">7 × 1.5 × 1 × 1.2</span></span></li>
    
    </ol>
   </div>
@@ -98,9 +98,9 @@
    <h3>Онооны задаргаа</h3>
    <div class="bd">
     <div class="bdrow"><span>Томьёо</span><code>100/(1+P/100)</code></div>
-    <div class="bdrow"><span>Нийт торгууль (P)</span><b>355.6</b></div>
-    <div class="bdrow"><span>Crit/High/Med</span>345.6</div>
-    <div class="bdrow"><span>LOW сан</span>36 → 10 <span class="cc">(хязгаарлав 10)</span></div>
+    <div class="bdrow"><span>Нийт торгууль (P)</span><b>339.4</b></div>
+    <div class="bdrow"><span>Crit/High/Med</span>329.4</div>
+    <div class="bdrow"><span>LOW сан</span>37.8 → 10 <span class="cc">(хязгаарлав 10)</span></div>
     <div class="bdrow cc">суурь × орчин × ил гарц × итгэл</div>
    </div>
   </div>
@@ -332,7 +332,7 @@
     <td>TATAR-RBAC-005<br><span class="cc">RBAC &amp; Authorization</span></td>
     <td>production/pod/api-7d8</td>
     <td>Default service account ашиглаж байна</td>
-    <td class="ev"><div class="evrow"><span class="evs">popeye</span> Uses &#34;default&#34; ServiceAccount</div></td>
+    <td class="ev"><div class="evrow"><span class="evs">popeye</span> Uses &#34;default&#34; ServiceAccount <span class="evv">(popeye warning)</span></div></td>
     <td class="fix">Workload бүрт тусгай, least-privilege SA үүсгэнэ.</td>
     <td><span class="fbb">popeye</span></td>
     <td class="fb">HIGH<br><span class="pen">−5.4</span></td>
@@ -368,39 +368,6 @@
     <td class="ev"><div class="evrow"><span class="evs">checkov</span> <code>/lab/broken/host-namespaces.yaml:2-19</code></div></td>
     <td class="fix">automountServiceAccountToken=false.</td>
     <td><span class="fbb">checkov</span></td>
-    <td class="fb">HIGH<br><span class="pen">−5.4</span></td>
-   </tr>
-  
-   <tr>
-    <td><span class="badge bM">MEDIUM</span></td>
-    <td>TATAR-CON-010<br><span class="cc">Container Security</span></td>
-    <td>production/pod/api-7d8</td>
-    <td>CPU/санах ойн хязгаар дутуу</td>
-    <td class="ev"><div class="evrow"><span class="evs">popeye</span> No resources requests/limits defined</div></td>
-    <td class="fix">resources.limits.cpu болон .memory тохируулна.</td>
-    <td><span class="fbb">popeye</span></td>
-    <td class="fb">HIGH<br><span class="pen">−5.4</span></td>
-   </tr>
-  
-   <tr>
-    <td><span class="badge bM">MEDIUM</span></td>
-    <td>TATAR-OPS-003<br><span class="cc">Operational Health</span></td>
-    <td>production/service/orphan-svc</td>
-    <td>Эзэнгүй / идэвхгүй service (endpoint-гүй)</td>
-    <td class="ev"><div class="evrow"><span class="evs">popeye</span> No pods match service selector</div></td>
-    <td class="fix">Service-ийг устгах эсвэл selector-ыг засна.</td>
-    <td><span class="fbb">popeye</span></td>
-    <td class="fb">HIGH<br><span class="pen">−5.4</span></td>
-   </tr>
-  
-   <tr>
-    <td><span class="badge bM">MEDIUM</span></td>
-    <td>TATAR-OPS-001<br><span class="cc">Operational Health</span></td>
-    <td>production/pod/api-7d8</td>
-    <td>readiness probe дутуу</td>
-    <td class="ev"><div class="evrow"><span class="evs">popeye</span> No probes defined</div></td>
-    <td class="fix">readinessProbe нэмнэ.</td>
-    <td><span class="fbb">popeye</span></td>
     <td class="fb">HIGH<br><span class="pen">−5.4</span></td>
    </tr>
   
@@ -640,7 +607,7 @@
     <td>TATAR-IMG-003<br><span class="cc">Image Security</span><br><span class="atk" title="Implant Internal Image · Persistence (боломжжуулна)">⚔ T1525</span></td>
     <td>production/pod/api-7d8</td>
     <td>Image :latest tag ашигласан</td>
-    <td class="ev"><div class="evrow"><span class="evs">popeye</span> Image tagged &#34;latest&#34; in use</div></td>
+    <td class="ev"><div class="evrow"><span class="evs">popeye</span> <code>container-x</code>Image tagged &#34;latest&#34; in use <span class="evv">(popeye warning)</span></div></td>
     <td class="fix">Тодорхой хувилбар (digest/tag) ашиглана.</td>
     <td><span class="fbb">popeye</span></td>
     <td class="fb">HIGH<br><span class="pen">−5.4</span></td>
@@ -736,11 +703,22 @@
   
    <tr>
     <td><span class="badge bL">LOW</span></td>
-    <td>TATAR-OPS-004<br><span class="cc">Operational Health</span></td>
-    <td>production/configmap/unused-cm</td>
-    <td>Ашиглагдаагүй ConfigMap / Secret</td>
-    <td class="ev"><div class="evrow"><span class="evs">popeye</span> Used? Unable to locate resource reference</div></td>
-    <td class="fix">Ашиглагдаагүй объектыг устгана.</td>
+    <td>TATAR-CON-010<br><span class="cc">Container Security</span></td>
+    <td>production/pod/api-7d8</td>
+    <td>CPU/санах ойн хязгаар дутуу</td>
+    <td class="ev"><div class="evrow"><span class="evs">popeye</span> <code>container-x</code>No resources requests/limits defined <span class="evv">(popeye warning)</span></div></td>
+    <td class="fix">resources.limits.cpu болон .memory тохируулна.</td>
+    <td><span class="fbb">popeye</span></td>
+    <td class="fb">HIGH<br><span class="pen">−1.8</span></td>
+   </tr>
+  
+   <tr>
+    <td><span class="badge bL">LOW</span></td>
+    <td>TATAR-OPS-001<br><span class="cc">Operational Health</span></td>
+    <td>production/pod/api-7d8</td>
+    <td>readiness probe дутуу</td>
+    <td class="ev"><div class="evrow"><span class="evs">popeye</span> <code>container-x</code>No probes defined <span class="evv">(popeye warning)</span></div></td>
+    <td class="fix">readinessProbe нэмнэ.</td>
     <td><span class="fbb">popeye</span></td>
     <td class="fb">HIGH<br><span class="pen">−1.8</span></td>
    </tr>
@@ -888,6 +866,28 @@
     <td class="fb">HIGH<br><span class="pen">−1.8</span></td>
    </tr>
   
+   <tr>
+    <td><span class="badge bI">INFO</span></td>
+    <td>TATAR-OPS-003<br><span class="cc">Operational Health</span></td>
+    <td>production/service/orphan-svc</td>
+    <td>Эзэнгүй / идэвхгүй service (endpoint-гүй)</td>
+    <td class="ev"><div class="evrow"><span class="evs">popeye</span> No pods match service selector <span class="evv">(popeye warning)</span></div></td>
+    <td class="fix">Service-ийг устгах эсвэл selector-ыг засна.</td>
+    <td><span class="fbb">popeye</span></td>
+    <td class="fb">HIGH</td>
+   </tr>
+  
+   <tr>
+    <td><span class="badge bI">INFO</span></td>
+    <td>TATAR-OPS-004<br><span class="cc">Operational Health</span></td>
+    <td>production/configmap/unused-cm</td>
+    <td>Ашиглагдаагүй ConfigMap / Secret</td>
+    <td class="ev"><div class="evrow"><span class="evs">popeye</span> Used? Unable to locate resource reference <span class="evv">(popeye info)</span></div></td>
+    <td class="fix">Ашиглагдаагүй объектыг устгана.</td>
+    <td><span class="fbb">popeye</span></td>
+    <td class="fb">HIGH</td>
+   </tr>
+  
   </tbody>
  </table>
 </div>
@@ -895,7 +895,7 @@
  <div class="grid">
   <div><b>Scanner хувилбар</b><br>checkov 3.2.10<br>kubescape 3.1.4<br>popeye 0.22.1<br>trivy 0.67.2<br></div>
   <div><b>Схем</b><br>Finding v1.0</div>
-  <div><b>Үр дүнгийн hash</b><br>sha256:1093ee0f9e1314f6110bcdb7ec71e419b0847cd949b043351226e6b67f094dc6</div>
+  <div><b>Үр дүнгийн hash</b><br>sha256:369a59f3d475a59860955d1f59a8fe37fc98eee8e6a113336bb490baf8cde980</div>
   <div><b>Үүсгэсэн</b><br>TATAR-Kuber 1.0.1</div>
   <div><b>Онооны зурвас</b><br>90-100 Excellent<br>70-89 Good<br>50-69 Fair<br>30-49 Poor<br>0-29 Critical</div>
  </div>
