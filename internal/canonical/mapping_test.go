@@ -48,9 +48,12 @@ func TestResolveMulti(t *testing.T) {
 	if id, _ := rs.ResolveOne("trivy", "CVE-*", ResolverContext{Severity: "HIGH"}); id != "TATAR-IMG-002" {
 		t.Errorf("CVE HIGH -> %s, want TATAR-IMG-002", id)
 	}
-	// probe төрлөөр
-	if id, _ := rs.ResolveOne("kubescape", "C-0018", ResolverContext{Detail: "liveness"}); id != "TATAR-OPS-002" {
-		t.Errorf("C-0018 liveness -> %s, want TATAR-OPS-002", id)
+	// C-0018 нь ЗӨВХӨН readiness (liveness нь C-0056) — multi-candidate биш болов.
+	if id, _ := rs.ResolveOne("kubescape", "C-0018", ResolverContext{}); id != "TATAR-OPS-001" {
+		t.Errorf("C-0018 -> %s, want TATAR-OPS-001", id)
+	}
+	if id, _ := rs.ResolveOne("kubescape", "C-0056", ResolverContext{}); id != "TATAR-OPS-002" {
+		t.Errorf("C-0056 -> %s, want TATAR-OPS-002", id)
 	}
 	// secret байршлаар
 	if id, _ := rs.ResolveOne("trivy", "secret", ResolverContext{Detail: "image"}); id != "TATAR-SEC-002" {
@@ -274,6 +277,107 @@ func TestTrivyMappingsMatchUpstreamMeaning(t *testing.T) {
 	for _, code := range []string{"KSV-0020", "KSV-0021", "KSV-0110"} {
 		if ids, ok := reg.Resolve("trivy", code); ok {
 			t.Errorf("%s зурагдсан (-> %v) — 0020/0021 нь low UID/GID (root БИШ), 0110 нь default namespace; тусдаа control хэрэгтэй (v2)", code, ids)
+		}
+	}
+}
+
+// Kubescape-ийн C-XXXX кодууд. Аудитаар 28 зураглалын 6 нь зөрсөн — түүний дотор
+// ХОЁР ХОС сольж бичигдсэн байв:
+//
+//	C-0187 "Minimize wildcard use in Roles and ClusterRoles" -> RBAC-005 "Default
+//	  service account" гэж зурагдсан; жинхэнэ гэр нь RBAC-002 (wildcard).
+//	C-0272 "Workload with administrative roles" -> RBAC-002 (wildcard) гэж
+//	  зурагдсан; жинхэнэ гэр нь RBAC-001 (admin/cluster-admin).
+//	C-0078 "Images from allowed registry" -> IMG-001/IMG-002 (image CVE) гэж CVE
+//	  severity-ээр зурагдсан. Kubescape image CVE scan ХИЙДЭГГҮЙ — жинхэнэ гэр нь
+//	  IMG-004 (unapproved registry).
+//	C-0079 нь "CVE-2022-0185-linux-kernel-container-escape" (тодорхой нэг CVE)
+//	  байхад IMG-004 "unapproved registry" гэж зурагдсан.
+//	C-0075 "Image pull policy on latest tag" -> IMG-003 ":latest tag" гэж
+//	  зурагдсан; энэ нь imagePullPolicy-ийн шалгалт тул OPS-005.
+//	C-0018 нь ЗӨВХӨН readiness probe; liveness нь тусдаа control C-0056. Гэтэл
+//	  C-0018-ыг selector-оор OPS-001/OPS-002 хоёуланд зураглаж байв.
+//
+// Утгуудыг бодит kubescape 4.0 гаралт (results[].controls[].name) ба upstream-ийн
+// control каталог (hub.armosec.io/docs/controls)-аас батлав.
+func TestKubescapeMappingsMatchUpstreamMeaning(t *testing.T) {
+	reg, err := Load(regPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := []struct{ code, meaning, control string }{
+		{"C-0002", `Prevent containers from allowing command execution`, "TATAR-RBAC-003"},
+		{"C-0007", `Roles with delete capabilities`, "TATAR-RBAC-003"},
+		{"C-0009", `Resource limits`, "TATAR-CON-010"},
+		{"C-0012", `Applications credentials in configuration files`, "TATAR-SEC-001"},
+		{"C-0013", `Non-root containers`, "TATAR-CON-002"},
+		{"C-0015", `List Kubernetes secrets`, "TATAR-RBAC-003"},
+		{"C-0016", `Allow privilege escalation`, "TATAR-CON-003"},
+		{"C-0017", `Immutable container filesystem`, "TATAR-CON-009"},
+		{"C-0018", `Configured readiness probe`, "TATAR-OPS-001"},
+		{"C-0030", `Ingress and Egress blocked`, "TATAR-NET-002"},
+		{"C-0031", `Delete Kubernetes events`, "TATAR-RBAC-003"},
+		{"C-0034", `Automatic mapping of service account`, "TATAR-SEC-003"},
+		{"C-0035", `Administrative Roles`, "TATAR-RBAC-001"},
+		{"C-0037", `CoreDNS poisoning`, "TATAR-RBAC-003"},
+		{"C-0038", `Host PID/IPC privileges`, "TATAR-CON-005"},
+		{"C-0041", `HostNetwork access`, "TATAR-CON-006"},
+		{"C-0045", `Writable hostPath mount`, "TATAR-CON-007"},
+		{"C-0046", `Insecure capabilities`, "TATAR-CON-004"},
+		{"C-0056", `Configured liveness probe`, "TATAR-OPS-002"},
+		{"C-0057", `Privileged container`, "TATAR-CON-001"},
+		{"C-0063", `Portforwarding privileges`, "TATAR-RBAC-003"},
+		{"C-0075", `Image pull policy on latest tag`, "TATAR-OPS-005"},
+		{"C-0078", `Images from allowed registry`, "TATAR-IMG-004"},
+		{"C-0186", `Minimize access to secrets`, "TATAR-RBAC-003"},
+		{"C-0187", `Minimize wildcard use in Roles and ClusterRoles`, "TATAR-RBAC-002"},
+		{"C-0188", `Minimize access to create pods`, "TATAR-RBAC-003"},
+		{"C-0210", `Ensure that the seccomp profile is set to docker/default`, "TATAR-CON-011"},
+		{"C-0211", `Apply Security Context to Your Pods and Containers`, "TATAR-CON-008"},
+		{"C-0256", `External facing`, "TATAR-NET-003"},
+		{"C-0260", `Missing network policy`, "TATAR-NET-001"},
+		{"C-0262", `Anonymous access enabled`, "TATAR-RBAC-004"},
+		{"C-0267", `Workload with cluster takeover roles`, "TATAR-RBAC-001"},
+		{"C-0270", `Ensure CPU limits are set`, "TATAR-CON-010"},
+		{"C-0271", `Ensure memory limits are set`, "TATAR-CON-010"},
+		{"C-0272", `Workload with administrative roles`, "TATAR-RBAC-001"},
+	}
+	for _, w := range want {
+		ids, ok := reg.Resolve("kubescape", w.code)
+		if !ok || len(ids) != 1 {
+			t.Errorf("%s (%s): зураглал олдсонгүй/олон (%v)", w.code, w.meaning, ids)
+			continue
+		}
+		if ids[0] != w.control {
+			t.Errorf("%s (%s) -> %s, хүлээсэн %s", w.code, w.meaning, ids[0], w.control)
+		}
+	}
+	// ЗОРИУДААР зураглаагүй — утга гуйвуулахгүйн тулд (v2-д тусдаа control):
+	//   C-0079 тодорхой нэг CVE (CVE-2022-0185), ерөнхий control биш
+	//   C-0055 "Linux hardening" хэт өргөн (seccomp+apparmor+selinux+capabilities)
+	//   C-0054 "Cluster internal networking" namespace түвшний segmentation
+	for _, code := range []string{"C-0079", "C-0055", "C-0054"} {
+		if ids, ok := reg.Resolve("kubescape", code); ok {
+			t.Errorf("%s зурагдсан (-> %v) — зориудаар зураглаагүй байх ёстой", code, ids)
+		}
+	}
+	// Kubescape image CVE scan хийдэггүй (Trivy хийдэг) — IMG-001/002-д kubescape байх ёсгүй.
+	for _, cid := range []string{"TATAR-IMG-001", "TATAR-IMG-002"} {
+		c, _ := reg.Get(cid)
+		if len(c.Mappings["kubescape"]) != 0 {
+			t.Errorf("%s: kubescape=%v — kubescape image CVE scan хийдэггүй", cid, c.Mappings["kubescape"])
+		}
+	}
+	// Зураглагдсан код бүр дээрх жагсаалтад байх ёстой.
+	known := map[string]bool{}
+	for _, w := range want {
+		known[w.code] = true
+	}
+	for _, c := range reg.Controls {
+		for _, code := range c.Mappings["kubescape"] {
+			if !known[code] {
+				t.Errorf("%s: %s зураглагдсан ч утга батлагдаагүй — kubescape каталогоос шалгаж тестэд нэм", c.ID, code)
+			}
 		}
 	}
 }

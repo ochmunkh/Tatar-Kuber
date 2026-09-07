@@ -280,6 +280,8 @@ controls:
     - AVD-KSV0018
     kubescape:
     - C-0009
+    - C-0270
+    - C-0271
     checkov:
     - CKV_K8S_10
     - CKV_K8S_11
@@ -334,6 +336,8 @@ controls:
     trivy: []
     kubescape:
     - C-0035
+    - C-0272
+    - C-0267
     checkov: []
     popeye: []
 - id: TATAR-RBAC-002
@@ -357,7 +361,7 @@ controls:
   mappings:
     trivy: []
     kubescape:
-    - C-0272
+    - C-0187
     checkov:
     - CKV_K8S_49
     popeye: []
@@ -381,6 +385,12 @@ controls:
     kubescape:
     - C-0015
     - C-0031
+    - C-0002
+    - C-0007
+    - C-0037
+    - C-0063
+    - C-0186
+    - C-0188
     checkov:
     - CKV_K8S_155
     - CKV_K8S_156
@@ -423,8 +433,7 @@ controls:
   - CIS-5.1.5
   mappings:
     trivy: []
-    kubescape:
-    - C-0187
+    kubescape: []
     checkov: []
     popeye:
     - POP-300
@@ -472,7 +481,7 @@ controls:
   mappings:
     trivy: []
     kubescape:
-    - C-0260
+    - C-0030
     checkov: []
     popeye: []
 - id: TATAR-NET-003
@@ -529,8 +538,7 @@ controls:
   mappings:
     trivy:
     - CVE-*
-    kubescape:
-    - C-0078
+    kubescape: []
     checkov: []
     popeye: []
 - id: TATAR-IMG-002
@@ -549,8 +557,7 @@ controls:
   mappings:
     trivy:
     - CVE-*
-    kubescape:
-    - C-0078
+    kubescape: []
     checkov: []
     popeye: []
 - id: TATAR-IMG-003
@@ -574,8 +581,7 @@ controls:
   mappings:
     trivy:
     - AVD-KSV0013
-    kubescape:
-    - C-0075
+    kubescape: []
     checkov:
     - CKV_K8S_14
     popeye:
@@ -597,7 +603,7 @@ controls:
   mappings:
     trivy: []
     kubescape:
-    - C-0079
+    - C-0078
     checkov: []
     popeye: []
 - id: TATAR-SEC-001
@@ -728,7 +734,7 @@ controls:
   mappings:
     trivy: []
     kubescape:
-    - C-0018
+    - C-0056
     checkov:
     - CKV_K8S_8
     popeye:
@@ -788,7 +794,8 @@ controls:
   references: []
   mappings:
     trivy: []
-    kubescape: []
+    kubescape:
+    - C-0075
     checkov:
     - CKV_K8S_15
     popeye: []

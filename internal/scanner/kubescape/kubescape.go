@@ -127,13 +127,33 @@ type ksReport struct {
 	Resources []struct {
 		ResourceID string `json:"resourceID"`
 		Object     struct {
-			Kind     string `json:"kind"`
-			Metadata struct {
-				Name      string `json:"name"`
-				Namespace string `json:"namespace"`
-			} `json:"metadata"`
+			Kind string `json:"kind"`
+			// Name — RBAC subject (Group/User/ServiceAccount) объектууд нэрээ ДЭЭД
+			// түвшний "name" талбарт өгдөг, metadata.name-д БИШ. v1.0.1 хүртэл
+			// зөвхөн metadata.name уншиж байсан тул тэдгээр finding нь "group/",
+			// "user/" гэж хоосон нэртэй гарч, dedup түлхүүр (control|resource|ns)
+			// давхцаж ӨӨР ӨӨР subject-ууд НЭГ finding болж нийлж байв.
+			Name           string          `json:"name"`
+			APIGroup       string          `json:"apiGroup"`
+			Metadata       objectMetadata  `json:"metadata"`
+			RelatedObjects []relatedObject `json:"relatedObjects"`
 		} `json:"object"`
 	} `json:"resources"`
+}
+
+type objectMetadata struct {
+	Name      string `json:"name"`
+	Namespace string `json:"namespace"`
+}
+
+// relatedObject — RBAC subject-ийн хамаарах binding/role (нотолгоонд).
+type relatedObject struct {
+	Kind     string         `json:"kind"`
+	Metadata objectMetadata `json:"metadata"`
+	RoleRef  struct {
+		Kind string `json:"kind"`
+		Name string `json:"name"`
+	} `json:"roleRef"`
 }
 
 // Normalize — Kubescape raw JSON -> []finding.Finding.
@@ -142,10 +162,25 @@ func (s *Scanner) Normalize(raw scanner.RawResult) ([]finding.Finding, error) {
 	if err := json.Unmarshal(raw.Data, &rep); err != nil {
 		return nil, fmt.Errorf("kubescape JSON parse: %w", err)
 	}
-	// resourceID -> object
-	objs := map[string]struct{ Kind, Name, NS string }{}
+	// resourceID -> object. Нэрийг metadata.name-аас, байхгүй бол дээд түвшний
+	// name-аас авна (RBAC subject-ууд), эцэст нь resourceID-ийн сүүлийн хэсгээс.
+	type objInfo struct {
+		Kind, Name, NS string
+		Related        []relatedObject
+	}
+	objs := map[string]objInfo{}
 	for _, r := range rep.Resources {
-		objs[r.ResourceID] = struct{ Kind, Name, NS string }{r.Object.Kind, r.Object.Metadata.Name, r.Object.Metadata.Namespace}
+		name := r.Object.Metadata.Name
+		if name == "" {
+			name = r.Object.Name
+		}
+		if name == "" {
+			// Хамгийн сүүлийн нөөц: resourceID-ийн "/"-аар хуваасан сүүлийн хэсэг.
+			if i := strings.LastIndex(r.ResourceID, "/"); i >= 0 && i+1 < len(r.ResourceID) {
+				name = r.ResourceID[i+1:]
+			}
+		}
+		objs[r.ResourceID] = objInfo{r.Object.Kind, name, r.Object.Metadata.Namespace, r.Object.RelatedObjects}
 	}
 
 	var out []finding.Finding
@@ -172,6 +207,19 @@ func (s *Scanner) Normalize(raw scanner.RawResult) ([]finding.Finding, error) {
 						evs = append(evs, e)
 					}
 				}
+			}
+			// RBAC subject-ийн хамаарах binding/role-ыг нотолгоонд нэмнэ — аудитад
+			// "ямар group ямар role-той холбогдсон" нь зайлшгүй мэдээлэл.
+			for _, ro := range o.Related {
+				if ro.RoleRef.Name == "" {
+					continue
+				}
+				evs = append(evs, finding.Evidence{
+					Scanner: "kubescape",
+					Path:    strings.ToLower(ro.Kind) + "/" + ro.Metadata.Name,
+					Value:   strings.ToLower(ro.RoleRef.Kind) + "/" + ro.RoleRef.Name,
+					Detail:  "bound role",
+				})
 			}
 			ctx := canonical.ResolverContext{ResourceKind: o.Kind, Namespace: o.NS}
 			meta := normalizer.Meta{Resource: resource, Namespace: o.NS, Title: c.Name, Evidence: evs}

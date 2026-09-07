@@ -237,15 +237,10 @@ func (r *Registry) NewResolver() *Resolver {
 		return pick(cands, "TATAR-IMG-002")
 	}
 	res.rules[key("trivy", "CVE-*")] = bySeverity
-	res.rules[key("kubescape", "C-0078")] = bySeverity
-
-	// probe төрлөөр OPS-001(readiness) vs OPS-002(liveness)
-	res.rules[key("kubescape", "C-0018")] = func(cands []string, ctx ResolverContext) string {
-		if ctx.Detail == "liveness" {
-			return pick(cands, "TATAR-OPS-002")
-		}
-		return pick(cands, "TATAR-OPS-001")
-	}
+	// Тэмдэглэл (v1.0.2 аудит): kubescape C-0078 нь "Images from allowed registry" —
+	// image CVE-тэй ХОЛБООГҮЙ, гэтэл CVE severity-ээр IMG-001/002 руу зурагдаж байв.
+	// C-0018 нь ЗӨВХӨН readiness probe (liveness нь C-0056) тул probe selector
+	// шаардлагагүй болов. C-0260 нь зөвхөн NET-001 (default-deny нь C-0030).
 
 	// secret байршлаар SEC-001(env) / SEC-002(image) / SEC-004(configmap)
 	res.rules[key("trivy", "secret")] = func(cands []string, ctx ResolverContext) string {
@@ -259,13 +254,6 @@ func (r *Registry) NewResolver() *Resolver {
 		}
 	}
 
-	// default-deny эсэхээр NET-001 vs NET-002
-	res.rules[key("kubescape", "C-0260")] = func(cands []string, ctx ResolverContext) string {
-		if ctx.Detail == "default-deny" {
-			return pick(cands, "TATAR-NET-002")
-		}
-		return pick(cands, "TATAR-NET-001")
-	}
 	return res
 }
 

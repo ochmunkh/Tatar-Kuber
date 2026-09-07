@@ -271,8 +271,24 @@ failed in local mode, so Trivy showed up as `error` in Mode A instead of honestl
 Adding real local support needs manifest parsing (Trivy's config output names no Kubernetes object,
 only a file and line), so it is a v2 item rather than a half-measure that would under-report.
 
-Scoreboard for the mapping audit: **Popeye 7 of 10 wrong, Checkov 2 of 18, Trivy 0 of 11.** Every
-mapped rule in all three is now pinned by a test against upstream's own definitions.
+**Kubescape** was the last one, and it held the second-worst set: **6 of its 28 mappings were wrong,
+including two swapped pairs.** `C-0187` ("Minimize wildcard use in Roles and ClusterRoles") pointed at
+"Default service account in use" while `C-0272` ("Workload with administrative roles") pointed at
+"Wildcard permissions in role" — each sitting in the other's place. `C-0078` is "Images from allowed
+registry", yet it was mapped by CVE severity onto "Critical/High CVE in image": Kubescape does not
+scan image CVEs at all. `C-0075` is an imagePullPolicy check, not ":latest tag", and `C-0018` covers
+only readiness (liveness is the separate `C-0056`). All fixed; coverage went from 28 rules with 17
+unmapped to 35 with only 2 deliberately unmapped.
+
+Kubescape also had an identity bug: RBAC subjects (Group/User) carry their name in a top-level
+`name` field, not `metadata.name`, so those findings came out as `group/` and `user/` with **empty
+names** — which made the dedup key collide and merged different subjects into one finding. Names are
+now resolved, and each subject's bound role is attached as evidence (`clusterrole/cluster-admin`),
+which is the detail an auditor actually needs.
+
+Scoreboard for the mapping audit: **Popeye 7 of 10 wrong, Kubescape 6 of 28, Checkov 2 of 18,
+Trivy 0 of 11.** Every mapped rule in all four scanners is now pinned by a test against upstream's
+own definitions, so a scanner renaming or renumbering a check fails the build.
 
 One more correction came out of reading the first good live report: Popeye's lint level
 (info/warn/error) was overriding each control's **curated** `default_severity`, so a dead Service
@@ -537,8 +553,24 @@ Local-ыг бодитоор дэмжихэд манифестыг парслах
 объектын нэрийг өгдөггүй, зөвхөн файл ба мөр), тиймээс дутуу тайлагнах хагас шийдлийн оронд
 v2-ын ажил болгов.
 
-Зураглалын аудитын дүн: **Popeye 10-аас 7 буруу, Checkov 18-аас 2, Trivy 11-ээс 0.** Гурвуулангийн
-зурагдсан rule бүр одоо upstream-ийн өөрийн тодорхойлолттой тулгах тестээр бэхлэгдсэн.
+**Kubescape** нь сүүлчийнх бөгөөд хоёрдугаарт хамгийн их зөрүүтэй гарлаа: **28 зураглалын 6 нь
+буруу, түүний дотор хоёр хос сольж бичигдсэн.** `C-0187` ("Minimize wildcard use in Roles and
+ClusterRoles") нь "Default service account in use" руу, `C-0272` ("Workload with administrative
+roles") нь "Wildcard permissions in role" руу зааж — тус бүр нөгөөгийнхөө оронд байв. `C-0078` нь
+"Images from allowed registry" боловч CVE severity-ээр "Critical/High CVE in image" руу зурагдаж
+байсан: Kubescape image CVE-г огт шалгадаггүй. `C-0075` нь imagePullPolicy-ийн шалгалт, ":latest
+tag" биш; `C-0018` нь зөвхөн readiness (liveness нь тусдаа `C-0056`). Бүгд зассан; хамрах хүрээ
+28 зураглал/17 зураглалгүйгээс 35/2 (зориудаар) болов.
+
+Kubescape-д мөн нөөцийн нэрийн эвдрэл байв: RBAC subject-ууд (Group/User) нэрээ дээд түвшний
+`name` талбарт өгдөг, `metadata.name`-д БИШ — тиймээс тэдгээр finding нь `group/`, `user/` гэж
+**хоосон нэртэй** гарч, dedup түлхүүр давхцаж өөр өөр subject нэг finding болж нийлж байв. Одоо
+нэр зөв тодорхойлогдож, subject бүрийн хамаарах role нь нотолгоонд орж байна
+(`clusterrole/cluster-admin`) — аудиторт яг тэр мэдээлэл хэрэгтэй.
+
+Зураглалын аудитын дүн: **Popeye 10-аас 7 буруу, Kubescape 28-аас 6, Checkov 18-аас 2,
+Trivy 11-ээс 0.** Дөрвүүлэнгийн зурагдсан rule бүр одоо upstream-ийн өөрийн тодорхойлолттой тулгах
+тестээр бэхлэгдсэн тул scanner шалгалтаа дахин нэрлэхэд build унана.
 
 Анхны бүтэн live тайланг уншихад нэг засвар бас гарлаа: Popeye-ийн lint level
 (info/warn/error) нь control бүрийн **curated** `default_severity`-г дарж байсан тул dead Service
