@@ -41,9 +41,15 @@ const (
 type Confidence string
 
 const (
-	ConfidenceHigh   Confidence = "HIGH"   // 3+ scanner
-	ConfidenceMedium Confidence = "MEDIUM" // 1 scanner
-	ConfidenceLow    Confidence = "LOW"    // контекст/эвристик
+	// Тэмдэглэл: эдгээрийг risk.Confidence(scannerCount, heuristic) тооцоолно —
+	// scanner тоо БА шалгалтын determinism хоёулангаас (Doc #4 §4.3):
+	//   2+ scanner                     -> HIGH   (олон scanner санал нийлсэн)
+	//   1 scanner + deterministic      -> HIGH   (CVE, тодорхой талбарын шалгалт)
+	//   1 scanner + эвристик           -> MEDIUM (canonical control heuristic: true)
+	//   0 scanner (зөвхөн контекст)    -> LOW
+	ConfidenceHigh   Confidence = "HIGH"
+	ConfidenceMedium Confidence = "MEDIUM"
+	ConfidenceLow    Confidence = "LOW"
 )
 
 // RawRef — raw scanner гаралт руу заасан лавлагаа.

@@ -27,6 +27,28 @@ distribution via brew / curl / Docker; govulncheck + gosec in CI.
 
 ---
 
+## v1.0.1 / v1.0.2 — Accountability ✅ (shipped)
+
+Theme: **a scanner that contributes nothing must never look like one that found nothing.**
+
+An audit of v1.0.0's own live run showed all 11 findings came from Kubescape alone — Trivy and
+Popeye were detected, versioned in the report, and silently contributing zero. Fixed, then the
+same audit method was turned on the mapping registry itself.
+
+- **`metadata.scanner_runs[]`** — per-scanner status / duration / findings / unmapped rules,
+  surfaced as a *Scanner coverage* table in the report. Graceful degradation is no longer silent.
+- **Raw scanner output kept** as evidence in `<out>/raw/` (the same layout `--raw-dir` accepts,
+  so any scan is re-processable and auditable).
+- **Mapping audit against upstream definitions** — Popeye 7 of 10 mappings wrong, Kubescape 6 of
+  28 (two swapped pairs), Checkov 2 of 18, Trivy 0 of 11. All fixed and pinned by tests that force
+  any new rule to have its meaning verified.
+- **Mode A validated** — a new no-cluster [static-scan workflow](.github/workflows/static-scan.yml)
+  runs real Checkov weekly; the real-cluster workflow now asserts **each** scanner individually.
+- **Curated severity wins** — a linter's log level no longer overrides a control's
+  `default_severity`; adapters set severity only when the scanner gives a real security rating.
+
+---
+
 ## Release 2 (v2.0) — Depth & the audit deliverable 🎯
 
 Theme: **make it the tool a security auditor reaches for.**
@@ -38,7 +60,18 @@ Theme: **make it the tool a security auditor reaches for.**
   Hardening, ISO/IEC 27001 Annex A, MITRE ATT&CK for Containers**; add a compliance view/section
   to the report ("X% aligned, these gaps").
 - **Expanded control coverage** — grow the canonical registry well beyond the current set;
-  broaden per-scanner rule mappings.
+  broaden per-scanner rule mappings. Gaps the v1.0.2 audit already surfaced, visible in every
+  report: `TATAR-NET-004` (Ingress without TLS) has no scanner rule mapped at all; and these are
+  deliberately unmapped for want of a matching control — Trivy `KSV-0020/0021` (low UID/GID),
+  `KSV-0110` (default namespace); Kubescape `C-0079` (a single CVE), `C-0055` (Linux hardening),
+  `C-0054` (cluster internal networking); Checkov `CKV_K8S_40` (high UID), `CKV_K8S_21` (default
+  namespace), `CKV_K8S_18` (hostIPC), `CKV_K8S_43` (image digest), `CKV_K8S_27` (docker socket —
+  deserves its own critical control).
+- **Object-aware Mode A for Trivy** — `trivy config` works on manifests but names no Kubernetes
+  object (only file:line plus a prose message in five shapes), so file-scoped reporting would
+  merge several identical violations in one file into one finding. Needs manifest parsing.
+- **Pod ↔ owner rollup** — the same issue is currently counted twice when Popeye lints a Pod and
+  Trivy/Kubescape lint its Deployment. Needs `ownerReferences` resolution.
 - **Scan trending / diff** — compare two scans (the schema already carries `result_hash` and
   finding IDs): new / fixed / regressed findings, and score delta over time.
 - **5th scanner adapter** — prove the pluggable promise and deepen coverage (candidates:
@@ -110,6 +143,29 @@ CI-д батлагдсан); JSON / SARIF / HTML (хоёр хэлт); CI/CD gate
 
 ---
 
+## v1.0.1 / v1.0.2 — Шударга байдал ✅ (гарсан)
+
+Сэдэв: **юу ч өгөөгүй scanner нь "юу ч олдсонгүй" гэж харагдах ёсгүй.**
+
+v1.0.0-ийн бодит live run-ыг аудит хийхэд 11 finding бүгд зөвхөн Kubescape-ээс ирсэн нь
+тогтоогдов — Trivy, Popeye хоёул танигдаж, хувилбар нь тайланд бичигдээд, чимээгүй юу ч
+өгөөгүй. Зассаны дараа мөнөөх аудитын аргыг зураглалын registry дээр өөр дээр нь хэрэглэв.
+
+- **`metadata.scanner_runs[]`** — scanner тус бүрийн төлөв / хугацаа / finding / зураглалгүй
+  rule, тайланд *Scanner хамрах хүрээ* хүснэгтээр гарна. Graceful degradation чимээгүй биш болов.
+- **Түүхий scanner гаралт** `<out>/raw/`-д нотолгоо болж хадгалагдана (`--raw-dir` хүлээж авдаг
+  яг тэр бүтэц тул scan бүрийг дахин боловсруулж, аудит хийж болно).
+- **Зураглалыг upstream-ийн тодорхойлолттой тулгасан аудит** — Popeye 10-аас 7 буруу,
+  Kubescape 28-аас 6 (хоёр хос сольсон), Checkov 18-аас 2, Trivy 11-ээс 0. Бүгд зассан ба шинэ
+  rule нэмэхэд утгыг батлахыг албадах тестээр бэхлэгдсэн.
+- **Mode A батлагдсан** — cluster шаардахгүй шинэ
+  [static-scan workflow](.github/workflows/static-scan.yml) бодит Checkov-ыг 7 хоног тутам
+  ажиллуулна; real-cluster workflow одоо scanner **тус бүрийг** шалгана.
+- **Curated severity дийлнэ** — линтерийн log-level нь control-ийн `default_severity`-г дарахаа
+  болив; adapter нь зөвхөн scanner бодит аюулгүй байдлын үнэлгээ өгсөн үед severity тавина.
+
+---
+
 ## Release 2 (v2.0) — Гүн ба аудитын deliverable 🎯
 
 Сэдэв: **аудиторын гар татдаг багаж болгох.**
@@ -120,6 +176,17 @@ CI-д батлагдсан); JSON / SARIF / HTML (хоёр хэлт); CI/CD gate
 - **Compliance mapping** — canonical control-уудыг **CIS Kubernetes Benchmark, NSA/CISA,
   ISO/IEC 27001 Annex A, MITRE ATT&CK for Containers**-т зурах; тайланд compliance хэсэг нэмэх
   ("X% нийцсэн, эдгээр цоорхой").
+- **Trivy-д объект танидаг Mode A** — `trivy config` манифест дээр ажилладаг ч K8s объектын
+  нэрийг өгдөггүй (зөвхөн файл:мөр ба 5 хэлбэртэй проз мессеж), тиймээс файлын хэмжээнд
+  тайлагнавал нэг файл дахь хэд хэдэн ижил зөрчил нэг finding болж нийлнэ. Манифестыг парслах
+  шаардлагатай.
+- **Pod ↔ эзэмшигч rollup** — Popeye нь Pod-ыг, Trivy/Kubescape нь түүний Deployment-ыг
+  шалгадаг тул нэг асуудал хоёр удаа тоологдож байна. `ownerReferences` шийдэх шаардлагатай.
+- **Зураглалын хийдлүүд** (v1.0.2 аудитаар илэрсэн, тайлан бүрт ил): `TATAR-NET-004`-д ямар ч
+  scanner rule зурагдаагүй; тохирох control байхгүйн улмаас зориудаар зураглаагүй — Trivy
+  `KSV-0020/0021`, `KSV-0110`; Kubescape `C-0079`, `C-0055`, `C-0054`; Checkov `CKV_K8S_40`,
+  `CKV_K8S_21`, `CKV_K8S_18`, `CKV_K8S_43` (digest), `CKV_K8S_27` (docker socket — тусдаа
+  critical control болох ёстой).
 - **Control хамрах хүрээг өргөтгөх** — canonical registry-г одоогийнхоос хамаагүй нэмэгдүүлэх;
   scanner тус бүрийн rule mapping-ийг өргөжүүлэх.
 - **Scan trending / diff** — хоёр scan-ыг харьцуулах (схемд `result_hash` + finding ID бэлэн):

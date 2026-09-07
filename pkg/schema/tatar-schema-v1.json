@@ -4,7 +4,7 @@
   "type": "object",
   "required": ["id","canonical_control","resource","type","category","severity","title","description","remediation","found_by","confidence","blind_shot","status","first_seen","last_seen"],
   "properties": {
-    "id":                { "type": "string", "pattern": "^TK-[0-9a-f]{6,}$" },
+    "id":                { "type": "string", "pattern": "^TK-[0-9a-f]{12}$", "description": "Тогтвортой content-hash ID: TK- + SHA256(canonical_control|resource|namespace)-ийн эхний 12 hex (48 бит)" },
     "canonical_control": { "type": "string", "pattern": "^TATAR-[A-Z]+-[0-9]{3}$" },
     "resource":          { "type": "string" },
     "namespace":         { "type": "string" },
