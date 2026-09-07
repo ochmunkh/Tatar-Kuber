@@ -240,7 +240,14 @@ Adapter Interface, 04 Severity & Risk Scoring, 05 CLI Spec, 06 Repository Struct
 **Honesty note (v1.0.1).** Auditing the v1.0.0 live run showed that all 11 findings came from
 Kubescape alone: Trivy was silently contributing nothing (real Trivy emits `AVD-KSV-0017`, the
 registry had `AVD-KSV0017`; `trivy k8s` defaults to `--report summary`; context is positional),
-and adapter errors were swallowed. v1.0.1 fixes the adapters, records every scanner's outcome in
+and adapter errors were swallowed. With per-scanner assertions in place, the same audit then caught two
+more: Kubescape's `--kube-contexts` renames its own output file (fleet mode), and Popeye 0.22 changed
+its JSON schema (`sanitizers` → `sections`) *and* the meaning of its POP codes — 7 of the 10 Popeye
+mappings pointed at the wrong canonical control (e.g. POP-108 "unnamed port" was reported as
+"Missing CPU/memory limits"). All are fixed and pinned by a test that checks every mapped POP code
+against upstream's `codes.yaml`.
+
+v1.0.1 fixes the adapters, records every scanner's outcome in
 `metadata.scanner_runs` (status, duration, findings, unmapped rules) — shown in the HTML report
 as *Scanner coverage* — keeps raw scanner output as evidence, and the
 [real-cluster workflow](.github/workflows/real-cluster.yml) now asserts **each** scanner
@@ -472,7 +479,14 @@ Kubescape-ээс ирсэн нь тогтоогдсон: Trivy чимээгүй 
 гэж гаргадаг, registry-д `AVD-KSV0017` байсан; `trivy k8s` default нь `--report summary`;
 context нь positional), adapter-ийн алдаанууд залгигдаж байсан. v1.0.1-д adapter-уудыг зассан,
 scanner бүрийн үр дүнг `metadata.scanner_runs`-д (төлөв, хугацаа, finding, зураглалгүй rule)
-бичдэг болгож HTML тайланд *Scanner хамрах хүрээ* хэсгээр харуулна, түүхий scanner гаралтыг
+бичдэг болгосон. Scanner тус бүрийн шалгалт нэмэгдсэний дараа мөнөөх аудит дахин хоёрыг барив:
+Kubescape-ийн `--kube-contexts` (fleet mode) нь гаралтын файлын нэрийг өөрөө сольдог, мөн Popeye 0.22
+нь JSON схемээ (`sanitizers` → `sections`) БОЛОН POP кодынхоо утгыг сольсон — Popeye-ийн 10
+зураглалын 7 нь буруу canonical control руу зааж байсан (ж: POP-108 "unnamed port"-ыг "Missing
+CPU/memory limits" гэж тайлагнаж байв). Бүгдийг зассан ба зураглагдсан POP код бүрийг upstream-ийн
+`codes.yaml`-тай тулгах тестээр бэхэлсэн.
+
+HTML тайланд *Scanner хамрах хүрээ* хэсгээр харуулна, түүхий scanner гаралтыг
 нотолгоо болгон хадгална, [real-cluster workflow](.github/workflows/real-cluster.yml) одоо
 scanner **тус бүр** finding өгснийг ба ядаж нэг finding 2+ scanner-ээр батлагдсаныг шалгана.
 "0 finding" scanner дахиж хэзээ ч чимээгүй өнгөрөхгүй.

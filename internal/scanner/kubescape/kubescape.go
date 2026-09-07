@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -44,13 +45,15 @@ func (s *Scanner) Scan(ctx context.Context, t scanner.Target) (scanner.RawResult
 	if t.Mode != scanner.ModeRemote {
 		return scanner.RawResult{Scanner: "kubescape"}, fmt.Errorf("kubescape live: зөвхөн remote (Mode B) дэмжигдэнэ")
 	}
-	tmp, err := os.CreateTemp("", "tatar-kubescape-*.json")
+	// Гаралтыг тусдаа ХАВТАСТ бичүүлнэ: --kube-contexts (fleet mode) үед kubescape
+	// нэрийг өөрөө сольдог (`scan.json` -> `scan.<context>.json`) тул тогтсон
+	// файлын нэрээр уншиж болохгүй — хавтас доторх JSON-ыг хайж уншина.
+	tmpDir, err := os.MkdirTemp("", "tatar-kubescape-*")
 	if err != nil {
 		return scanner.RawResult{Scanner: "kubescape"}, err
 	}
-	tmpPath := tmp.Name()
-	_ = tmp.Close()
-	defer os.Remove(tmpPath)
+	defer os.RemoveAll(tmpDir)
+	tmpPath := filepath.Join(tmpDir, "scan.json")
 
 	args := []string{"scan", "--format", "json", "--output", tmpPath}
 	if len(t.Namespaces) > 0 {
@@ -69,7 +72,7 @@ func (s *Scanner) Scan(ctx context.Context, t scanner.Target) (scanner.RawResult
 	}
 	res, runErr := toolexec.Run(ctx, "kubescape", args, env...)
 
-	data, _ := os.ReadFile(tmpPath)
+	data := readOutput(tmpDir)
 	if len(data) == 0 {
 		if runErr != nil {
 			return scanner.RawResult{Scanner: "kubescape"}, runErr
@@ -77,6 +80,26 @@ func (s *Scanner) Scan(ctx context.Context, t scanner.Target) (scanner.RawResult
 		return scanner.RawResult{Scanner: "kubescape"}, fmt.Errorf("kubescape: хоосон гаралт (stderr: %s)", strings.TrimSpace(string(res.Stderr)))
 	}
 	return scanner.RawResult{Scanner: "kubescape", Format: "json", Data: data, ExitCode: res.ExitCode}, nil
+}
+
+// readOutput — tmpDir доторх хамгийн том JSON файлыг уншина. Fleet mode-д
+// kubescape `scan.<context>.json` гэж бичдэг тул нэрээр таамаглахгүй, хайна.
+func readOutput(dir string) []byte {
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return nil
+	}
+	var best []byte
+	for _, e := range entries {
+		if e.IsDir() || !strings.HasSuffix(e.Name(), ".json") {
+			continue
+		}
+		b, err := os.ReadFile(filepath.Join(dir, e.Name()))
+		if err == nil && len(b) > len(best) {
+			best = b
+		}
+	}
+	return best
 }
 
 // ---- Kubescape JSON бүтэц (kubescape scan --format json) ----

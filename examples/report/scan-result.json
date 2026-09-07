@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "metadata": {
-    "scan_id": "c078c7147ea68310a21733b1f611b8cf",
+    "scan_id": "5ad65b8e4c2c257159a312d2d03a2544",
     "cluster_name": "demo-prod",
     "scan_mode": "remote",
     "lang": "en",
@@ -60,13 +60,13 @@
         "scanner": "popeye",
         "status": "ingested",
         "version": "0.22.1",
-        "raw_bytes": 895,
-        "findings": 3
+        "raw_bytes": 1583,
+        "findings": 6
       }
     ],
-    "started_at": "2026-09-07T04:26:45Z",
-    "finished_at": "2026-09-07T04:26:45Z",
-    "result_hash": "sha256:5e1c2a5e0f6810bd55401262a0fa1c7f4d05c35812e4a6c15eb964a1b2259c09",
+    "started_at": "2026-09-07T04:41:52Z",
+    "finished_at": "2026-09-07T04:41:52Z",
+    "result_hash": "sha256:1093ee0f9e1314f6110bcdb7ec71e419b0847cd949b043351226e6b67f094dc6",
     "inventory": {
       "ClusterRoles": 27,
       "Deployments": 31,
@@ -82,17 +82,17 @@
       "CRITICAL": 2,
       "HIGH": 12,
       "INFO": 0,
-      "LOW": 21,
-      "MEDIUM": 28
+      "LOW": 20,
+      "MEDIUM": 32
     },
     "blind_shot": 0,
-    "risk_score": 23,
+    "risk_score": 22,
     "risk_band": "Critical",
-    "total_findings": 63,
+    "total_findings": 66,
     "risk_breakdown": {
-      "total_penalty": 334,
-      "high_penalty": 324,
-      "low_penalty_raw": 37.8,
+      "total_penalty": 355.6,
+      "high_penalty": 345.6,
+      "low_penalty_raw": 36,
       "low_penalty_capped": 10,
       "low_pool_cap": 10,
       "scale": 100,
@@ -104,7 +104,7 @@
           "resource": "deployment/api",
           "severity": "CRITICAL",
           "contribution": 18,
-          "share": 5
+          "share": 4.7
         },
         {
           "id": "TK-099acce09622",
@@ -112,7 +112,7 @@
           "resource": "deployment/root-app",
           "severity": "HIGH",
           "contribution": 12.6,
-          "share": 3.5
+          "share": 3.3
         },
         {
           "id": "TK-31cdabe90e87",
@@ -120,7 +120,7 @@
           "resource": "deployment/privileged-app",
           "severity": "HIGH",
           "contribution": 12.6,
-          "share": 3.5
+          "share": 3.3
         },
         {
           "id": "TK-3d236fda3600",
@@ -128,7 +128,7 @@
           "resource": "deployment/host-ns-app",
           "severity": "HIGH",
           "contribution": 12.6,
-          "share": 3.5
+          "share": 3.3
         },
         {
           "id": "TK-41b7549616ee",
@@ -136,7 +136,7 @@
           "resource": "deployment/api",
           "severity": "HIGH",
           "contribution": 12.6,
-          "share": 3.5
+          "share": 3.3
         }
       ]
     }
@@ -175,8 +175,8 @@
         "contribution": 18
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "references": [
         "CVE-2024-0001",
         "https://avd.aquasec.com/nvd/cve-2024-0001"
@@ -220,8 +220,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "kubescape",
@@ -268,8 +268,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -316,8 +316,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -364,8 +364,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -406,8 +406,8 @@
         "contribution": 12.6
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "references": [
         "CVE-2024-0002",
         "https://avd.aquasec.com/nvd/cve-2024-0002"
@@ -458,8 +458,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -506,8 +506,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -554,8 +554,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -608,8 +608,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "references": [
         "https://avd.aquasec.com/misconfig/ksv017",
         "https://docs.prismacloud.io/en/enterprise-edition/policy-reference/kubernetes-policies/kubernetes-policy-index/bc-k8s-15"
@@ -668,8 +668,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -716,8 +716,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -764,8 +764,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "trivy",
@@ -812,8 +812,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -853,12 +853,53 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
           "rule_id": "CKV_K8S_22"
+        }
+      ]
+    },
+    {
+      "id": "TK-1128ca969582",
+      "canonical_control": "TATAR-RBAC-005",
+      "resource": "pod/api-7d8",
+      "namespace": "production",
+      "type": "rbac",
+      "category": "RBAC \u0026 Authorization",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Default service account in use",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "popeye",
+          "detail": "Uses \"default\" ServiceAccount"
+        }
+      ],
+      "remediation": "Create a dedicated least-privilege SA per workload.",
+      "found_by": [
+        "popeye"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 5.4,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 5.4
+      },
+      "status": "OPEN",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
+      "raw_refs": [
+        {
+          "scanner": "popeye",
+          "rule_id": "POP-300"
         }
       ]
     },
@@ -901,8 +942,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -949,8 +990,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -997,12 +1038,53 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
           "rule_id": "CKV_K8S_38"
+        }
+      ]
+    },
+    {
+      "id": "TK-2fdd9b42905f",
+      "canonical_control": "TATAR-CON-010",
+      "resource": "pod/api-7d8",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Container Security",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Missing CPU/memory limits",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "popeye",
+          "detail": "No resources requests/limits defined"
+        }
+      ],
+      "remediation": "Set resources.limits.cpu and .memory.",
+      "found_by": [
+        "popeye"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 5.4,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 5.4
+      },
+      "status": "OPEN",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
+      "raw_refs": [
+        {
+          "scanner": "popeye",
+          "rule_id": "POP-106"
         }
       ]
     },
@@ -1038,12 +1120,53 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "popeye",
-          "rule_id": "POP-1102"
+          "rule_id": "POP-1100"
+        }
+      ]
+    },
+    {
+      "id": "TK-4a7a7eed92c4",
+      "canonical_control": "TATAR-OPS-001",
+      "resource": "pod/api-7d8",
+      "namespace": "production",
+      "type": "hygiene",
+      "category": "Operational Health",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Missing readiness probe",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "popeye",
+          "detail": "No probes defined"
+        }
+      ],
+      "remediation": "Add a readinessProbe.",
+      "found_by": [
+        "popeye"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 5.4,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 5.4
+      },
+      "status": "OPEN",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
+      "raw_refs": [
+        {
+          "scanner": "popeye",
+          "rule_id": "POP-102"
         }
       ]
     },
@@ -1079,8 +1202,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1127,8 +1250,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1168,8 +1291,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1209,8 +1332,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1250,8 +1373,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1291,8 +1414,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1332,8 +1455,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1373,8 +1496,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1414,8 +1537,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1455,8 +1578,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "trivy",
@@ -1496,8 +1619,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1544,8 +1667,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1592,8 +1715,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1633,8 +1756,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1681,8 +1804,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1723,8 +1846,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "kubescape",
@@ -1764,8 +1887,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1805,8 +1928,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1853,8 +1976,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1894,8 +2017,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1942,12 +2065,60 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
           "rule_id": "CKV_K8S_38"
+        }
+      ]
+    },
+    {
+      "id": "TK-e204cf95d5fe",
+      "canonical_control": "TATAR-IMG-003",
+      "resource": "pod/api-7d8",
+      "namespace": "production",
+      "type": "misconfiguration",
+      "category": "Image Security",
+      "severity": "MEDIUM",
+      "original_severity": "MEDIUM",
+      "title": "Image uses :latest tag",
+      "description": "",
+      "evidence": [
+        {
+          "scanner": "popeye",
+          "detail": "Image tagged \"latest\" in use"
+        }
+      ],
+      "remediation": "Use a specific version (digest/tag).",
+      "found_by": [
+        "popeye"
+      ],
+      "confidence": "HIGH",
+      "blind_shot": false,
+      "risk_contribution": 5.4,
+      "risk_factors": {
+        "base_weight": 3,
+        "asset_context": 1.5,
+        "exposure": 1,
+        "confidence": 1.2,
+        "contribution": 5.4
+      },
+      "attack": [
+        {
+          "technique": "T1525",
+          "name": "Implant Internal Image",
+          "tactic": "Persistence"
+        }
+      ],
+      "status": "OPEN",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
+      "raw_refs": [
+        {
+          "scanner": "popeye",
+          "rule_id": "POP-101"
         }
       ]
     },
@@ -1990,8 +2161,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2031,8 +2202,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2072,8 +2243,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2113,8 +2284,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2158,8 +2329,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2199,8 +2370,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2240,8 +2411,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2281,8 +2452,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2322,8 +2493,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "popeye",
@@ -2363,8 +2534,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2404,8 +2575,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2449,8 +2620,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2490,8 +2661,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2535,8 +2706,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2576,8 +2747,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2617,8 +2788,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2658,8 +2829,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2699,8 +2870,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2740,8 +2911,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2750,47 +2921,6 @@
         {
           "scanner": "checkov",
           "rule_id": "CKV_K8S_11"
-        }
-      ]
-    },
-    {
-      "id": "TK-da455b153a9b",
-      "canonical_control": "TATAR-OPS-005",
-      "resource": "pod/api-7d8",
-      "namespace": "production",
-      "type": "hygiene",
-      "category": "Operational Health",
-      "severity": "LOW",
-      "original_severity": "LOW",
-      "title": "imagePullPolicy not set correctly",
-      "description": "",
-      "evidence": [
-        {
-          "scanner": "popeye",
-          "detail": "No image tag/digest pinned; using latest is unwise"
-        }
-      ],
-      "remediation": "Set imagePullPolicy explicitly to IfNotPresent/Always.",
-      "found_by": [
-        "popeye"
-      ],
-      "confidence": "HIGH",
-      "blind_shot": false,
-      "risk_contribution": 1.8,
-      "risk_factors": {
-        "base_weight": 1,
-        "asset_context": 1.5,
-        "exposure": 1,
-        "confidence": 1.2,
-        "contribution": 1.8
-      },
-      "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
-      "raw_refs": [
-        {
-          "scanner": "popeye",
-          "rule_id": "POP-106"
         }
       ]
     },
@@ -2826,8 +2956,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2867,8 +2997,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2912,8 +3042,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-09-07T04:26:45Z",
-      "last_seen": "2026-09-07T04:26:45Z",
+      "first_seen": "2026-09-07T04:41:52Z",
+      "last_seen": "2026-09-07T04:41:52Z",
       "raw_refs": [
         {
           "scanner": "checkov",

@@ -94,3 +94,58 @@ func TestResolveRealTrivyAVDID(t *testing.T) {
 		t.Fatalf("trivy short ID KSV-0017 must resolve")
 	}
 }
+
+// Popeye-ийн POP код бүрийн УТГА хувилбар хооронд өөрчлөгддөг (0.22-д POP-101
+// нь ":latest", POP-106 нь "resources requests/limits" — 0.21-д өөр байсан).
+// v1.0.0-д зураглалын 10-аас 7 нь зөрж, аудитад БУРУУ control тайлагнах эрсдэл
+// байсан (ж: "unnamed port" -> "Missing CPU/memory limits"). Энэ тест нь код бүрийн
+// утгыг эх сурвалжтай (popeye internal/issues/assets/codes.yaml) хамт бэхэлнэ.
+func TestPopeyeMappingsMatchUpstreamMeaning(t *testing.T) {
+	reg, err := Load(regPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// code -> {upstream дахь утга, хүлээгдэх canonical control}
+	want := []struct{ code, meaning, control string }{
+		{"POP-100", `Untagged docker image in use`, "TATAR-IMG-003"},
+		{"POP-101", `Image tagged "latest" in use`, "TATAR-IMG-003"},
+		{"POP-102", `No probes defined`, "TATAR-OPS-001"},
+		{"POP-103", `No liveness probe`, "TATAR-OPS-002"},
+		{"POP-106", `No resources requests/limits defined`, "TATAR-CON-010"},
+		{"POP-107", `No resource limits defined`, "TATAR-CON-010"},
+		{"POP-300", `Uses "default" ServiceAccount`, "TATAR-RBAC-005"},
+		{"POP-302", `Pod could be running as root user`, "TATAR-CON-002"},
+		{"POP-303", `ServiceAccount is automounting APIServer credentials`, "TATAR-SEC-003"},
+		{"POP-306", `Container could be running as root user`, "TATAR-CON-002"},
+		{"POP-400", `Used? Unable to locate resource reference`, "TATAR-OPS-004"},
+		{"POP-401", `Key used? Unable to locate key reference`, "TATAR-OPS-004"},
+		{"POP-1100", `No pods match service selector`, "TATAR-OPS-003"},
+		{"POP-1110", `Match EP has no subsets`, "TATAR-OPS-003"},
+		{"POP-1204", `Pod is not secured by a network policy`, "TATAR-NET-001"},
+	}
+
+	for _, w := range want {
+		ids, ok := reg.Resolve("popeye", w.code)
+		if !ok || len(ids) != 1 {
+			t.Errorf("%s (%s): зураглал олдсонгүй/олон (%v)", w.code, w.meaning, ids)
+			continue
+		}
+		if ids[0] != w.control {
+			t.Errorf("%s (%s) -> %s, хүлээсэн %s", w.code, w.meaning, ids[0], w.control)
+		}
+	}
+
+	// Зураглагдсан POP код бүр дээрх жагсаалтад БАЙХ ёстой — шинэ код нэмэхэд
+	// утгыг нь эх сурвалжаас батлаж, энэ тестэд бүртгэхийг албадана.
+	known := map[string]bool{}
+	for _, w := range want {
+		known[w.code] = true
+	}
+	for _, c := range reg.Controls {
+		for _, code := range c.Mappings["popeye"] {
+			if !known[code] {
+				t.Errorf("%s: %s зураглагдсан ч утга батлагдаагүй — popeye codes.yaml-аас шалгаж тестэд нэм", c.ID, code)
+			}
+		}
+	}
+}

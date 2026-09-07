@@ -4,7 +4,7 @@
 # Canonical ID = IMMUTABLE CONTRACT. scanner rule ID-ууд PROVISIONAL.
 
 schema_version: '1.0'
-last_updated: '2026-07-24'
+last_updated: '2026-09-07'
 categories:
 - id: CON
   name: Container Security
@@ -72,7 +72,9 @@ controls:
     - C-0013
     checkov:
     - CKV_K8S_23
-    popeye: []
+    popeye:
+    - POP-302
+    - POP-306
 - id: TATAR-CON-003
   title:
     en: Allow privilege escalation
@@ -262,7 +264,8 @@ controls:
     - CKV_K8S_10
     - CKV_K8S_11
     popeye:
-    - POP-108
+    - POP-106
+    - POP-107
 - id: TATAR-CON-011
   title:
     en: Default seccomp profile not set
@@ -397,7 +400,7 @@ controls:
     - C-0187
     checkov: []
     popeye:
-    - POP-303
+    - POP-300
 - id: TATAR-NET-001
   title:
     en: Missing NetworkPolicy
@@ -423,7 +426,7 @@ controls:
     - C-0260
     checkov: []
     popeye:
-    - POP-1500
+    - POP-1204
 - id: TATAR-NET-002
   title:
     en: No default-deny NetworkPolicy
@@ -463,8 +466,7 @@ controls:
     kubescape:
     - C-0256
     checkov: []
-    popeye:
-    - POP-1100
+    popeye: []
 - id: TATAR-NET-004
   title:
     en: Ingress without TLS
@@ -549,7 +551,8 @@ controls:
     checkov:
     - CKV_K8S_43
     popeye:
-    - POP-105
+    - POP-100
+    - POP-101
 - id: TATAR-IMG-004
   title:
     en: Image from unapproved registry
@@ -639,7 +642,8 @@ controls:
     - C-0034
     checkov:
     - CKV_K8S_38
-    popeye: []
+    popeye:
+    - POP-303
 - id: TATAR-SEC-004
   title:
     en: Sensitive data in ConfigMap
@@ -719,7 +723,8 @@ controls:
     kubescape: []
     checkov: []
     popeye:
-    - POP-1102
+    - POP-1100
+    - POP-1110
 - id: TATAR-OPS-004
   title:
     en: Unused ConfigMap / Secret
@@ -758,5 +763,4 @@ controls:
     kubescape: []
     checkov:
     - CKV_K8S_15
-    popeye:
-    - POP-106
+    popeye: []

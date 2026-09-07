@@ -120,6 +120,17 @@
               }
             },
             {
+              "id": "TATAR-RBAC-005",
+              "name": "Default service account in use",
+              "shortDescription": {
+                "text": "Default service account in use"
+              },
+              "properties": {
+                "category": "RBAC \u0026 Authorization",
+                "security-severity": "5.0"
+              }
+            },
+            {
               "id": "TATAR-SEC-003",
               "name": "Service account token auto-mounted",
               "shortDescription": {
@@ -142,10 +153,32 @@
               }
             },
             {
+              "id": "TATAR-CON-010",
+              "name": "Missing CPU/memory limits",
+              "shortDescription": {
+                "text": "Missing CPU/memory limits"
+              },
+              "properties": {
+                "category": "Container Security",
+                "security-severity": "5.0"
+              }
+            },
+            {
               "id": "TATAR-OPS-003",
               "name": "Orphan / dead service (no endpoints)",
               "shortDescription": {
                 "text": "Orphan / dead service (no endpoints)"
+              },
+              "properties": {
+                "category": "Operational Health",
+                "security-severity": "5.0"
+              }
+            },
+            {
+              "id": "TATAR-OPS-001",
+              "name": "Missing readiness probe",
+              "shortDescription": {
+                "text": "Missing readiness probe"
               },
               "properties": {
                 "category": "Operational Health",
@@ -197,32 +230,10 @@
               }
             },
             {
-              "id": "TATAR-CON-010",
-              "name": "Missing CPU/memory limits",
-              "shortDescription": {
-                "text": "Missing CPU/memory limits"
-              },
-              "properties": {
-                "category": "Container Security",
-                "security-severity": "3.0"
-              }
-            },
-            {
               "id": "TATAR-OPS-002",
               "name": "Missing liveness probe",
               "shortDescription": {
                 "text": "Missing liveness probe"
-              },
-              "properties": {
-                "category": "Operational Health",
-                "security-severity": "3.0"
-              }
-            },
-            {
-              "id": "TATAR-OPS-001",
-              "name": "Missing readiness probe",
-              "shortDescription": {
-                "text": "Missing readiness probe"
               },
               "properties": {
                 "category": "Operational Health",
@@ -652,6 +663,33 @@
           }
         },
         {
+          "ruleId": "TATAR-RBAC-005",
+          "level": "warning",
+          "message": {
+            "text": "Default service account in use — Create a dedicated least-privilege SA per workload."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/pod/api-7d8"
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-1128ca969582"
+          },
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "popeye"
+            ],
+            "tatar_id": "TK-1128ca969582"
+          }
+        },
+        {
           "ruleId": "TATAR-SEC-003",
           "level": "warning",
           "message": {
@@ -733,6 +771,33 @@
           }
         },
         {
+          "ruleId": "TATAR-CON-010",
+          "level": "warning",
+          "message": {
+            "text": "Missing CPU/memory limits — Set resources.limits.cpu and .memory."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/pod/api-7d8"
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-2fdd9b42905f"
+          },
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "popeye"
+            ],
+            "tatar_id": "TK-2fdd9b42905f"
+          }
+        },
+        {
           "ruleId": "TATAR-OPS-003",
           "level": "warning",
           "message": {
@@ -757,6 +822,33 @@
               "popeye"
             ],
             "tatar_id": "TK-45802dee62f8"
+          }
+        },
+        {
+          "ruleId": "TATAR-OPS-001",
+          "level": "warning",
+          "message": {
+            "text": "Missing readiness probe — Add a readinessProbe."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "production/pod/api-7d8"
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-4a7a7eed92c4"
+          },
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "popeye"
+            ],
+            "tatar_id": "TK-4a7a7eed92c4"
           }
         },
         {
@@ -1336,6 +1428,33 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
+                  "uri": "production/pod/api-7d8"
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-e204cf95d5fe"
+          },
+          "properties": {
+            "blind_shot": false,
+            "confidence": "HIGH",
+            "found_by": [
+              "popeye"
+            ],
+            "tatar_id": "TK-e204cf95d5fe"
+          }
+        },
+        {
+          "ruleId": "TATAR-IMG-003",
+          "level": "warning",
+          "message": {
+            "text": "Image uses :latest tag — Use a specific version (digest/tag)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
                   "uri": "production/deployment/root-app"
                 }
               }
@@ -1837,33 +1956,6 @@
               "checkov"
             ],
             "tatar_id": "TK-d83cf4dbcadb"
-          }
-        },
-        {
-          "ruleId": "TATAR-OPS-005",
-          "level": "note",
-          "message": {
-            "text": "imagePullPolicy not set correctly — Set imagePullPolicy explicitly to IfNotPresent/Always."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "production/pod/api-7d8"
-                }
-              }
-            }
-          ],
-          "partialFingerprints": {
-            "tatarId/v1": "TK-da455b153a9b"
-          },
-          "properties": {
-            "blind_shot": false,
-            "confidence": "HIGH",
-            "found_by": [
-              "popeye"
-            ],
-            "tatar_id": "TK-da455b153a9b"
           }
         },
         {

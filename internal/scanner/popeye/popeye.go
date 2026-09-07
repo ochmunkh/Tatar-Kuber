@@ -73,18 +73,56 @@ func (s *Scanner) Scan(ctx context.Context, t scanner.Target) (scanner.RawResult
 	return scanner.RawResult{Scanner: "popeye", Format: "json", Data: res.Stdout, ExitCode: res.ExitCode}, nil
 }
 
-// ---- Popeye JSON бүтэц (popeye --out json) ----
+// ---- Popeye JSON бүтэц (popeye -o json) ----
+//
+// Popeye нь схемээ хувилбар хооронд СОЛЬСОН:
+//   - <=0.21: popeye.sanitizers[].sanitizer + issues
+//   - 0.22+:  popeye.sections[].linter (+ gvr) + issues
+//
+// Хоёуланг дэмжинэ: sections байвал түүнийг, үгүй бол sanitizers-ыг уншина —
+// ингэснээр хэрэглэгчийн суулгасан popeye-ийн хувилбараас хамаарахгүй.
+
+type popIssue struct {
+	Level   int    `json:"level"`
+	Message string `json:"message"`
+	Group   string `json:"group"`
+	GVR     string `json:"gvr"`
+}
+
+type popGroup struct {
+	Linter    string                `json:"linter"`    // 0.22+
+	Sanitizer string                `json:"sanitizer"` // <=0.21
+	GVR       string                `json:"gvr"`       // 0.22+ (ж: apps/v1/deployments)
+	Issues    map[string][]popIssue `json:"issues"`
+}
+
+// kind — бүлгийн K8s kind (ганц тоо, жижиг үсэг). linter/sanitizer нэр (олон тоо)
+// эсвэл gvr-ийн сүүлийн хэсгээс гарна.
+func (g popGroup) kind() string {
+	name := g.Linter
+	if name == "" {
+		name = g.Sanitizer
+	}
+	if name == "" && g.GVR != "" {
+		parts := strings.Split(g.GVR, "/")
+		name = parts[len(parts)-1]
+	}
+	return singular(strings.ToLower(name))
+}
 
 type popReport struct {
 	Popeye struct {
-		Sanitizers []struct {
-			Sanitizer string `json:"sanitizer"`
-			Issues    map[string][]struct {
-				Level   int    `json:"level"`
-				Message string `json:"message"`
-			} `json:"issues"`
-		} `json:"sanitizers"`
+		Sections   []popGroup `json:"sections"`   // 0.22+
+		Sanitizers []popGroup `json:"sanitizers"` // <=0.21
 	} `json:"popeye"`
+}
+
+// groups — хувилбараас хамааралгүйгээр бүлгүүдийг буцаана.
+func (r popReport) groups() []popGroup {
+	if len(r.Popeye.Sections) > 0 {
+		return r.Popeye.Sections
+	}
+	return r.Popeye.Sanitizers
 }
 
 var popCode = regexp.MustCompile(`\[(POP-\d+)\]`)
@@ -110,8 +148,8 @@ func (s *Scanner) Normalize(raw scanner.RawResult) ([]finding.Finding, error) {
 		return nil, fmt.Errorf("popeye JSON parse: %w", err)
 	}
 	var out []finding.Finding
-	for _, san := range rep.Popeye.Sanitizers {
-		kind := singular(san.Sanitizer) // services -> service, ingresses -> ingress
+	for _, san := range rep.groups() {
+		kind := san.kind() // services -> service, ingresses -> ingress
 		for resKey, issues := range san.Issues {
 			ns, name := splitResKey(resKey)
 			if s.scopeNS != nil && ns != "" && !s.scopeNS[ns] {
