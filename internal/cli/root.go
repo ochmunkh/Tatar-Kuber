@@ -8,7 +8,7 @@ import (
 )
 
 // Version — build-time-д тохируулагдана (-ldflags).
-var Version = "1.0.0-dev"
+var Version = "1.0.1-dev"
 
 const usage = `TATAR-Kuber — Kubernetes security posture assessment framework
 
@@ -21,7 +21,7 @@ Commands:
   gate      scan-result.json-ыг .tatar-kuber.yaml бодлоготой тулгаж CI-д pass/fail (exit code)
   doctor    Scanner binary-ууд суусан эсэх, хувилбар, горимыг шалгана
   verify-lab expected-findings.json-той тулгаж regression шалгана
-  update    Scanner binary-уудыг татаж, баталгаажуулж шинэчилнэ
+  update    (төлөвлөсөн, v2) Scanner binary-уудыг татаж, баталгаажуулж шинэчилнэ
   version   Хувилбар харуулна
 
 Жишээ:
@@ -50,7 +50,7 @@ func Execute() int {
 	case "verify-lab":
 		return cmdVerifyLab(os.Args[2:])
 	case "update":
-		fmt.Println("update: not implemented (download -> verify checksum/cosign -> tools.lock.yaml)")
+		fmt.Fprintln(os.Stderr, "update: v1-д хэрэгжээгүй (төлөвлөгөө: download -> checksum/cosign баталгаажуулалт -> tools.lock.yaml). Одоогоор scanner-уудыг өөрөө суулгаж `tatar-kuber doctor`-оор шалгана уу.")
 		return 2
 	case "version":
 		fmt.Printf("TATAR-Kuber %s\n", Version)

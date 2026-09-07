@@ -19,6 +19,7 @@ import (
 type Scanner struct {
 	resolver *canonical.Resolver
 	now      func() string
+	scopeNS  map[string]bool // олон namespace-тэй live scan-д Normalize-ийн шүүлтүүр (nil = бүгд)
 }
 
 func New(resolver *canonical.Resolver) *Scanner {
@@ -47,11 +48,19 @@ func (s *Scanner) Scan(ctx context.Context, t scanner.Target) (scanner.RawResult
 	if t.Context != "" {
 		args = append(args, "--context", t.Context)
 	}
+	// Popeye нэг л namespace (-n) дэмждэг. Олон namespace өгвөл бүх cluster-ийг
+	// чимээгүй scan хийхийн оронд Normalize дээр хамрах хүрээгээр шүүнэ (доор).
 	if len(t.Namespaces) == 1 {
-		args = append(args, "-n", t.Namespaces[0]) // popeye нэг namespace дэмждэг
+		args = append(args, "-n", t.Namespaces[0])
+	} else if len(t.Namespaces) > 1 {
+		s.scopeNS = map[string]bool{}
+		for _, ns := range t.Namespaces {
+			s.scopeNS[ns] = true
+		}
 	}
 	var env []string
 	if t.Kubeconfig != "" {
+		args = append(args, "--kubeconfig", t.Kubeconfig)
 		env = append(env, "KUBECONFIG="+t.Kubeconfig)
 	}
 	res, err := toolexec.Run(ctx, "popeye", args, env...)
@@ -102,9 +111,12 @@ func (s *Scanner) Normalize(raw scanner.RawResult) ([]finding.Finding, error) {
 	}
 	var out []finding.Finding
 	for _, san := range rep.Popeye.Sanitizers {
-		kind := strings.TrimSuffix(san.Sanitizer, "s") // services -> service
+		kind := singular(san.Sanitizer) // services -> service, ingresses -> ingress
 		for resKey, issues := range san.Issues {
 			ns, name := splitResKey(resKey)
+			if s.scopeNS != nil && ns != "" && !s.scopeNS[ns] {
+				continue // хамрах хүрээнээс гадуурх namespace
+			}
 			resource := kind + "/" + name
 			for _, iss := range issues {
 				m := popCode.FindStringSubmatch(iss.Message)
@@ -123,6 +135,20 @@ func (s *Scanner) Normalize(raw scanner.RawResult) ([]finding.Finding, error) {
 		}
 	}
 	return out, nil
+}
+
+// singular — Popeye sanitizer нэр (олон тоо) -> K8s kind (ганц тоо, жижиг үсэг).
+// "ingresses" -> "ingress", "networkpolicies" -> "networkpolicy", "services" -> "service".
+func singular(p string) string {
+	switch {
+	case strings.HasSuffix(p, "ies"):
+		return strings.TrimSuffix(p, "ies") + "y"
+	case strings.HasSuffix(p, "sses"): // ingresses, storageclasses
+		return strings.TrimSuffix(p, "es")
+	case strings.HasSuffix(p, "s"):
+		return strings.TrimSuffix(p, "s")
+	}
+	return p
 }
 
 // splitResKey — "namespace/name" эсвэл "name" -> (ns, name).

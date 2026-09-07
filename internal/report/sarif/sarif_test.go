@@ -38,3 +38,24 @@ func TestRender_SARIF(t *testing.T) {
 		t.Error("INFO -> level note байх ёстой")
 	}
 }
+
+func TestRuleSeverityIsMaxAndFingerprints(t *testing.T) {
+	res := finding.ScanResult{Findings: []finding.Finding{
+		{ID: "TK-aaaaaa", CanonicalControl: "TATAR-X-001", Severity: finding.SeverityLow, Title: "x", Resource: "deployment/a"},
+		{ID: "TK-bbbbbb", CanonicalControl: "TATAR-X-001", Severity: finding.SeverityCritical, Title: "x", Resource: "deployment/b"},
+	}}
+	var buf bytes.Buffer
+	if err := Render(&buf, res); err != nil {
+		t.Fatal(err)
+	}
+	var log sarifLog
+	if err := json.Unmarshal(buf.Bytes(), &log); err != nil {
+		t.Fatal(err)
+	}
+	if got := log.Runs[0].Tool.Driver.Rules[0].Properties["security-severity"]; got != "9.5" {
+		t.Errorf("rule security-severity=%v, want 9.5 (max of findings)", got)
+	}
+	if fp := log.Runs[0].Results[1].PartialFingerprints["tatarId/v1"]; fp != "TK-bbbbbb" {
+		t.Errorf("partialFingerprints=%v", log.Runs[0].Results[1].PartialFingerprints)
+	}
+}

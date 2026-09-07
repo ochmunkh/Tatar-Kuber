@@ -25,11 +25,11 @@ type fakeAdapter struct {
 	started *int32        // Scan дуудагдсан тоо (сонголт)
 }
 
-func (f *fakeAdapter) Name() string                         { return f.name }
-func (f *fakeAdapter) Available() (bool, error)             { return true, nil }
+func (f *fakeAdapter) Name() string                            { return f.name }
+func (f *fakeAdapter) Available() (bool, error)                { return true, nil }
 func (f *fakeAdapter) Version(context.Context) (string, error) { return "test-1.0", nil }
-func (f *fakeAdapter) Supports(m scanner.Mode) bool         { return f.mode == "" || f.mode == m }
-func (f *fakeAdapter) Timeout() time.Duration               { return f.timeout }
+func (f *fakeAdapter) Supports(m scanner.Mode) bool            { return f.mode == "" || f.mode == m }
+func (f *fakeAdapter) Timeout() time.Duration                  { return f.timeout }
 
 func (f *fakeAdapter) Scan(ctx context.Context, _ scanner.Target) (scanner.RawResult, error) {
 	if f.started != nil {
@@ -222,3 +222,57 @@ func TestRun_SkipsUnavailable(t *testing.T) {
 type unavailableAdapter struct{ fakeAdapter }
 
 func (u *unavailableAdapter) Available() (bool, error) { return false, nil }
+
+// Унасан/timeout/unsupported adapter бүр scanner_runs-д ИЛ бичигдэх ёстой —
+// graceful degradation нь чимээгүй байж болохгүй (v1.0.0-д Trivy 0 finding өгч
+// байсныг хэн ч анзаараагүй шалтгаан).
+func TestRun_ScannerRunsAreReported(t *testing.T) {
+	reg := testRegistry(t)
+	p := New(reg,
+		&fakeAdapter{name: "good", ctrl: "TATAR-TEST-001", res: "deployment/a"},
+		&fakeAdapter{name: "bad", ctrl: "TATAR-TEST-002", res: "deployment/b", failErr: errors.New("boom")},
+		&fakeAdapter{name: "slow", ctrl: "TATAR-TEST-003", res: "deployment/c", sleep: 2 * time.Second, timeout: 50 * time.Millisecond},
+		&fakeAdapter{name: "local-only", mode: scanner.ModeLocal, ctrl: "TATAR-TEST-004", res: "deployment/d"},
+	)
+	res, err := p.Run(context.Background(), scanner.Target{Mode: scanner.ModeRemote}, Meta{ScanMode: "remote"})
+	if err != nil {
+		t.Fatalf("Run: %v", err)
+	}
+	got := map[string]finding.ScannerRun{}
+	for _, r := range res.Metadata.ScannerRuns {
+		got[r.Scanner] = r
+	}
+	if len(got) != 4 {
+		t.Fatalf("scanner_runs=%d, want 4 (adapter бүр нэг бичлэг)", len(got))
+	}
+	if r := got["good"]; r.Status != "ok" || r.Findings != 1 || r.Version != "test-1.0" {
+		t.Errorf("good: %+v", r)
+	}
+	if r := got["bad"]; r.Status != "error" || r.Error == "" {
+		t.Errorf("bad: %+v (status=error + error text байх ёстой)", r)
+	}
+	if r := got["slow"]; r.Status != "timeout" {
+		t.Errorf("slow: %+v (status=timeout байх ёстой)", r)
+	}
+	if r := got["local-only"]; r.Status != "unsupported" {
+		t.Errorf("local-only: %+v (status=unsupported байх ёстой)", r)
+	}
+	probs := Problems(res.Metadata.ScannerRuns)
+	if len(probs) != 2 { // bad + slow; good ok, unsupported хэвийн
+		t.Errorf("Problems=%v, want 2", probs)
+	}
+}
+
+// Offline ingest (Process) — raw бүрд "ingested" бичлэг; 0 finding бол Problems анхааруулна.
+func TestProcess_IngestedRunsAndEmptyWarning(t *testing.T) {
+	reg := testRegistry(t)
+	p := New(reg, &fakeAdapter{name: "z", ctrl: "TATAR-TEST-001", res: "deployment/z"})
+	res, _ := p.Process([]scanner.RawResult{{Scanner: "z", Data: []byte("{}"), Version: "9.9"}}, Meta{})
+	if len(res.Metadata.ScannerRuns) != 1 || res.Metadata.ScannerRuns[0].Status != "ingested" || res.Metadata.ScannerRuns[0].Version != "9.9" {
+		t.Fatalf("runs=%+v", res.Metadata.ScannerRuns)
+	}
+	empty := []finding.ScannerRun{{Scanner: "trivy", Status: "ok", Findings: 0, UnmappedCount: 3, UnmappedRules: []string{"AVD-X-1"}}}
+	if ps := Problems(empty); len(ps) != 1 {
+		t.Errorf("0 finding scanner анхааруулга өгөх ёстой: %v", ps)
+	}
+}

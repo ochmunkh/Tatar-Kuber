@@ -77,12 +77,16 @@ Full walk-through: [`docs/dedup-example.md`](docs/dedup-example.md).
 
 ## Scanner stack
 
-| Scanner | Purpose |
-|---|---|
-| Trivy | Image CVEs, secrets, misconfiguration |
-| Kubescape | NSA / MITRE / RBAC / compliance (primary posture engine) |
-| Checkov | IaC (YAML / Helm / Terraform) |
-| Popeye | Runtime hygiene (dead service, unused, broken reference) |
+| Scanner | Purpose | Live-tested with |
+|---|---|---|
+| Trivy | Image CVEs, secrets, misconfiguration | 0.74 (`k8s --report all`) |
+| Kubescape | NSA / MITRE / RBAC / compliance (primary posture engine) | 4.0 (`--kube-contexts`) |
+| Checkov | IaC (YAML / Helm / Terraform) | 3.2 (local mode) |
+| Popeye | Runtime hygiene (dead service, unused, broken reference) | 0.22 |
+
+> The "live-tested with" column is the version the [real-cluster workflow](.github/workflows/real-cluster.yml)
+> actually runs against every week. Scanner CLIs rename flags between releases, so a mismatch shows up as
+> `status: error` / `unavailable` in the report's *Scanner coverage* table rather than as a silent zero.
 
 > `kube-bench` (node/CIS) needs a privileged DaemonSet and is out of MVP scope (Enterprise Agent).
 
@@ -201,7 +205,8 @@ go test ./...          # 14 packages, all green
 ## CLI
 
 ```
-tatar-kuber scan        --kubeconfig | --context | -f | --raw-dir  [--namespace ns1,ns2] [--lang en|mn]
+tatar-kuber scan        --kubeconfig | --context | -f | --raw-dir  [--namespace ns1,ns2] [--lang en|mn] [--no-raw]
+                        # live scan keeps raw scanner output in <out>/raw/ (evidence; re-ingestable via --raw-dir)
 tatar-kuber report      -o json | sarif | html  [--fail-on HIGH]
 tatar-kuber gate        --input scan-result.json [--policy .tatar-kuber.yaml] [--fail-on high] [--min-score N]
 tatar-kuber doctor      # which scanners are installed, versions, supported modes
@@ -229,15 +234,20 @@ Adapter Interface, 04 Severity & Risk Scoring, 05 CLI Spec, 06 Repository Struct
 
 ## Status
 
-**v1.0.0** — Live Mode B (parallel adapters) · explainable risk · CI/CD gatekeeper
-(policy + GitHub Action + SARIF) · goreleaser + brew/curl/Docker.
+**v1.0.1** — Live Mode B (parallel adapters) · explainable risk · CI/CD gatekeeper
+(policy + GitHub Action + SARIF) · goreleaser + brew/curl/Docker · **scanner coverage report**.
 
-All tests green, and **live Mode B is validated on a real `kind` cluster in CI** — the
-[real-cluster workflow](.github/workflows/real-cluster.yml) spins up a cluster, deploys a
-vulnerable workload, installs Trivy + Kubescape + Popeye and runs a real
-`tatar-kuber scan --kubeconfig` (last run: `scan_mode=remote`, 11 findings, 59/100).
-Next: CLI test coverage and broader compliance mapping. Where it's headed — v2 (audit-grade PDF +
-compliance mapping + trending), v3 (continuous + dashboard): see the [**Roadmap**](ROADMAP.md).
+**Honesty note (v1.0.1).** Auditing the v1.0.0 live run showed that all 11 findings came from
+Kubescape alone: Trivy was silently contributing nothing (real Trivy emits `AVD-KSV-0017`, the
+registry had `AVD-KSV0017`; `trivy k8s` defaults to `--report summary`; context is positional),
+and adapter errors were swallowed. v1.0.1 fixes the adapters, records every scanner's outcome in
+`metadata.scanner_runs` (status, duration, findings, unmapped rules) — shown in the HTML report
+as *Scanner coverage* — keeps raw scanner output as evidence, and the
+[real-cluster workflow](.github/workflows/real-cluster.yml) now asserts **each** scanner
+produced findings and that at least one finding is corroborated by 2+ scanners.
+A "0 findings" scanner is never silent again.
+Where it's headed — v2 (audit-grade PDF + compliance mapping + trending), v3 (continuous +
+dashboard): see the [**Roadmap**](ROADMAP.md).
 
 ## Security
 
@@ -325,12 +335,17 @@ TATAR-Kuber эдгээрийг **нэг** finding болгож нэгтгэнэ:
 
 ### Scanner-ууд
 
-| Scanner | Зорилго |
-|---|---|
-| Trivy | Image CVE, secret, misconfiguration |
-| Kubescape | NSA / MITRE / RBAC / compliance (үндсэн posture engine) |
-| Checkov | IaC (YAML / Helm / Terraform) |
-| Popeye | Runtime hygiene (dead service, unused, broken reference) |
+| Scanner | Зорилго | Live-д тестлэгдсэн |
+|---|---|---|
+| Trivy | Image CVE, secret, misconfiguration | 0.74 (`k8s --report all`) |
+| Kubescape | NSA / MITRE / RBAC / compliance (үндсэн posture engine) | 4.0 (`--kube-contexts`) |
+| Checkov | IaC (YAML / Helm / Terraform) | 3.2 (local горим) |
+| Popeye | Runtime hygiene (dead service, unused, broken reference) | 0.22 |
+
+> "Live-д тестлэгдсэн" гэдэг нь [real-cluster workflow](.github/workflows/real-cluster.yml) 7 хоног тутам
+> бодитоор ажиллуулдаг хувилбар. Scanner CLI-ууд хувилбар хооронд флагаа нэрлэж сольдог тул зөрүү нь
+> тайлангийн *Scanner хамрах хүрээ* хүснэгтэд `status: error` / `unavailable` болж харагдана — чимээгүй
+> тэг болохгүй.
 
 > `kube-bench` (node/CIS) нь privileged DaemonSet шаарддаг тул MVP-д багтаагүй (Enterprise Agent).
 
@@ -412,7 +427,8 @@ tatar-kuber report --input out/scan-result.json -o html --out report.html
 ### CLI командууд
 
 ```
-tatar-kuber scan        --kubeconfig | --context | -f | --raw-dir  [--namespace ns1,ns2] [--lang en|mn]
+tatar-kuber scan        --kubeconfig | --context | -f | --raw-dir  [--namespace ns1,ns2] [--lang en|mn] [--no-raw]
+                        # live scan нь scanner-уудын түүхий гаралтыг <out>/raw/-д хадгална (нотолгоо; --raw-dir-ээр дахин боловсруулна)
 tatar-kuber report      -o json | sarif | html  [--fail-on HIGH]
 tatar-kuber gate        --input scan-result.json [--policy .tatar-kuber.yaml] [--fail-on high] [--min-score N]
 tatar-kuber doctor      # ямар scanner суусан, хувилбар, дэмжих горим
@@ -448,15 +464,20 @@ Adapter Interface, 04 Severity & Risk Scoring, 05 CLI Spec, 06 Repository Struct
 
 ### Төлөв
 
-**v1.0.0** — Live Mode B (parallel adapters) · тайлбарлагдах эрсдэл · CI/CD gatekeeper
-(бодлого + GitHub Action + SARIF) · goreleaser + brew/curl/Docker.
+**v1.0.1** — Live Mode B (parallel adapters) · тайлбарлагдах эрсдэл · CI/CD gatekeeper
+(бодлого + GitHub Action + SARIF) · goreleaser + brew/curl/Docker · **scanner хамрах хүрээний тайлан**.
 
-Бүх тест ногоон, мөн **live Mode B нь бодит `kind` cluster дээр CI-д батлагдсан** —
-[real-cluster workflow](.github/workflows/real-cluster.yml) нь cluster босгож, эмзэг workload
-deploy хийж, Trivy + Kubescape + Popeye суулгаж, жинхэнэ `tatar-kuber scan --kubeconfig`
-ажиллуулна (сүүлийн run: `scan_mode=remote`, 11 finding, 59/100).
-Дараа нь: CLI тест, өргөн compliance mapping. Хаашаа явж байгаа — v2 (аудитын PDF + compliance
-mapping + trending), v3 (тасралтгүй + dashboard): [**Замын зураг**](ROADMAP.md)-г үз.
+**Шударга тэмдэглэл (v1.0.1).** v1.0.0-ийн live run-ыг аудит хийхэд 11 finding бүгд зөвхөн
+Kubescape-ээс ирсэн нь тогтоогдсон: Trivy чимээгүй юу ч өгөөгүй (бодит Trivy `AVD-KSV-0017`
+гэж гаргадаг, registry-д `AVD-KSV0017` байсан; `trivy k8s` default нь `--report summary`;
+context нь positional), adapter-ийн алдаанууд залгигдаж байсан. v1.0.1-д adapter-уудыг зассан,
+scanner бүрийн үр дүнг `metadata.scanner_runs`-д (төлөв, хугацаа, finding, зураглалгүй rule)
+бичдэг болгож HTML тайланд *Scanner хамрах хүрээ* хэсгээр харуулна, түүхий scanner гаралтыг
+нотолгоо болгон хадгална, [real-cluster workflow](.github/workflows/real-cluster.yml) одоо
+scanner **тус бүр** finding өгснийг ба ядаж нэг finding 2+ scanner-ээр батлагдсаныг шалгана.
+"0 finding" scanner дахиж хэзээ ч чимээгүй өнгөрөхгүй.
+Хаашаа явж байгаа — v2 (аудитын PDF + compliance mapping + trending), v3 (тасралтгүй +
+dashboard): [**Замын зураг**](ROADMAP.md)-г үз.
 
 ### Аюулгүй байдал
 

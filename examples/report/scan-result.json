@@ -1,20 +1,72 @@
 {
   "schema_version": "1.0",
   "metadata": {
-    "scan_id": "e1dc6c83b47494653be92e7ad9a3f9bb",
+    "scan_id": "c078c7147ea68310a21733b1f611b8cf",
     "cluster_name": "demo-prod",
     "scan_mode": "remote",
     "lang": "en",
-    "tatar_version": "1.0.0",
+    "tatar_version": "1.0.1",
     "scanner_versions": {
       "checkov": "3.2.10",
       "kubescape": "3.1.4",
       "popeye": "0.22.1",
       "trivy": "0.67.2"
     },
-    "started_at": "2026-08-30T13:03:45Z",
-    "finished_at": "2026-08-30T13:03:45Z",
-    "result_hash": "sha256:7e8d21c7b2a4d125c76f9e22d6f1af48f5c380279129b1a869df303eb5657765",
+    "scanner_runs": [
+      {
+        "scanner": "trivy",
+        "status": "ingested",
+        "version": "0.67.2",
+        "raw_bytes": 2954,
+        "findings": 5
+      },
+      {
+        "scanner": "kubescape",
+        "status": "ingested",
+        "version": "3.1.4",
+        "raw_bytes": 1027,
+        "findings": 3
+      },
+      {
+        "scanner": "checkov",
+        "status": "ingested",
+        "version": "3.2.10",
+        "raw_bytes": 41403,
+        "findings": 59,
+        "unmapped_rules": [
+          "CKV2_K8S_1",
+          "CKV2_K8S_2",
+          "CKV2_K8S_3",
+          "CKV2_K8S_4",
+          "CKV2_K8S_5",
+          "CKV2_K8S_6",
+          "CKV_K8S_12",
+          "CKV_K8S_13",
+          "CKV_K8S_14",
+          "CKV_K8S_155",
+          "CKV_K8S_156",
+          "CKV_K8S_157",
+          "CKV_K8S_158",
+          "CKV_K8S_28",
+          "CKV_K8S_29",
+          "CKV_K8S_30",
+          "CKV_K8S_37",
+          "CKV_K8S_40",
+          "CKV_K8S_42"
+        ],
+        "unmapped_count": 49
+      },
+      {
+        "scanner": "popeye",
+        "status": "ingested",
+        "version": "0.22.1",
+        "raw_bytes": 895,
+        "findings": 3
+      }
+    ],
+    "started_at": "2026-09-07T04:26:45Z",
+    "finished_at": "2026-09-07T04:26:45Z",
+    "result_hash": "sha256:5e1c2a5e0f6810bd55401262a0fa1c7f4d05c35812e4a6c15eb964a1b2259c09",
     "inventory": {
       "ClusterRoles": 27,
       "Deployments": 31,
@@ -47,7 +99,7 @@
       "formula": "100 / (1 + P/K)",
       "top_contributors": [
         {
-          "id": "TK-9b701e",
+          "id": "TK-9b701eb0482a",
           "canonical_control": "TATAR-IMG-001",
           "resource": "deployment/api",
           "severity": "CRITICAL",
@@ -55,7 +107,7 @@
           "share": 5
         },
         {
-          "id": "TK-099acc",
+          "id": "TK-099acce09622",
           "canonical_control": "TATAR-CON-003",
           "resource": "deployment/root-app",
           "severity": "HIGH",
@@ -63,7 +115,7 @@
           "share": 3.5
         },
         {
-          "id": "TK-31cdab",
+          "id": "TK-31cdabe90e87",
           "canonical_control": "TATAR-CON-001",
           "resource": "deployment/privileged-app",
           "severity": "HIGH",
@@ -71,7 +123,7 @@
           "share": 3.5
         },
         {
-          "id": "TK-3d236f",
+          "id": "TK-3d236fda3600",
           "canonical_control": "TATAR-CON-006",
           "resource": "deployment/host-ns-app",
           "severity": "HIGH",
@@ -79,7 +131,7 @@
           "share": 3.5
         },
         {
-          "id": "TK-41b754",
+          "id": "TK-41b7549616ee",
           "canonical_control": "TATAR-IMG-002",
           "resource": "deployment/api",
           "severity": "HIGH",
@@ -91,7 +143,7 @@
   },
   "findings": [
     {
-      "id": "TK-9b701e",
+      "id": "TK-9b701eb0482a",
       "canonical_control": "TATAR-IMG-001",
       "resource": "deployment/api",
       "namespace": "production",
@@ -123,8 +175,8 @@
         "contribution": 18
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "references": [
         "CVE-2024-0001",
         "https://avd.aquasec.com/nvd/cve-2024-0001"
@@ -137,7 +189,7 @@
       ]
     },
     {
-      "id": "TK-951f02",
+      "id": "TK-951f02615a28",
       "canonical_control": "TATAR-RBAC-001",
       "resource": "clusterrolebinding/admin-bind",
       "type": "rbac",
@@ -168,8 +220,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "kubescape",
@@ -178,7 +230,7 @@
       ]
     },
     {
-      "id": "TK-099acc",
+      "id": "TK-099acce09622",
       "canonical_control": "TATAR-CON-003",
       "resource": "deployment/root-app",
       "namespace": "production",
@@ -216,8 +268,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -226,7 +278,7 @@
       ]
     },
     {
-      "id": "TK-31cdab",
+      "id": "TK-31cdabe90e87",
       "canonical_control": "TATAR-CON-001",
       "resource": "deployment/privileged-app",
       "namespace": "production",
@@ -264,8 +316,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -274,7 +326,7 @@
       ]
     },
     {
-      "id": "TK-3d236f",
+      "id": "TK-3d236fda3600",
       "canonical_control": "TATAR-CON-006",
       "resource": "deployment/host-ns-app",
       "namespace": "production",
@@ -312,8 +364,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -322,7 +374,7 @@
       ]
     },
     {
-      "id": "TK-41b754",
+      "id": "TK-41b7549616ee",
       "canonical_control": "TATAR-IMG-002",
       "resource": "deployment/api",
       "namespace": "production",
@@ -354,8 +406,8 @@
         "contribution": 12.6
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "references": [
         "CVE-2024-0002",
         "https://avd.aquasec.com/nvd/cve-2024-0002"
@@ -368,7 +420,7 @@
       ]
     },
     {
-      "id": "TK-4aa9f9",
+      "id": "TK-4aa9f9accec0",
       "canonical_control": "TATAR-CON-003",
       "resource": "deployment/latest-app",
       "namespace": "production",
@@ -406,8 +458,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -416,7 +468,7 @@
       ]
     },
     {
-      "id": "TK-5704a8",
+      "id": "TK-5704a8c54610",
       "canonical_control": "TATAR-CON-003",
       "resource": "deployment/privileged-app",
       "namespace": "production",
@@ -454,8 +506,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -464,7 +516,7 @@
       ]
     },
     {
-      "id": "TK-68270b",
+      "id": "TK-68270b3a0306",
       "canonical_control": "TATAR-CON-003",
       "resource": "deployment/secret-env-app",
       "namespace": "production",
@@ -502,8 +554,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -512,7 +564,7 @@
       ]
     },
     {
-      "id": "TK-8d84b4",
+      "id": "TK-8d84b4a0664a",
       "canonical_control": "TATAR-CON-001",
       "resource": "deployment/api",
       "namespace": "production",
@@ -556,8 +608,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "references": [
         "https://avd.aquasec.com/misconfig/ksv017",
         "https://docs.prismacloud.io/en/enterprise-edition/policy-reference/kubernetes-policies/kubernetes-policy-index/bc-k8s-15"
@@ -578,7 +630,7 @@
       ]
     },
     {
-      "id": "TK-98dbfd",
+      "id": "TK-98dbfde1c7dd",
       "canonical_control": "TATAR-CON-003",
       "resource": "deployment/host-ns-app",
       "namespace": "production",
@@ -616,8 +668,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -626,7 +678,7 @@
       ]
     },
     {
-      "id": "TK-ace1a8",
+      "id": "TK-ace1a8e38c9b",
       "canonical_control": "TATAR-CON-005",
       "resource": "deployment/host-ns-app",
       "namespace": "production",
@@ -664,8 +716,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -674,7 +726,7 @@
       ]
     },
     {
-      "id": "TK-63fbfb",
+      "id": "TK-63fbfb555a96",
       "canonical_control": "TATAR-SEC-001",
       "resource": "pod/worker",
       "namespace": "default",
@@ -712,8 +764,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "trivy",
@@ -722,7 +774,7 @@
       ]
     },
     {
-      "id": "TK-9716b3",
+      "id": "TK-9716b35d5c9f",
       "canonical_control": "TATAR-RBAC-002",
       "resource": "clusterrole/too-powerful",
       "namespace": "default",
@@ -760,8 +812,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -770,7 +822,7 @@
       ]
     },
     {
-      "id": "TK-082fb3",
+      "id": "TK-082fb33745e9",
       "canonical_control": "TATAR-CON-009",
       "resource": "deployment/privileged-app",
       "namespace": "production",
@@ -801,8 +853,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -811,7 +863,7 @@
       ]
     },
     {
-      "id": "TK-2681ba",
+      "id": "TK-2681ba7df61b",
       "canonical_control": "TATAR-SEC-003",
       "resource": "deployment/latest-app",
       "namespace": "production",
@@ -849,8 +901,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -859,7 +911,7 @@
       ]
     },
     {
-      "id": "TK-270b9f",
+      "id": "TK-270b9f4bd915",
       "canonical_control": "TATAR-IMG-003",
       "resource": "deployment/privileged-app",
       "namespace": "production",
@@ -897,8 +949,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -907,7 +959,7 @@
       ]
     },
     {
-      "id": "TK-2a5ed4",
+      "id": "TK-2a5ed40b070f",
       "canonical_control": "TATAR-SEC-003",
       "resource": "deployment/host-ns-app",
       "namespace": "production",
@@ -945,8 +997,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -955,7 +1007,7 @@
       ]
     },
     {
-      "id": "TK-45802d",
+      "id": "TK-45802dee62f8",
       "canonical_control": "TATAR-OPS-003",
       "resource": "service/orphan-svc",
       "namespace": "production",
@@ -986,8 +1038,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "popeye",
@@ -996,7 +1048,7 @@
       ]
     },
     {
-      "id": "TK-516c6d",
+      "id": "TK-516c6d9edcb3",
       "canonical_control": "TATAR-CON-009",
       "resource": "deployment/latest-app",
       "namespace": "production",
@@ -1027,8 +1079,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1037,7 +1089,7 @@
       ]
     },
     {
-      "id": "TK-6139b2",
+      "id": "TK-6139b2518fff",
       "canonical_control": "TATAR-IMG-003",
       "resource": "deployment/secret-env-app",
       "namespace": "production",
@@ -1075,8 +1127,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1085,7 +1137,7 @@
       ]
     },
     {
-      "id": "TK-6beef8",
+      "id": "TK-6beef8a54dc8",
       "canonical_control": "TATAR-CON-009",
       "resource": "deployment/secret-env-app",
       "namespace": "production",
@@ -1116,8 +1168,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1126,7 +1178,7 @@
       ]
     },
     {
-      "id": "TK-719563",
+      "id": "TK-7195633ad1e7",
       "canonical_control": "TATAR-CON-011",
       "resource": "deployment/privileged-app",
       "namespace": "production",
@@ -1157,8 +1209,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1167,7 +1219,7 @@
       ]
     },
     {
-      "id": "TK-7be77a",
+      "id": "TK-7be77a7df53a",
       "canonical_control": "TATAR-CON-002",
       "resource": "deployment/privileged-app",
       "namespace": "production",
@@ -1198,8 +1250,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1208,7 +1260,7 @@
       ]
     },
     {
-      "id": "TK-7e89d4",
+      "id": "TK-7e89d41311ae",
       "canonical_control": "TATAR-CON-009",
       "resource": "deployment/root-app",
       "namespace": "production",
@@ -1239,8 +1291,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1249,7 +1301,7 @@
       ]
     },
     {
-      "id": "TK-814cb7",
+      "id": "TK-814cb7a3c114",
       "canonical_control": "TATAR-CON-002",
       "resource": "deployment/host-ns-app",
       "namespace": "production",
@@ -1280,8 +1332,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1290,7 +1342,7 @@
       ]
     },
     {
-      "id": "TK-839459",
+      "id": "TK-839459326531",
       "canonical_control": "TATAR-CON-011",
       "resource": "deployment/latest-app",
       "namespace": "production",
@@ -1321,8 +1373,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1331,7 +1383,7 @@
       ]
     },
     {
-      "id": "TK-87988c",
+      "id": "TK-87988c74ef05",
       "canonical_control": "TATAR-CON-002",
       "resource": "deployment/root-app",
       "namespace": "production",
@@ -1362,8 +1414,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1372,7 +1424,7 @@
       ]
     },
     {
-      "id": "TK-8b4244",
+      "id": "TK-8b4244f9cf41",
       "canonical_control": "TATAR-CON-002",
       "resource": "deployment/api",
       "namespace": "production",
@@ -1403,8 +1455,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "trivy",
@@ -1413,7 +1465,7 @@
       ]
     },
     {
-      "id": "TK-8ee9df",
+      "id": "TK-8ee9dfe4dcc7",
       "canonical_control": "TATAR-CON-011",
       "resource": "deployment/secret-env-app",
       "namespace": "production",
@@ -1444,8 +1496,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1454,7 +1506,7 @@
       ]
     },
     {
-      "id": "TK-a5de8c",
+      "id": "TK-a5de8cd35166",
       "canonical_control": "TATAR-IMG-003",
       "resource": "deployment/latest-app",
       "namespace": "production",
@@ -1492,8 +1544,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1502,7 +1554,7 @@
       ]
     },
     {
-      "id": "TK-a87376",
+      "id": "TK-a8737652d0ce",
       "canonical_control": "TATAR-SEC-003",
       "resource": "deployment/root-app",
       "namespace": "production",
@@ -1540,8 +1592,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1550,7 +1602,7 @@
       ]
     },
     {
-      "id": "TK-a9ae78",
+      "id": "TK-a9ae78ef5560",
       "canonical_control": "TATAR-CON-011",
       "resource": "deployment/host-ns-app",
       "namespace": "production",
@@ -1581,8 +1633,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1591,7 +1643,7 @@
       ]
     },
     {
-      "id": "TK-b856db",
+      "id": "TK-b856db0d7963",
       "canonical_control": "TATAR-SEC-003",
       "resource": "deployment/privileged-app",
       "namespace": "production",
@@ -1629,8 +1681,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1639,7 +1691,7 @@
       ]
     },
     {
-      "id": "TK-bb3bbf",
+      "id": "TK-bb3bbf42d8cd",
       "canonical_control": "TATAR-NET-001",
       "resource": "deployment/api",
       "namespace": "production",
@@ -1671,8 +1723,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "kubescape",
@@ -1681,7 +1733,7 @@
       ]
     },
     {
-      "id": "TK-bd2b14",
+      "id": "TK-bd2b145c543d",
       "canonical_control": "TATAR-CON-011",
       "resource": "deployment/root-app",
       "namespace": "production",
@@ -1712,8 +1764,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1722,7 +1774,7 @@
       ]
     },
     {
-      "id": "TK-ca93ac",
+      "id": "TK-ca93aca05b29",
       "canonical_control": "TATAR-CON-009",
       "resource": "deployment/host-ns-app",
       "namespace": "production",
@@ -1753,8 +1805,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1763,7 +1815,7 @@
       ]
     },
     {
-      "id": "TK-cd6234",
+      "id": "TK-cd623492fa3b",
       "canonical_control": "TATAR-IMG-003",
       "resource": "deployment/host-ns-app",
       "namespace": "production",
@@ -1801,8 +1853,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1811,7 +1863,7 @@
       ]
     },
     {
-      "id": "TK-d3601d",
+      "id": "TK-d3601d8c9f44",
       "canonical_control": "TATAR-CON-002",
       "resource": "deployment/latest-app",
       "namespace": "production",
@@ -1842,8 +1894,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1852,7 +1904,7 @@
       ]
     },
     {
-      "id": "TK-deeec9",
+      "id": "TK-deeec93fcca3",
       "canonical_control": "TATAR-SEC-003",
       "resource": "deployment/secret-env-app",
       "namespace": "production",
@@ -1890,8 +1942,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1900,7 +1952,7 @@
       ]
     },
     {
-      "id": "TK-eaf694",
+      "id": "TK-eaf694f91047",
       "canonical_control": "TATAR-IMG-003",
       "resource": "deployment/root-app",
       "namespace": "production",
@@ -1938,8 +1990,8 @@
         }
       ],
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1948,7 +2000,7 @@
       ]
     },
     {
-      "id": "TK-ee582c",
+      "id": "TK-ee582c898d28",
       "canonical_control": "TATAR-CON-002",
       "resource": "deployment/secret-env-app",
       "namespace": "production",
@@ -1979,8 +2031,8 @@
         "contribution": 5.4
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -1989,7 +2041,7 @@
       ]
     },
     {
-      "id": "TK-038d0c",
+      "id": "TK-038d0c5df290",
       "canonical_control": "TATAR-OPS-005",
       "resource": "deployment/root-app",
       "namespace": "production",
@@ -2020,8 +2072,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2030,7 +2082,7 @@
       ]
     },
     {
-      "id": "TK-074f58",
+      "id": "TK-074f58bfc052",
       "canonical_control": "TATAR-CON-010",
       "resource": "deployment/secret-env-app",
       "namespace": "production",
@@ -2061,8 +2113,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2075,7 +2127,7 @@
       ]
     },
     {
-      "id": "TK-0ae0b9",
+      "id": "TK-0ae0b98d93ee",
       "canonical_control": "TATAR-OPS-002",
       "resource": "deployment/host-ns-app",
       "namespace": "production",
@@ -2106,8 +2158,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2116,7 +2168,7 @@
       ]
     },
     {
-      "id": "TK-18ab67",
+      "id": "TK-18ab67dd3f54",
       "canonical_control": "TATAR-OPS-001",
       "resource": "deployment/secret-env-app",
       "namespace": "production",
@@ -2147,8 +2199,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2157,7 +2209,7 @@
       ]
     },
     {
-      "id": "TK-237bab",
+      "id": "TK-237bab83414e",
       "canonical_control": "TATAR-OPS-002",
       "resource": "deployment/secret-env-app",
       "namespace": "production",
@@ -2188,8 +2240,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2198,7 +2250,7 @@
       ]
     },
     {
-      "id": "TK-2b7f65",
+      "id": "TK-2b7f656a9095",
       "canonical_control": "TATAR-OPS-001",
       "resource": "deployment/privileged-app",
       "namespace": "production",
@@ -2229,8 +2281,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2239,7 +2291,7 @@
       ]
     },
     {
-      "id": "TK-497ef2",
+      "id": "TK-497ef288eeed",
       "canonical_control": "TATAR-OPS-004",
       "resource": "configmap/unused-cm",
       "namespace": "production",
@@ -2270,8 +2322,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "popeye",
@@ -2280,7 +2332,7 @@
       ]
     },
     {
-      "id": "TK-692c88",
+      "id": "TK-692c88e9019b",
       "canonical_control": "TATAR-OPS-005",
       "resource": "deployment/privileged-app",
       "namespace": "production",
@@ -2311,8 +2363,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2321,7 +2373,7 @@
       ]
     },
     {
-      "id": "TK-721ece",
+      "id": "TK-721ece12b07e",
       "canonical_control": "TATAR-CON-010",
       "resource": "deployment/privileged-app",
       "namespace": "production",
@@ -2352,8 +2404,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2366,7 +2418,7 @@
       ]
     },
     {
-      "id": "TK-74c9df",
+      "id": "TK-74c9df40c60c",
       "canonical_control": "TATAR-OPS-002",
       "resource": "deployment/privileged-app",
       "namespace": "production",
@@ -2397,8 +2449,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2407,7 +2459,7 @@
       ]
     },
     {
-      "id": "TK-9ee9a8",
+      "id": "TK-9ee9a819ee98",
       "canonical_control": "TATAR-CON-010",
       "resource": "deployment/root-app",
       "namespace": "production",
@@ -2438,8 +2490,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2452,7 +2504,7 @@
       ]
     },
     {
-      "id": "TK-ae88c4",
+      "id": "TK-ae88c4a249fc",
       "canonical_control": "TATAR-OPS-005",
       "resource": "deployment/host-ns-app",
       "namespace": "production",
@@ -2483,8 +2535,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2493,7 +2545,7 @@
       ]
     },
     {
-      "id": "TK-af8897",
+      "id": "TK-af8897bfd471",
       "canonical_control": "TATAR-OPS-002",
       "resource": "deployment/latest-app",
       "namespace": "production",
@@ -2524,8 +2576,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2534,7 +2586,7 @@
       ]
     },
     {
-      "id": "TK-b37a35",
+      "id": "TK-b37a3556a105",
       "canonical_control": "TATAR-OPS-002",
       "resource": "deployment/root-app",
       "namespace": "production",
@@ -2565,8 +2617,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2575,7 +2627,7 @@
       ]
     },
     {
-      "id": "TK-c4c3a4",
+      "id": "TK-c4c3a4ebaadc",
       "canonical_control": "TATAR-OPS-001",
       "resource": "deployment/latest-app",
       "namespace": "production",
@@ -2606,8 +2658,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2616,7 +2668,7 @@
       ]
     },
     {
-      "id": "TK-d677b8",
+      "id": "TK-d677b8052956",
       "canonical_control": "TATAR-OPS-001",
       "resource": "deployment/host-ns-app",
       "namespace": "production",
@@ -2647,8 +2699,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2657,7 +2709,7 @@
       ]
     },
     {
-      "id": "TK-d83cf4",
+      "id": "TK-d83cf4dbcadb",
       "canonical_control": "TATAR-CON-010",
       "resource": "deployment/latest-app",
       "namespace": "production",
@@ -2688,8 +2740,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2702,7 +2754,7 @@
       ]
     },
     {
-      "id": "TK-da455b",
+      "id": "TK-da455b153a9b",
       "canonical_control": "TATAR-OPS-005",
       "resource": "pod/api-7d8",
       "namespace": "production",
@@ -2733,8 +2785,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "popeye",
@@ -2743,7 +2795,7 @@
       ]
     },
     {
-      "id": "TK-e42455",
+      "id": "TK-e424554e66b4",
       "canonical_control": "TATAR-OPS-005",
       "resource": "deployment/secret-env-app",
       "namespace": "production",
@@ -2774,8 +2826,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2784,7 +2836,7 @@
       ]
     },
     {
-      "id": "TK-e674e7",
+      "id": "TK-e674e784efe2",
       "canonical_control": "TATAR-CON-010",
       "resource": "deployment/host-ns-app",
       "namespace": "production",
@@ -2815,8 +2867,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",
@@ -2829,7 +2881,7 @@
       ]
     },
     {
-      "id": "TK-f46eb1",
+      "id": "TK-f46eb13ab024",
       "canonical_control": "TATAR-OPS-001",
       "resource": "deployment/root-app",
       "namespace": "production",
@@ -2860,8 +2912,8 @@
         "contribution": 1.8
       },
       "status": "OPEN",
-      "first_seen": "2026-08-30T13:03:45Z",
-      "last_seen": "2026-08-30T13:03:45Z",
+      "first_seen": "2026-09-07T04:26:45Z",
+      "last_seen": "2026-09-07T04:26:45Z",
       "raw_refs": [
         {
           "scanner": "checkov",

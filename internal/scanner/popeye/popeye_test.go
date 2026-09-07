@@ -42,3 +42,13 @@ func TestNormalize_Fixture(t *testing.T) {
 		}
 	}
 }
+
+func TestSingular(t *testing.T) {
+	cases := map[string]string{"pods": "pod", "services": "service", "ingresses": "ingress",
+		"networkpolicies": "networkpolicy", "storageclasses": "storageclass", "deployments": "deployment", "node": "node"}
+	for in, want := range cases {
+		if got := singular(in); got != want {
+			t.Errorf("singular(%q)=%q want %q", in, got, want)
+		}
+	}
+}

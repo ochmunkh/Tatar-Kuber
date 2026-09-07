@@ -11,14 +11,6 @@ import (
 	"github.com/ochmunkh/tatar-kuber/internal/risk"
 )
 
-var sevRank = map[finding.Severity]int{
-	finding.SeverityCritical: 5,
-	finding.SeverityHigh:     4,
-	finding.SeverityMedium:   3,
-	finding.SeverityLow:      2,
-	finding.SeverityInfo:     1,
-}
-
 // key — dedup түлхүүр: canonical_control + resource (kind/name) + namespace.
 func key(f finding.Finding) string {
 	return f.CanonicalControl + "|" + f.Resource + "|" + f.Namespace
@@ -49,10 +41,10 @@ func Deduplicate(findings []finding.Finding, reg *canonical.Registry) []finding.
 		refs := map[string]bool{}
 
 		for _, f := range g {
-			if sevRank[f.Severity] > sevRank[merged.Severity] {
+			if finding.Rank(f.Severity) > finding.Rank(merged.Severity) {
 				merged.Severity = f.Severity
 			}
-			if sevRank[f.OriginalSeverity] > sevRank[merged.OriginalSeverity] {
+			if finding.Rank(f.OriginalSeverity) > finding.Rank(merged.OriginalSeverity) {
 				merged.OriginalSeverity = f.OriginalSeverity
 			}
 			for _, s := range f.FoundBy {

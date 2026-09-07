@@ -7,6 +7,13 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "0 6 * * 1" # 7 хоног тутам (Даваа) — live флагууд эвдрээгүйг хянана
+  push:
+    branches: [master, main]
+    paths: # scanner флаг/парсер өөрчлөгдвөл бодит cluster дээр шууд шалгана
+      - "internal/scanner/**"
+      - "internal/orchestrator/**"
+      - "schema/canonical-controls.yaml"
+      - ".github/workflows/real-cluster.yml"
 
 permissions:
   contents: read
@@ -73,20 +80,42 @@ jobs:
           ./tatar-kuber report --input out/scan-result.json -o html  --out out/report.html
           ./tatar-kuber report --input out/scan-result.json -o sarif --out out/tatar-kuber.sarif
 
-      - name: Upload live scan artifacts
+      - name: Upload live scan artifacts (report + raw scanner output as evidence)
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: live-scan-report
           path: out/
 
-      - name: Assert live scan actually found issues
+      # SCANNER ТУС БҮРИЙГ шалгана. v1.0.0-д "нийт ≥1" гэсэн сул шалгалт байсан тул
+      # Trivy/Popeye 0 finding өгч байхад (AVD ID формат, --report summary) CI ногоон байсан.
+      - name: Assert EVERY available scanner produced findings
         run: |
-          FOUND="$(./tatar-kuber report --input out/scan-result.json -o json | grep -o '"total_findings": *[0-9]*' | grep -o '[0-9]*' | head -1)"
-          echo "total_findings=$FOUND"
-          if [ "${FOUND:-0}" -lt 1 ]; then
-            echo "::error::Live Mode B ямар ч finding олсонгүй — scanner флаг эсвэл cluster хандалт эвдэрсэн байж болзошгүй"
-            exit 1
+          echo "----- scanner_runs -----"
+          jq -r '.metadata.scanner_runs[] | "\(.scanner)\t\(.status)\tfindings=\(.findings)\tunmapped=\(.unmapped_count // 0)\t\(.error // "")"' out/scan-result.json
+          FAIL=0
+          for s in trivy kubescape popeye; do
+            ST="$(jq -r --arg s "$s" '.metadata.scanner_runs[] | select(.scanner==$s) | .status' out/scan-result.json)"
+            N="$(jq -r --arg s "$s" '.metadata.scanner_runs[] | select(.scanner==$s) | .findings' out/scan-result.json)"
+            if [ "$ST" = "unavailable" ]; then
+              echo "::warning::$s суугаагүй — алгасав"; continue
+            fi
+            if [ "$ST" != "ok" ] || [ "${N:-0}" -lt 1 ]; then
+              echo "::error::$s: status=$ST findings=${N:-0} — live Mode B-д энэ scanner finding өгөх ЁСТОЙ (эмзэг workload deploy хийгдсэн)"
+              FAIL=1
+            fi
+          done
+          # Trivy заавал privileged (TATAR-CON-001)-ийг олох ёстой — бодит AVD ID формат зөв тайлагдаж буйн баталгаа.
+          if ! jq -e '.findings[] | select(.canonical_control=="TATAR-CON-001") | select(.found_by | index("trivy"))' out/scan-result.json >/dev/null; then
+            echo "::error::Trivy TATAR-CON-001 (privileged)-ийг илрүүлээгүй — AVD ID зураглал эвдэрсэн байж болзошгүй"
+            FAIL=1
           fi
+          # Хамгийн багадаа 2 scanner нэг л finding дээр санал нийлсэн байх (dedup ажиллаж буйн баталгаа).
+          if ! jq -e '[.findings[] | select((.found_by | length) >= 2)] | length > 0' out/scan-result.json >/dev/null; then
+            echo "::error::Ямар ч finding 2+ scanner-ээр батлагдаагүй — dedup/resource нэршил зөрсөн байж болзошгүй"
+            FAIL=1
+          fi
+          exit $FAIL
 
       - name: Gate (informational)
         continue-on-error: true

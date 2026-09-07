@@ -14,13 +14,13 @@ inputs:
     required: false
     default: ""
   fail-on:
-    description: "Gate severity босго: critical | high | medium | low"
+    description: "Gate severity босго: critical | high | medium | low. Хоосон бол .tatar-kuber.yaml (эсвэл default high)."
     required: false
-    default: "high"
+    default: ""
   min-score:
-    description: "Cluster score доод хязгаар (0 = хэрэгсэхгүй)"
+    description: "Cluster score доод хязгаар. Хоосон бол .tatar-kuber.yaml-ын утга (0 = хэрэгсэхгүй)."
     required: false
-    default: "0"
+    default: ""
   policy:
     description: ".tatar-kuber.yaml бодлогын файл"
     required: false
@@ -30,9 +30,9 @@ inputs:
     required: false
     default: "latest"
   registry:
-    description: "canonical-controls.yaml зам"
+    description: "canonical-controls.yaml зам. Хоосон бол binary-д шигтгэсэн registry (ихэнх repo-д энэ л зөв)."
     required: false
-    default: "schema/canonical-controls.yaml"
+    default: ""
 
 outputs:
   sarif:
@@ -53,16 +53,28 @@ runs:
     - name: Run TATAR-Kuber
       id: run
       shell: bash
+      # Оролтуудыг env-ээр дамжуулна (script injection-оос сэргийлнэ: ${{ }} нь shell рүү шууд орохгүй).
+      env:
+        IN_PATH: ${{ inputs.path }}
+        IN_RAW_DIR: ${{ inputs.raw-dir }}
+        IN_FAIL_ON: ${{ inputs.fail-on }}
+        IN_MIN_SCORE: ${{ inputs.min-score }}
+        IN_POLICY: ${{ inputs.policy }}
+        IN_VERSION: ${{ inputs.version }}
+        IN_REGISTRY: ${{ inputs.registry }}
       run: |
         set -euo pipefail
-        go install "github.com/ochmunkh/tatar-kuber/cmd/tatar-kuber@${{ inputs.version }}"
+        go install "github.com/ochmunkh/tatar-kuber/cmd/tatar-kuber@${IN_VERSION}"
         BIN="$(go env GOPATH)/bin/tatar-kuber"
         mkdir -p tatar-out
 
-        if [ -n "${{ inputs.raw-dir }}" ]; then
-          "$BIN" scan --raw-dir "${{ inputs.raw-dir }}" -o tatar-out --registry "${{ inputs.registry }}"
+        REG=()
+        [ -n "$IN_REGISTRY" ] && REG=(--registry "$IN_REGISTRY")
+
+        if [ -n "$IN_RAW_DIR" ]; then
+          "$BIN" scan --raw-dir "$IN_RAW_DIR" -o tatar-out ${REG[@]+"${REG[@]}"}
         else
-          "$BIN" scan -f "${{ inputs.path }}" -o tatar-out --registry "${{ inputs.registry }}"
+          "$BIN" scan -f "$IN_PATH" -o tatar-out ${REG[@]+"${REG[@]}"}
         fi
 
         "$BIN" report --input tatar-out/scan-result.json -o sarif --out tatar-out/tatar-kuber.sarif
@@ -70,8 +82,8 @@ runs:
         echo "result=tatar-out/scan-result.json" >> "$GITHUB_OUTPUT"
 
         # Gate — босго давбал энэ алхам exit 1 буцааж workflow-г унагана.
-        "$BIN" gate \
-          --input tatar-out/scan-result.json \
-          --policy "${{ inputs.policy }}" \
-          --fail-on "${{ inputs.fail-on }}" \
-          --min-score "${{ inputs.min-score }}"
+        # fail-on / min-score-ыг ЗӨВХӨН өгсөн үед дамжуулна → .tatar-kuber.yaml утга хүчинтэй үлдэнэ.
+        GATE=(--input tatar-out/scan-result.json --policy "$IN_POLICY")
+        [ -n "$IN_FAIL_ON" ] && GATE+=(--fail-on "$IN_FAIL_ON")
+        [ -n "$IN_MIN_SCORE" ] && GATE+=(--min-score "$IN_MIN_SCORE")
+        "$BIN" gate "${GATE[@]}"

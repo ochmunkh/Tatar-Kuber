@@ -12,9 +12,9 @@ import (
 // expectedSpec — expected-findings.json бүтэц (lab regression).
 type expectedSpec struct {
 	Scenario    string         `json:"scenario"`
-	MinFindings int            `json:"min_findings"`         // зөөлөн доод хязгаар (сонголт)
-	Total       *int           `json:"total,omitempty"`      // яг нийт тоо (сонголт)
-	Counts      map[string]int `json:"counts,omitempty"`     // severity бүрээр яг тоо (сонголт)
+	MinFindings int            `json:"min_findings"`     // зөөлөн доод хязгаар (сонголт)
+	Total       *int           `json:"total,omitempty"`  // яг нийт тоо (сонголт)
+	Counts      map[string]int `json:"counts,omitempty"` // severity бүрээр яг тоо (сонголт)
 	Controls    []string       `json:"controls"`
 }
 

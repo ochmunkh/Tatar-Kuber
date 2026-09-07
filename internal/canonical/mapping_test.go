@@ -21,12 +21,12 @@ func TestResolveSingle(t *testing.T) {
 	cases := []struct {
 		scanner, rule, want string
 	}{
-		{"trivy", "AVD-KSV0017", "TATAR-CON-001"},   // privileged
+		{"trivy", "AVD-KSV0017", "TATAR-CON-001"}, // privileged
 		{"kubescape", "C-0057", "TATAR-CON-001"},
 		{"checkov", "CKV_K8S_16", "TATAR-CON-001"},
-		{"checkov", "CKV_K8S_20", "TATAR-CON-003"},   // allowPrivilegeEscalation (NET-004 БИШ!)
-		{"checkov", "CKV_K8S_22", "TATAR-CON-009"},   // readonly fs (IMG-004 БИШ!)
-		{"kubescape", "C-0035", "TATAR-RBAC-001"},    // cluster-admin
+		{"checkov", "CKV_K8S_20", "TATAR-CON-003"}, // allowPrivilegeEscalation (NET-004 БИШ!)
+		{"checkov", "CKV_K8S_22", "TATAR-CON-009"}, // readonly fs (IMG-004 БИШ!)
+		{"kubescape", "C-0035", "TATAR-RBAC-001"},  // cluster-admin
 	}
 	for _, c := range cases {
 		ids, ok := r.Resolve(c.scanner, c.rule)
@@ -63,5 +63,34 @@ func TestResolveUnknown(t *testing.T) {
 	r, _ := Load(regPath)
 	if _, ok := r.Resolve("trivy", "DOES-NOT-EXIST"); ok {
 		t.Error("байхгүй rule ok=true буцаалаа")
+	}
+}
+
+// Бодит Trivy гаралт "AVD-KSV-0017" (зураастай) — registry-д "AVD-KSV0017" гэж
+// бичсэн ч заавал таарах ёстой. v1.0.0-д энэ зөрүү live Mode B-д Trivy-ийн бүх
+// finding-ийг чимээгүй алдуулж байсан.
+func TestNormalizeRuleID(t *testing.T) {
+	cases := map[string]string{
+		"AVD-KSV-0017": "KSV17", "AVD-KSV0017": "KSV17", "KSV017": "KSV17", "KSV-0017": "KSV17",
+		"C-0057": "C57", "POP-106": "POP106", "CKV_K8S_16": "CKV_K8S_16", "CVE-*": "CVE-*", "secret": "SECRET",
+	}
+	for in, want := range cases {
+		if got := NormalizeRuleID("trivy", in); got != want {
+			t.Errorf("NormalizeRuleID(%q) = %q, want %q", in, got, want)
+		}
+	}
+}
+
+func TestResolveRealTrivyAVDID(t *testing.T) {
+	reg, err := Load(regPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ids, ok := reg.Resolve("trivy", "AVD-KSV-0017")
+	if !ok || len(ids) != 1 || ids[0] != "TATAR-CON-001" {
+		t.Fatalf("real Trivy AVDID must resolve to TATAR-CON-001, got %v %v", ids, ok)
+	}
+	if _, ok := reg.Resolve("trivy", "KSV-0017"); !ok {
+		t.Fatalf("trivy short ID KSV-0017 must resolve")
 	}
 }

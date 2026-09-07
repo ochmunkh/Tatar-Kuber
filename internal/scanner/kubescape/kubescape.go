@@ -56,6 +56,13 @@ func (s *Scanner) Scan(ctx context.Context, t scanner.Target) (scanner.RawResult
 	if len(t.Namespaces) > 0 {
 		args = append(args, "--include-namespaces", strings.Join(t.Namespaces, ","))
 	}
+	// Хэрэглэгчийн заасан context-ыг ЗААВАЛ дамжуулна — эс бөгөөс kubescape
+	// kubeconfig-ийн одоогийн context-ыг (өөр cluster байж болзошгүй) scan хийнэ.
+	// Тэмдэглэл: kubescape-ийн флаг нь ОЛОН тоо (--kube-contexts, StringSlice);
+	// нэг context өгвөл яг түүнийг scan хийнэ.
+	if t.Context != "" {
+		args = append(args, "--kube-contexts", t.Context)
+	}
 	var env []string
 	if t.Kubeconfig != "" {
 		env = append(env, "KUBECONFIG="+t.Kubeconfig)

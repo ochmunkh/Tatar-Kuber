@@ -51,7 +51,7 @@ func buildPipeline(registryPath string) (*orchestrator.Pipeline, error) {
 	rs := reg.NewResolver()
 	return orchestrator.New(reg,
 		trivy.New(rs), kubescape.New(rs), checkov.New(rs), popeye.New(rs),
-	), nil
+	).WithResolver(rs), nil
 }
 
 // loadRawDir — <dir>/{trivy,kubescape,checkov,popeye}.json-г RawResult болгож ачаална.

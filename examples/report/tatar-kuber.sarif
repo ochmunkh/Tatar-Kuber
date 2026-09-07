@@ -6,7 +6,7 @@
       "tool": {
         "driver": {
           "name": "TATAR-Kuber",
-          "version": "1.0.0",
+          "version": "1.0.1",
           "informationUri": "https://github.com/ochmunkh/tatar-kuber",
           "rules": [
             {
@@ -259,13 +259,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-9b701eb0482a"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "trivy"
             ],
-            "tatar_id": "TK-9b701e"
+            "tatar_id": "TK-9b701eb0482a"
           }
         },
         {
@@ -283,13 +286,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-951f02615a28"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "kubescape"
             ],
-            "tatar_id": "TK-951f02"
+            "tatar_id": "TK-951f02615a28"
           }
         },
         {
@@ -307,13 +313,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-099acce09622"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-099acc"
+            "tatar_id": "TK-099acce09622"
           }
         },
         {
@@ -331,13 +340,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-31cdabe90e87"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-31cdab"
+            "tatar_id": "TK-31cdabe90e87"
           }
         },
         {
@@ -355,13 +367,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-3d236fda3600"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-3d236f"
+            "tatar_id": "TK-3d236fda3600"
           }
         },
         {
@@ -379,13 +394,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-41b7549616ee"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "trivy"
             ],
-            "tatar_id": "TK-41b754"
+            "tatar_id": "TK-41b7549616ee"
           }
         },
         {
@@ -403,13 +421,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-4aa9f9accec0"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-4aa9f9"
+            "tatar_id": "TK-4aa9f9accec0"
           }
         },
         {
@@ -427,13 +448,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-5704a8c54610"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-5704a8"
+            "tatar_id": "TK-5704a8c54610"
           }
         },
         {
@@ -451,13 +475,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-68270b3a0306"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-68270b"
+            "tatar_id": "TK-68270b3a0306"
           }
         },
         {
@@ -475,6 +502,9 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-8d84b4a0664a"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
@@ -483,7 +513,7 @@
               "kubescape",
               "trivy"
             ],
-            "tatar_id": "TK-8d84b4"
+            "tatar_id": "TK-8d84b4a0664a"
           }
         },
         {
@@ -501,13 +531,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-98dbfde1c7dd"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-98dbfd"
+            "tatar_id": "TK-98dbfde1c7dd"
           }
         },
         {
@@ -525,13 +558,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-ace1a8e38c9b"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-ace1a8"
+            "tatar_id": "TK-ace1a8e38c9b"
           }
         },
         {
@@ -549,13 +585,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-63fbfb555a96"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "trivy"
             ],
-            "tatar_id": "TK-63fbfb"
+            "tatar_id": "TK-63fbfb555a96"
           }
         },
         {
@@ -573,13 +612,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-9716b35d5c9f"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-9716b3"
+            "tatar_id": "TK-9716b35d5c9f"
           }
         },
         {
@@ -597,13 +639,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-082fb33745e9"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-082fb3"
+            "tatar_id": "TK-082fb33745e9"
           }
         },
         {
@@ -621,13 +666,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-2681ba7df61b"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-2681ba"
+            "tatar_id": "TK-2681ba7df61b"
           }
         },
         {
@@ -645,13 +693,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-270b9f4bd915"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-270b9f"
+            "tatar_id": "TK-270b9f4bd915"
           }
         },
         {
@@ -669,13 +720,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-2a5ed40b070f"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-2a5ed4"
+            "tatar_id": "TK-2a5ed40b070f"
           }
         },
         {
@@ -693,13 +747,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-45802dee62f8"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "popeye"
             ],
-            "tatar_id": "TK-45802d"
+            "tatar_id": "TK-45802dee62f8"
           }
         },
         {
@@ -717,13 +774,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-516c6d9edcb3"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-516c6d"
+            "tatar_id": "TK-516c6d9edcb3"
           }
         },
         {
@@ -741,13 +801,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-6139b2518fff"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-6139b2"
+            "tatar_id": "TK-6139b2518fff"
           }
         },
         {
@@ -765,13 +828,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-6beef8a54dc8"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-6beef8"
+            "tatar_id": "TK-6beef8a54dc8"
           }
         },
         {
@@ -789,13 +855,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-7195633ad1e7"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-719563"
+            "tatar_id": "TK-7195633ad1e7"
           }
         },
         {
@@ -813,13 +882,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-7be77a7df53a"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-7be77a"
+            "tatar_id": "TK-7be77a7df53a"
           }
         },
         {
@@ -837,13 +909,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-7e89d41311ae"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-7e89d4"
+            "tatar_id": "TK-7e89d41311ae"
           }
         },
         {
@@ -861,13 +936,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-814cb7a3c114"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-814cb7"
+            "tatar_id": "TK-814cb7a3c114"
           }
         },
         {
@@ -885,13 +963,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-839459326531"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-839459"
+            "tatar_id": "TK-839459326531"
           }
         },
         {
@@ -909,13 +990,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-87988c74ef05"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-87988c"
+            "tatar_id": "TK-87988c74ef05"
           }
         },
         {
@@ -933,13 +1017,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-8b4244f9cf41"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "trivy"
             ],
-            "tatar_id": "TK-8b4244"
+            "tatar_id": "TK-8b4244f9cf41"
           }
         },
         {
@@ -957,13 +1044,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-8ee9dfe4dcc7"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-8ee9df"
+            "tatar_id": "TK-8ee9dfe4dcc7"
           }
         },
         {
@@ -981,13 +1071,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-a5de8cd35166"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-a5de8c"
+            "tatar_id": "TK-a5de8cd35166"
           }
         },
         {
@@ -1005,13 +1098,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-a8737652d0ce"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-a87376"
+            "tatar_id": "TK-a8737652d0ce"
           }
         },
         {
@@ -1029,13 +1125,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-a9ae78ef5560"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-a9ae78"
+            "tatar_id": "TK-a9ae78ef5560"
           }
         },
         {
@@ -1053,13 +1152,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-b856db0d7963"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-b856db"
+            "tatar_id": "TK-b856db0d7963"
           }
         },
         {
@@ -1077,13 +1179,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-bb3bbf42d8cd"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "kubescape"
             ],
-            "tatar_id": "TK-bb3bbf"
+            "tatar_id": "TK-bb3bbf42d8cd"
           }
         },
         {
@@ -1101,13 +1206,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-bd2b145c543d"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-bd2b14"
+            "tatar_id": "TK-bd2b145c543d"
           }
         },
         {
@@ -1125,13 +1233,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-ca93aca05b29"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-ca93ac"
+            "tatar_id": "TK-ca93aca05b29"
           }
         },
         {
@@ -1149,13 +1260,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-cd623492fa3b"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-cd6234"
+            "tatar_id": "TK-cd623492fa3b"
           }
         },
         {
@@ -1173,13 +1287,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-d3601d8c9f44"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-d3601d"
+            "tatar_id": "TK-d3601d8c9f44"
           }
         },
         {
@@ -1197,13 +1314,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-deeec93fcca3"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-deeec9"
+            "tatar_id": "TK-deeec93fcca3"
           }
         },
         {
@@ -1221,13 +1341,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-eaf694f91047"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-eaf694"
+            "tatar_id": "TK-eaf694f91047"
           }
         },
         {
@@ -1245,13 +1368,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-ee582c898d28"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-ee582c"
+            "tatar_id": "TK-ee582c898d28"
           }
         },
         {
@@ -1269,13 +1395,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-038d0c5df290"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-038d0c"
+            "tatar_id": "TK-038d0c5df290"
           }
         },
         {
@@ -1293,13 +1422,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-074f58bfc052"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-074f58"
+            "tatar_id": "TK-074f58bfc052"
           }
         },
         {
@@ -1317,13 +1449,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-0ae0b98d93ee"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-0ae0b9"
+            "tatar_id": "TK-0ae0b98d93ee"
           }
         },
         {
@@ -1341,13 +1476,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-18ab67dd3f54"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-18ab67"
+            "tatar_id": "TK-18ab67dd3f54"
           }
         },
         {
@@ -1365,13 +1503,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-237bab83414e"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-237bab"
+            "tatar_id": "TK-237bab83414e"
           }
         },
         {
@@ -1389,13 +1530,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-2b7f656a9095"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-2b7f65"
+            "tatar_id": "TK-2b7f656a9095"
           }
         },
         {
@@ -1413,13 +1557,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-497ef288eeed"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "popeye"
             ],
-            "tatar_id": "TK-497ef2"
+            "tatar_id": "TK-497ef288eeed"
           }
         },
         {
@@ -1437,13 +1584,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-692c88e9019b"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-692c88"
+            "tatar_id": "TK-692c88e9019b"
           }
         },
         {
@@ -1461,13 +1611,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-721ece12b07e"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-721ece"
+            "tatar_id": "TK-721ece12b07e"
           }
         },
         {
@@ -1485,13 +1638,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-74c9df40c60c"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-74c9df"
+            "tatar_id": "TK-74c9df40c60c"
           }
         },
         {
@@ -1509,13 +1665,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-9ee9a819ee98"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-9ee9a8"
+            "tatar_id": "TK-9ee9a819ee98"
           }
         },
         {
@@ -1533,13 +1692,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-ae88c4a249fc"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-ae88c4"
+            "tatar_id": "TK-ae88c4a249fc"
           }
         },
         {
@@ -1557,13 +1719,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-af8897bfd471"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-af8897"
+            "tatar_id": "TK-af8897bfd471"
           }
         },
         {
@@ -1581,13 +1746,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-b37a3556a105"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-b37a35"
+            "tatar_id": "TK-b37a3556a105"
           }
         },
         {
@@ -1605,13 +1773,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-c4c3a4ebaadc"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-c4c3a4"
+            "tatar_id": "TK-c4c3a4ebaadc"
           }
         },
         {
@@ -1629,13 +1800,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-d677b8052956"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-d677b8"
+            "tatar_id": "TK-d677b8052956"
           }
         },
         {
@@ -1653,13 +1827,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-d83cf4dbcadb"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-d83cf4"
+            "tatar_id": "TK-d83cf4dbcadb"
           }
         },
         {
@@ -1677,13 +1854,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-da455b153a9b"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "popeye"
             ],
-            "tatar_id": "TK-da455b"
+            "tatar_id": "TK-da455b153a9b"
           }
         },
         {
@@ -1701,13 +1881,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-e424554e66b4"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-e42455"
+            "tatar_id": "TK-e424554e66b4"
           }
         },
         {
@@ -1725,13 +1908,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-e674e784efe2"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-e674e7"
+            "tatar_id": "TK-e674e784efe2"
           }
         },
         {
@@ -1749,13 +1935,16 @@
               }
             }
           ],
+          "partialFingerprints": {
+            "tatarId/v1": "TK-f46eb13ab024"
+          },
           "properties": {
             "blind_shot": false,
             "confidence": "HIGH",
             "found_by": [
               "checkov"
             ],
-            "tatar_id": "TK-f46eb1"
+            "tatar_id": "TK-f46eb13ab024"
           }
         }
       ]

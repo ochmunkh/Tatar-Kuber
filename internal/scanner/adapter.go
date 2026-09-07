@@ -21,10 +21,10 @@ const (
 // Target — scan оролт.
 type Target struct {
 	Mode       Mode
-	Path       string        // -f ./k8s/ (local)
-	Kubeconfig string        // remote
-	Context    string        // --context production
-	Namespaces []string      // хязгаарлах (сонголт)
+	Path       string   // -f ./k8s/ (local)
+	Kubeconfig string   // remote
+	Context    string   // --context production
+	Namespaces []string // хязгаарлах (сонголт)
 	Timeout    time.Duration
 }
 

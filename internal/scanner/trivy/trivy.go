@@ -48,12 +48,18 @@ func (s *Scanner) Scan(ctx context.Context, t scanner.Target) (scanner.RawResult
 	if t.Mode != scanner.ModeRemote {
 		return scanner.RawResult{Scanner: "trivy"}, fmt.Errorf("trivy live: зөвхөн remote (Mode B) дэмжигдэнэ")
 	}
-	args := []string{"k8s", "--format", "json", "-q", "--scanners", "misconfig,vuln,secret"}
+	// --report all ЗААВАЛ: Trivy 0.50+ default нь "summary" бөгөөд JSON-д
+	// Misconfigurations/Vulnerabilities дэлгэрэнгүй ирдэггүй (finding 0 болно).
+	args := []string{"k8s", "--format", "json", "-q", "--report", "all", "--scanners", "misconfig,vuln,secret"}
 	if len(t.Namespaces) > 0 {
 		args = append(args, "--include-namespaces", strings.Join(t.Namespaces, ","))
 	}
+	if t.Kubeconfig != "" {
+		args = append(args, "--kubeconfig", t.Kubeconfig)
+	}
+	// Trivy-д kube context нь flag биш, POSITIONAL аргумент: trivy k8s [flags] [CONTEXT]
 	if t.Context != "" {
-		args = append(args, "--context", t.Context)
+		args = append(args, t.Context)
 	}
 	var env []string
 	if t.Kubeconfig != "" {
@@ -129,7 +135,11 @@ func (s *Scanner) Normalize(raw scanner.RawResult) ([]finding.Finding, error) {
 					ev.Path = fmt.Sprintf("%s:%d", r.Target, m.CauseMetadata.StartLine)
 				}
 				meta := normalizer.Meta{Resource: resource, Namespace: res.Namespace, Title: m.Title, Description: m.Description, Evidence: []finding.Evidence{ev}, Remediation: m.Resolution, Severity: m.Severity, References: m.References}
-				if f, ok := normalizer.Build(s.resolver, "trivy", m.AVDID, ctx, meta, s.now); ok {
+				rule := m.AVDID // "AVD-KSV-0017" (бодит) / "AVD-KSV0017" (хуучин) — resolver normalize хийнэ
+				if rule == "" {
+					rule = m.ID // "KSV017" / "KSV-0017"
+				}
+				if f, ok := normalizer.Build(s.resolver, "trivy", rule, ctx, meta, s.now); ok {
 					out = append(out, f)
 				}
 			}

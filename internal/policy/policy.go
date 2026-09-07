@@ -28,11 +28,6 @@ type Policy struct {
 	Suppress []Suppression `yaml:"suppress,omitempty"`
 }
 
-var sevRank = map[finding.Severity]int{
-	finding.SeverityCritical: 5, finding.SeverityHigh: 4, finding.SeverityMedium: 3,
-	finding.SeverityLow: 2, finding.SeverityInfo: 1,
-}
-
 // Default — бодлогын файл байхгүй үеийн үндсэн утга (high болон дээш унана).
 func Default() Policy { return Policy{FailOn: "high"} }
 
@@ -56,19 +51,29 @@ func Load(path string) (Policy, error) {
 	return p, nil
 }
 
+// ValidFailOn — fail_on утга танигдах эсэх (танигдахгүй бол threshold high-г ашиглана,
+// CLI анхааруулга хэвлэнэ — чимээгүй default руу унахгүй).
+func (p Policy) ValidFailOn() bool {
+	switch p.FailOn {
+	case "critical", "CRITICAL", "high", "HIGH", "medium", "MEDIUM", "low", "LOW":
+		return true
+	}
+	return false
+}
+
 // threshold — fail_on severity-ийн rank (танигдахгүй бол high).
 func (p Policy) threshold() int {
 	switch p.FailOn {
 	case "critical", "CRITICAL":
-		return sevRank[finding.SeverityCritical]
+		return finding.Rank(finding.SeverityCritical)
 	case "high", "HIGH":
-		return sevRank[finding.SeverityHigh]
+		return finding.Rank(finding.SeverityHigh)
 	case "medium", "MEDIUM":
-		return sevRank[finding.SeverityMedium]
+		return finding.Rank(finding.SeverityMedium)
 	case "low", "LOW":
-		return sevRank[finding.SeverityLow]
+		return finding.Rank(finding.SeverityLow)
 	default:
-		return sevRank[finding.SeverityHigh]
+		return finding.Rank(finding.SeverityHigh)
 	}
 }
 
@@ -144,7 +149,7 @@ func (p Policy) Evaluate(res finding.ScanResult, now time.Time) Result {
 			out.Suppressed = append(out.Suppressed, f)
 			continue
 		}
-		if sevRank[f.Severity] >= out.Threshold {
+		if finding.Rank(f.Severity) >= out.Threshold {
 			out.Violations = append(out.Violations, f)
 		}
 	}

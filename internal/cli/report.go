@@ -71,15 +71,10 @@ func cmdReport(args []string) int {
 	return 0
 }
 
-var sevOrder = map[finding.Severity]int{
-	finding.SeverityInfo: 1, finding.SeverityLow: 2, finding.SeverityMedium: 3,
-	finding.SeverityHigh: 4, finding.SeverityCritical: 5,
-}
-
 func exceedsThreshold(res finding.ScanResult, th finding.Severity) bool {
-	t := sevOrder[th]
+	t := finding.Rank(th)
 	for _, f := range res.Findings {
-		if sevOrder[f.Severity] >= t {
+		if finding.Rank(f.Severity) >= t {
 			return true
 		}
 	}

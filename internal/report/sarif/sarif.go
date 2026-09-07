@@ -30,11 +30,12 @@ type sarifLocation struct {
 	} `json:"physicalLocation"`
 }
 type sarifResult struct {
-	RuleID     string          `json:"ruleId"`
-	Level      string          `json:"level"`
-	Message    sarifText       `json:"message"`
-	Locations  []sarifLocation `json:"locations"`
-	Properties map[string]any  `json:"properties,omitempty"`
+	RuleID              string            `json:"ruleId"`
+	Level               string            `json:"level"`
+	Message             sarifText         `json:"message"`
+	Locations           []sarifLocation   `json:"locations"`
+	PartialFingerprints map[string]string `json:"partialFingerprints,omitempty"` // GitHub scan хоорондын alert дедуп
+	Properties          map[string]any    `json:"properties,omitempty"`
 }
 type sarifDriver struct {
 	Name           string      `json:"name"`
@@ -89,6 +90,15 @@ func Render(w io.Writer, res finding.ScanResult) error {
 		InformationURI: infoURI,
 	}
 
+	// Rule-ийн security-severity = тухайн control-ийн finding-үүдийн ХАМГИЙН ӨНДӨР
+	// severity (өмнө нь эхний таарсан finding-ийнх байсан → LOW эхэлбэл CRITICAL rule
+	// GitHub-д "low" харагдаж байсан).
+	maxSev := map[string]finding.Severity{}
+	for _, f := range res.Findings {
+		if cur, ok := maxSev[f.CanonicalControl]; !ok || finding.Rank(f.Severity) > finding.Rank(cur) {
+			maxSev[f.CanonicalControl] = f.Severity
+		}
+	}
 	seenRule := map[string]bool{}
 	for _, f := range res.Findings {
 		if !seenRule[f.CanonicalControl] {
@@ -98,7 +108,7 @@ func Render(w io.Writer, res finding.ScanResult) error {
 				Name:             f.Title,
 				ShortDescription: sarifText{Text: f.Title},
 				Properties: map[string]any{
-					"security-severity": securitySeverity(f.Severity),
+					"security-severity": securitySeverity(maxSev[f.CanonicalControl]),
 					"category":          f.Category,
 				},
 			})
@@ -114,6 +124,8 @@ func Render(w io.Writer, res finding.ScanResult) error {
 			Level:     level(f.Severity),
 			Message:   sarifText{Text: f.Title + " — " + f.Remediation},
 			Locations: []sarifLocation{loc},
+			// Stable ID нь control+resource+namespace-ийн hash тул scan хооронд тогтвортой.
+			PartialFingerprints: map[string]string{"tatarId/v1": f.ID},
 			Properties: map[string]any{
 				"found_by":   f.FoundBy,
 				"confidence": string(f.Confidence),

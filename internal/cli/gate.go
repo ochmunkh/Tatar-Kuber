@@ -20,8 +20,13 @@ func cmdGate(args []string) int {
 	input := fs.String("input", "scan-result.json", "scan-result.json зам")
 	policyPath := fs.String("policy", ".tatar-kuber.yaml", "бодлогын файл")
 	failOn := fs.String("fail-on", "", "severity босго (файлыг дарна): critical|high|medium|low")
-	minScore := fs.Int("min-score", -1, "cluster score доод хязгаар (файлыг дарна)")
+	minScore := fs.Int("min-score", 0, "cluster score доод хязгаар (файлыг дарна; 0 = хэрэгсэхгүй)")
 	_ = fs.Parse(args)
+	// Флагийг ЗӨВХӨН хэрэглэгч тодорхой өгсөн үед policy файлыг дарна. Өмнө нь
+	// default утга (--min-score 0, action.yml-ийн --fail-on high) файлын утгыг
+	// үргэлж дарж, .tatar-kuber.yaml утгагүй болж байсан.
+	setFlags := map[string]bool{}
+	fs.Visit(func(f *flag.Flag) { setFlags[f.Name] = true })
 
 	data, err := os.ReadFile(*input)
 	if err != nil {
@@ -39,11 +44,14 @@ func cmdGate(args []string) int {
 		fmt.Fprintln(os.Stderr, "алдаа:", err)
 		return 2
 	}
-	if *failOn != "" {
+	if setFlags["fail-on"] && *failOn != "" {
 		pol.FailOn = *failOn
 	}
-	if *minScore >= 0 {
+	if setFlags["min-score"] {
 		pol.MinScore = *minScore
+	}
+	if !pol.ValidFailOn() {
+		fmt.Fprintf(os.Stderr, "анхаар: fail_on='%s' танигдсангүй (critical|high|medium|low) — 'high' гэж үзнэ\n", pol.FailOn)
 	}
 
 	r := pol.Evaluate(res, time.Now())
