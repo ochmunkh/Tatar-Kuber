@@ -142,7 +142,7 @@ Kyverno/OPA and Vault for full coverage.
 brew install ochmunkh/tap/tatar-kuber
 
 # curl | sh (Linux / macOS) — downloads the release binary + verifies checksum
-curl -fsSL https://raw.githubusercontent.com/ochmunkh/Tatar-Kuber/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/ochmunkh/Tatar-Kuber/master/install.sh | sh
 
 # Docker
 docker run --rm -v "$PWD:/work" -w /work ghcr.io/ochmunkh/tatar-kuber:latest \
@@ -513,7 +513,7 @@ tatar-kuber version
 
 ```bash
 brew install ochmunkh/tap/tatar-kuber
-curl -fsSL https://raw.githubusercontent.com/ochmunkh/Tatar-Kuber/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/ochmunkh/Tatar-Kuber/master/install.sh | sh
 docker run --rm -v "$PWD:/work" -w /work ghcr.io/ochmunkh/tatar-kuber:latest scan --raw-dir ./raw -o .
 ```
 
