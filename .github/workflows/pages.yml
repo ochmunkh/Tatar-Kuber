@@ -1,4 +1,4 @@
-# examples/report/-г GitHub Pages дээр нийтэлнэ (жишээ тайланг suulgалгүй үзэх).
+# examples/report/-г GitHub Pages дээр нийтэлнэ (жишээ тайланг суулгалгүйгээр үзэх).
 # Ажиллахын тулд: Settings → Pages → Source: GitHub Actions (нэг удаа).
 name: Pages
 

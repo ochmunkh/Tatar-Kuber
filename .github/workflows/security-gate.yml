@@ -45,3 +45,4 @@ jobs:
       - name: Gate
         continue-on-error: true # ЖИШЭЭ: жинхэнэ хэрэглээнд энэ мөрийг устгана
         run: ./tatar-kuber gate --input out/scan-result.json --fail-on high
+# workflow-registration: repo re-created 2026-09-08

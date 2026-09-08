@@ -115,3 +115,4 @@ jobs:
         run: |
           jq -r '.metadata.scanner_runs[] | select((.unmapped_count // 0) > 0)
                  | "\(.scanner): \(.unmapped_count) илрүүлэлт, \(.unmapped_rules | length) rule\n  \(.unmapped_rules | join(", "))"' out/scan-result.json
+# workflow-registration: repo re-created 2026-09-08

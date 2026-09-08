@@ -39,3 +39,4 @@ jobs:
           # Homebrew tap руу бичихэд ochmunkh/homebrew-tap дээр эрхтэй PAT:
           # repo secret HOMEBREW_TAP_TOKEN нэмнэ. Байхгүй бол brew алхам алгасагдана.
           HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+# workflow-registration: repo re-created 2026-09-08
