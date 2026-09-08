@@ -33,3 +33,4 @@ jobs:
           path: examples/report
       - id: deployment
         uses: actions/deploy-pages@v4
+# workflow-registration: repo re-created 2026-09-08
