@@ -87,7 +87,24 @@ type Result struct {
 	Scanners []ScannerDelta `json:"scanners,omitempty"`
 
 	// Warnings — харьцуулалтыг үнэмшилгүй болгож болзошгүй нөхцөлүүд.
-	Warnings []string `json:"warnings,omitempty"`
+	Warnings []Warning `json:"warnings,omitempty"`
+}
+
+// Warning — харьцуулалтад итгэхэд саад болох нөхцөл. Хоёр хэлээр хадгална:
+// тайлан ба CLI хоёр хэлт байх нь төслийн зарчим, харин JSON хэрэглэгч Code-оор
+// нь машинаар боловсруулна.
+type Warning struct {
+	Code string `json:"code"`
+	MN   string `json:"mn"`
+	EN   string `json:"en"`
+}
+
+// Text — тухайн хэл дээрх бичвэр ("en" -> EN, бусад -> MN).
+func (w Warning) Text(lang string) string {
+	if lang == "en" {
+		return w.EN
+	}
+	return w.MN
 }
 
 // severities — тайланд гардаг эрэмбэ (өндрөөс нам руу).
@@ -96,13 +113,41 @@ var severities = []finding.Severity{
 	finding.SeverityLow, finding.SeverityInfo,
 }
 
-func index(fs []finding.Finding) map[string]finding.Finding {
+// key — тулгах түлхүүр. Ихэвчлэн finding.ID (StableID-ээр гарсан), гэхдээ
+// гараар засагдсан эсвэл хуучин файлд ID хоосон байж болно. Тэр үед бүх
+// ID-гүй finding НЭГ түлхүүрт нийлж, тоог чимээгүй гуйвуулна — тиймээс
+// canonical түлхүүр рүү (ID нь түүнээс л гардаг) шилжинэ.
+// canonicalKey — ID-ийн эх сурвалж. StableID нь яг эдгээр гурван талбараас
+// гардаг тул ID-тэй тулгахтай утга нэг.
+func canonicalKey(f finding.Finding) string {
+	return f.CanonicalControl + "|" + f.Resource + "|" + f.Namespace
+}
+
+// missingIDs — ID нь хоосон finding-ийн тоо.
+func missingIDs(fs []finding.Finding) int {
+	n := 0
+	for _, f := range fs {
+		if f.ID == "" {
+			n++
+		}
+	}
+	return n
+}
+
+// index — түлхүүрээр индексжүүлнэ. byCanonical=true үед ID-г огт хэрэглэхгүй:
+// нэг тал нь ID-гүй бол ХОЁУЛАНГ нь canonical түлхүүрт шилжүүлж тулгана, эс
+// бөгөөс ижил асуудал "зассан + шинэ" гэж хоёр удаа тоологдоно.
+func index(fs []finding.Finding, byCanonical bool) map[string]finding.Finding {
 	m := make(map[string]finding.Finding, len(fs))
 	for _, f := range fs {
-		if _, dup := m[f.ID]; dup {
+		k := f.ID
+		if byCanonical || k == "" {
+			k = "k:" + canonicalKey(f)
+		}
+		if _, dup := m[k]; dup {
 			continue // dedup-ийн дараа давхардах ёсгүй; давхарлавал эхнийхийг авна
 		}
-		m[f.ID] = f
+		m[k] = f
 	}
 	return m
 }
@@ -120,7 +165,9 @@ func counts(fs []finding.Finding) map[finding.Severity]int {
 
 // Compare — old -> new чиглэлд тулгана.
 func Compare(old, nw finding.ScanResult) Result {
-	oi, ni := index(old.Findings), index(nw.Findings)
+	oMissing, nMissing := missingIDs(old.Findings), missingIDs(nw.Findings)
+	byCanonical := oMissing > 0 || nMissing > 0
+	oi, ni := index(old.Findings, byCanonical), index(nw.Findings, byCanonical)
 
 	r := Result{
 		OldScanID:  old.Metadata.ScanID,
@@ -166,7 +213,7 @@ func Compare(old, nw finding.ScanResult) Result {
 	sortItems(r.Items)
 
 	r.Scanners = compareScanners(old.Metadata.ScannerRuns, nw.Metadata.ScannerRuns)
-	r.Warnings = warnings(old, nw, r.Scanners)
+	r.Warnings = warnings(old, nw, r.Scanners, oMissing, nMissing)
 	return r
 }
 
@@ -232,6 +279,10 @@ func compareScanners(oldRuns, newRuns []finding.ScannerRun) []ScannerDelta {
 	for k := range nm {
 		names[k] = true
 	}
+	// Нэг тал нь scanner_runs-гүй бол (хуучин хувилбар, эсвэл гараар үүсгэсэн
+	// файл) scanner бүрийг "унасан" гэж зарлах нь ХУДАЛ сэрэмжлүүлэг болно.
+	// Тэр тохиолдолд зөрүүг харуулна, гэхдээ regressed гэж тэмдэглэхгүй.
+	oneSided := len(oldRuns) == 0 || len(newRuns) == 0
 	var out []ScannerDelta
 	for name := range names {
 		o, oOK := om[name]
@@ -245,13 +296,15 @@ func compareScanners(oldRuns, newRuns []finding.ScannerRun) []ScannerDelta {
 		}
 		// Хамрах хүрээ буурсан гэж үзэх нөхцөл: өмнө finding өгч байсан scanner
 		// одоо юу ч өгөөгүй, эсвэл өмнө ok байсан нь ok-оос гарсан, эсвэл огт алга.
-		switch {
-		case oOK && !nOK && o.Findings > 0:
-			d.Regressed = true
-		case oOK && nOK && o.Findings > 0 && n.Findings == 0:
-			d.Regressed = true
-		case oOK && nOK && o.Status == "ok" && n.Status != "ok" && n.Status != "ingested":
-			d.Regressed = true
+		if !oneSided {
+			switch {
+			case oOK && !nOK && o.Findings > 0:
+				d.Regressed = true
+			case oOK && nOK && o.Findings > 0 && n.Findings == 0:
+				d.Regressed = true
+			case oOK && nOK && o.Status == "ok" && n.Status != "ok" && n.Status != "ingested":
+				d.Regressed = true
+			}
 		}
 		out = append(out, d)
 	}
@@ -264,36 +317,80 @@ func compareScanners(oldRuns, newRuns []finding.ScannerRun) []ScannerDelta {
 	return out
 }
 
-func warnings(old, nw finding.ScanResult, sd []ScannerDelta) []string {
-	var w []string
+func warnings(old, nw finding.ScanResult, sd []ScannerDelta, oMissingID, nMissingID int) []Warning {
+	var w []Warning
+	add := func(code, mn, en string) { w = append(w, Warning{Code: code, MN: mn, EN: en}) }
+
+	if oMissingID > 0 || nMissingID > 0 {
+		o, n := itoa(oMissingID), itoa(nMissingID)
+		add("missing_ids",
+			"finding-ийн ID дутуу ("+o+" хуучин / "+n+" шинэ) — ХОЁР талыг canonical түлхүүрээр "+
+				"(control|resource|namespace) тулгав; файл гараар засагдсан эсвэл хуучин хувилбарынх байж магадгүй",
+			"findings without an ID ("+o+" old / "+n+" new) — BOTH sides matched on the canonical key "+
+				"(control|resource|namespace); the file may be hand-edited or from an older version")
+	}
+	switch {
+	case len(old.Metadata.ScannerRuns) == 0 && len(nw.Metadata.ScannerRuns) > 0:
+		add("no_scanner_runs_old",
+			"хуучин scan-д metadata.scanner_runs байхгүй — scanner-ийн хамрах хүрээг харьцуулах боломжгүй",
+			"the old scan has no metadata.scanner_runs — scanner coverage cannot be compared")
+	case len(old.Metadata.ScannerRuns) > 0 && len(nw.Metadata.ScannerRuns) == 0:
+		add("no_scanner_runs_new",
+			"шинэ scan-д metadata.scanner_runs байхгүй — scanner-ийн хамрах хүрээг харьцуулах боломжгүй "+
+				"(тоо буурсан шалтгааныг батлах аргагүй)",
+			"the new scan has no metadata.scanner_runs — scanner coverage cannot be compared "+
+				"(a drop in counts cannot be explained)")
+	}
 	if a, b := old.Metadata.ClusterName, nw.Metadata.ClusterName; a != "" && b != "" && a != b {
-		w = append(w, "өөр cluster харьцуулж байна: "+a+" -> "+b)
+		add("cluster_mismatch",
+			"өөр cluster харьцуулж байна: "+a+" -> "+b,
+			"comparing different clusters: "+a+" -> "+b)
 	}
 	if a, b := old.Metadata.ScanMode, nw.Metadata.ScanMode; a != "" && b != "" && a != b {
-		w = append(w, "өөр горим харьцуулж байна: "+a+" -> "+b+" (Mode A ба Mode B-ийн объектын нэр өөр)")
+		add("mode_mismatch",
+			"өөр горим харьцуулж байна: "+a+" -> "+b+" (Mode A ба Mode B-ийн объектын нэр өөр)",
+			"comparing different modes: "+a+" -> "+b+" (Mode A and Mode B name objects differently)")
 	}
 	// rollup зөрөх нь resource-ийг өөрчилдөг тул ID бөөнөөрөө солигдоно.
-	oR, nR := old.Metadata.Rollup != nil, nw.Metadata.Rollup != nil
-	if oR != nR {
-		w = append(w, "нэг scan Pod->controller rollup-тай, нөгөө нь үгүй — объектын нэр өөр тул diff үнэмшилгүй (--no-rollup-ыг хоёуланд ижил өг)")
+	if (old.Metadata.Rollup != nil) != (nw.Metadata.Rollup != nil) {
+		add("rollup_mismatch",
+			"нэг scan Pod->controller rollup-тай, нөгөө нь үгүй — объектын нэр өөр тул diff үнэмшилгүй "+
+				"(--no-rollup-ыг хоёуланд ижил өг)",
+			"one scan has Pod->controller rollup and the other does not — object names differ, so the diff "+
+				"is not trustworthy (pass --no-rollup the same way on both)")
 	}
 	if a, b := old.SchemaVersion, nw.SchemaVersion; a != "" && b != "" && a != b {
-		w = append(w, "схемийн хувилбар өөр: "+a+" -> "+b)
+		add("schema_mismatch",
+			"схемийн хувилбар өөр: "+a+" -> "+b,
+			"schema version differs: "+a+" -> "+b)
 	}
 	if a, b := old.Metadata.TatarVersion, nw.Metadata.TatarVersion; a != "" && b != "" && a != b {
-		w = append(w, "TATAR-Kuber хувилбар өөр: "+a+" -> "+b+" (зураглал өөрчлөгдсөн бол finding шилжсэн байж болно)")
+		add("version_mismatch",
+			"TATAR-Kuber хувилбар өөр: "+a+" -> "+b+" (зураглал өөрчлөгдсөн бол finding шилжсэн байж болно)",
+			"TATAR-Kuber version differs: "+a+" -> "+b+" (findings may have moved if the mapping changed)")
 	}
 	for _, d := range sd {
 		if !d.Regressed {
 			continue
 		}
+		n := itoa(d.OldFindings)
 		switch {
 		case d.NewStatus == "":
-			w = append(w, "scanner '"+d.Scanner+"' энэ удаа огт ажиллаагүй (өмнө нь "+itoa(d.OldFindings)+" finding өгсөн) — тоо буурсан нь цэвэрлэгдсэний шинж БИШ")
+			add("scanner_absent",
+				"scanner '"+d.Scanner+"' энэ удаа огт ажиллаагүй (өмнө нь "+n+" finding өгсөн) — "+
+					"тоо буурсан нь цэвэрлэгдсэний шинж БИШ",
+				"scanner '"+d.Scanner+"' did not run at all this time (it produced "+n+" findings before) — "+
+					"a lower count is NOT evidence of remediation")
 		case d.NewFindings == 0 && d.OldFindings > 0:
-			w = append(w, "scanner '"+d.Scanner+"' одоо 0 finding өгөв (өмнө "+itoa(d.OldFindings)+", төлөв "+d.NewStatus+") — хамрах хүрээ буурсан байж магадгүй")
+			add("scanner_zero",
+				"scanner '"+d.Scanner+"' одоо 0 finding өгөв (өмнө "+n+", төлөв "+d.NewStatus+") — "+
+					"хамрах хүрээ буурсан байж магадгүй",
+				"scanner '"+d.Scanner+"' now produced 0 findings (was "+n+", status "+d.NewStatus+") — "+
+					"coverage may have regressed")
 		default:
-			w = append(w, "scanner '"+d.Scanner+"' төлөв "+d.OldStatus+" -> "+d.NewStatus)
+			add("scanner_status",
+				"scanner '"+d.Scanner+"' төлөв "+d.OldStatus+" -> "+d.NewStatus,
+				"scanner '"+d.Scanner+"' status "+d.OldStatus+" -> "+d.NewStatus)
 		}
 	}
 	return w

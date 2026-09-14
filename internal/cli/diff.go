@@ -179,8 +179,11 @@ func printDiff(r diff.Result, lang string, all bool) {
 			if d.Regressed {
 				flag = "  ← " + L.Regressed
 			}
-			fmt.Printf("  %-12s %-12s → %-12s %5d → %-5d%s\n",
-				d.Scanner, dashIf(d.OldStatus), dashIf(d.NewStatus), d.OldFindings, d.NewFindings, flag)
+			// Тал нь огт ажиллаагүй бол тоог 0 гэж БИШ, "—" гэж харуулна:
+			// 0 гэдэг нь "олдсонгүй", "—" нь "мэдэгдэхгүй".
+			fmt.Printf("  %-12s %-12s → %-12s %5s → %-5s%s\n",
+				d.Scanner, dashIf(d.OldStatus), dashIf(d.NewStatus),
+				countOr(d.OldStatus, d.OldFindings), countOr(d.NewStatus, d.NewFindings), flag)
 		}
 	}
 
@@ -188,9 +191,18 @@ func printDiff(r diff.Result, lang string, all bool) {
 		fmt.Printf("\n%s\n", L.Warnings)
 		fmt.Println(strings.Repeat("─", 64))
 		for _, w := range r.Warnings {
-			fmt.Println("  ! " + w)
+			fmt.Println("  ! " + w.Text(lang))
 		}
 	}
+}
+
+// countOr — төлөв байхгүй (scanner энэ scan-д огт бүртгэгдээгүй) бол тоо нь
+// утгагүй тул "—".
+func countOr(status string, n int) string {
+	if status == "" {
+		return "—"
+	}
+	return fmt.Sprintf("%d", n)
 }
 
 func dashIf(s string) string {

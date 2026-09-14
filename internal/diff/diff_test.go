@@ -147,7 +147,7 @@ func TestCompare_RollupMismatchWarns(t *testing.T) {
 	r := Compare(old, nw)
 	found := false
 	for _, w := range r.Warnings {
-		if len(w) > 0 && containsAll(w, "rollup") {
+		if w.Code == "rollup_mismatch" {
 			found = true
 		}
 	}
@@ -166,11 +166,47 @@ func TestCompare_ModeAndClusterWarn(t *testing.T) {
 	}
 }
 
-func containsAll(s, sub string) bool {
-	for i := 0; i+len(sub) <= len(s); i++ {
-		if s[i:i+len(sub)] == sub {
-			return true
-		}
+// ID хоосон файлтай тулгахад ижил асуудал "зассан + шинэ" гэж ХОЁР удаа
+// тоологдож, тоо гуйвж байсан. Одоо хоёр талыг canonical түлхүүрээр тулгана.
+func TestCompare_MissingIDsFallBackToCanonicalKey(t *testing.T) {
+	old := result(50,
+		f("aaa", "TATAR-CON-001", "deployment/api", finding.SeverityHigh, 20),
+		f("bbb", "TATAR-OPS-002", "deployment/web", finding.SeverityLow, 2),
+	)
+	nw := result(50,
+		f("", "TATAR-CON-001", "deployment/api", finding.SeverityHigh, 20),
+		f("", "TATAR-OPS-002", "deployment/web", finding.SeverityLow, 2),
+	)
+	r := Compare(old, nw)
+	if r.Counts[ChangeUnchanged] != 2 || r.Counts[ChangeNew] != 0 || r.Counts[ChangeFixed] != 0 {
+		t.Errorf("ID дутуу үед буруу тоолов: %v", r.Counts)
 	}
-	return false
+	if len(r.Warnings) == 0 || r.Warnings[0].Code != "missing_ids" {
+		t.Errorf("ID дутууг анхааруулаагүй: %v", r.Warnings)
+	}
+	// Бүх ID байгаа үед canonical түлхүүрт шилжих ёсгүй — энгийн замаар л явна.
+	if r2 := Compare(old, old); len(r2.Warnings) != 0 {
+		t.Errorf("шаардлагагүй сэрэмжлүүлэг: %v", r2.Warnings)
+	}
+}
+
+// Нэг талд scanner_runs огт байхгүй бол scanner бүрийг "унасан" гэж зарлах нь
+// ХУДАЛ сэрэмжлүүлэг. Зөрүүг харуулна, гэхдээ regressed гэж тэмдэглэхгүй.
+func TestCompare_MissingScannerRunsIsNotRegression(t *testing.T) {
+	old, nw := result(40), result(40)
+	old.Metadata.ScannerRuns = []finding.ScannerRun{
+		{Scanner: "trivy", Status: "ok", Findings: 5},
+		{Scanner: "checkov", Status: "ok", Findings: 89},
+	}
+	// nw-д scanner_runs байхгүй
+	r := Compare(old, nw)
+	if len(r.Regressions()) != 0 {
+		t.Errorf("худал regression: %v", r.Regressions())
+	}
+	if len(r.Scanners) != 2 {
+		t.Errorf("scanner зөрүү харагдах ёстой: %d", len(r.Scanners))
+	}
+	if len(r.Warnings) != 1 || r.Warnings[0].Code != "no_scanner_runs_new" {
+		t.Errorf("нэг тодорхой сэрэмжлүүлэг байх ёстой: %v", r.Warnings)
+	}
 }
