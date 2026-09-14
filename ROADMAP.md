@@ -54,6 +54,13 @@ same audit method was turned on the mapping registry itself.
   `rand.SafeEncodeString`'s vowel-free alphabet — so `api-598c4dc6b8-ldjqq` rolls up to `api`,
   `api-canary` does not. Moved pods stay in the evidence, counts appear in `metadata.rollup`, and
   `--no-rollup` disables it.
+- **Scan trending / diff** (v1.0.3) — `diff --old a.json --new b.json` compares two scans by
+  the stable finding ID: new / fixed / worsened / improved / unchanged, per-severity and score
+  deltas, `--fail-on-new <severity>` for CI, and text or JSON output. Because a lower count is
+  not always good news, it also diffs `metadata.scanner_runs`: a scanner that used to produce
+  findings and now produces none is flagged **COVERAGE REGRESSED** rather than read as "fixed".
+  Comparisons that cannot be trusted — different cluster, different mode, one side scanned with
+  `--no-rollup` — are called out as warnings instead of silently producing a misleading diff.
 - **Correctness fixes** (v1.0.2) — namespace asset context is token-matched (`non-production` is no
   longer scored as production), blind-shot rules are validated at registry load, never-matched
   suppressions and policy rules naming unknown controls are reported, and SARIF findings with a
@@ -82,8 +89,6 @@ Theme: **make it the tool a security auditor reaches for.**
 - **Object-aware Mode A for Trivy** — `trivy config` works on manifests but names no Kubernetes
   object (only file:line plus a prose message in five shapes), so file-scoped reporting would
   merge several identical violations in one file into one finding. Needs manifest parsing.
-- **Scan trending / diff** — compare two scans (the schema already carries `result_hash` and
-  finding IDs): new / fixed / regressed findings, and score delta over time.
 - **5th scanner adapter** — prove the pluggable promise and deepen coverage (candidates:
   kube-bench for CIS node checks, kubeaudit, or Terrascan). One clean adapter = one PR.
 - **Waiver/suppression maturity** — richer `.tatar-kuber.yaml` policy, expiring waivers with
@@ -181,6 +186,13 @@ v1.0.0-ийн бодит live run-ыг аудит хийхэд 11 finding бүг
   `rand.SafeEncodeString`-ийн эгшиггүй алфавитын дагавар нэмсэн байх ёстой — тиймээс
   `api-598c4dc6b8-ldjqq` нь `api` руу зөөгдөнө, `api-canary` зөөгдөхгүй. Зөөгдсөн pod нотолгоонд
   үлдэнэ, тоо нь `metadata.rollup`-д гарна, `--no-rollup`-аар болино.
+- **Scan trending / diff** (v1.0.3) — `diff --old a.json --new b.json` нь хоёр scan-ыг
+  тогтвортой finding ID-гаар тулгана: шинэ / зассан / дордсон / сайжирсан / хэвээр, severity
+  тус бүрийн ба онооны зөрүү, CI-д `--fail-on-new <severity>`, text эсвэл JSON гаралт. Тоо
+  буурсан нь үргэлж сайн мэдээ биш тул `metadata.scanner_runs`-ыг мөн тулгана: өмнө finding
+  өгч байсан scanner одоо 0 өгвөл **ХАМРАХ ХҮРЭЭ БУУРСАН** гэж тэмдэглэнэ, "зассан" гэж
+  уншигдахгүй. Итгэх боломжгүй харьцуулалтыг (өөр cluster, өөр горим, нэг тал нь
+  `--no-rollup`) чимээгүй өнгөрөөхгүй, анхааруулга болгож хэлнэ.
 - **Зөв байдлын засварууд** (v1.0.2) — namespace-ийн asset context token-оор тулгагдана
   (`non-production` нь production гэж үнэлэгдэхээ болив), blind-shot rule нь registry уншихад
   шалгагдана, юунд ч таараагүй suppression ба байхгүй control нэрлэсэн бодлогын rule мэдээлэгдэнэ,
@@ -209,8 +221,6 @@ v1.0.0-ийн бодит live run-ыг аудит хийхэд 11 finding бүг
   critical control болох ёстой).
 - **Control хамрах хүрээг өргөтгөх** — canonical registry-г одоогийнхоос хамаагүй нэмэгдүүлэх;
   scanner тус бүрийн rule mapping-ийг өргөжүүлэх.
-- **Scan trending / diff** — хоёр scan-ыг харьцуулах (схемд `result_hash` + finding ID бэлэн):
-  шинэ / зассан / буцаж гарсан олдвор, оноо хугацааны туршид хэрхэн өөрчлөгдсөн.
 - **5 дахь scanner adapter** — "залгаж болно" гэдгийг батлаж, хамрах хүрээг гүнзгийрүүлэх
   (нэр дэвшигч: CIS node-д kube-bench, эсвэл kubeaudit, Terrascan). Нэг цэвэр adapter = нэг PR.
 - **Waiver/suppression боловсронгуй** — илүү баялаг `.tatar-kuber.yaml`, хугацаатай waiver +

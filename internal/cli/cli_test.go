@@ -86,3 +86,43 @@ func TestCLI_ScanRequiresInput(t *testing.T) {
 		t.Errorf("оролтгүй scan exit=%d, want 3", code)
 	}
 }
+
+// E2E: rollup-тай ба rollup-гүй хоёр бодит scan-ыг diff хийнэ. --no-rollup нь
+// pod-scoped finding-үүдийг үлдээдэг тул "шинэ" гэж гарах ба rollup зөрүүг
+// анхааруулах ёстой. Мөн --fail-on-new exit code-ыг шалгана.
+func TestCLI_Diff_E2E(t *testing.T) {
+	out := t.TempDir()
+	a, b := filepath.Join(out, "a"), filepath.Join(out, "b")
+	if code := cmdScan([]string{"--raw-dir", "../../examples/demo", "--cluster", "e2e", "-o", a}); code != 0 {
+		t.Fatalf("scan a exit=%d", code)
+	}
+	if code := cmdScan([]string{"--raw-dir", "../../examples/demo", "--cluster", "e2e", "--no-rollup", "-o", b}); code != 0 {
+		t.Fatalf("scan b exit=%d", code)
+	}
+	ap := filepath.Join(a, "scan-result.json")
+	bp := filepath.Join(b, "scan-result.json")
+
+	if code := cmdDiff([]string{"--old", ap, "--new", bp}); code != 0 {
+		t.Errorf("diff exit=%d, want 0", code)
+	}
+	// Ижил файлыг өөртэй нь тулгавал өөрчлөлт байх ёсгүй — exit 0 хэвээр.
+	if code := cmdDiff([]string{"--old", ap, "--new", ap, "--fail-on-new", "low"}); code != 0 {
+		t.Errorf("identical diff exit=%d, want 0", code)
+	}
+	// --no-rollup-д pod-scoped MEDIUM шинээр гарна -> босго давна.
+	if code := cmdDiff([]string{"--old", ap, "--new", bp, "--fail-on-new", "medium"}); code != 1 {
+		t.Errorf("fail-on-new medium exit=%d, want 1", code)
+	}
+	// CRITICAL шинэ finding байхгүй -> дамжина.
+	if code := cmdDiff([]string{"--old", ap, "--new", bp, "--fail-on-new", "critical"}); code != 0 {
+		t.Errorf("fail-on-new critical exit=%d, want 0", code)
+	}
+	// Заавал флаг дутуу -> 3.
+	if code := cmdDiff([]string{"--new", bp}); code != 3 {
+		t.Errorf("missing --old exit=%d, want 3", code)
+	}
+	// Байхгүй файл -> 2.
+	if code := cmdDiff([]string{"--old", filepath.Join(out, "nope.json"), "--new", bp}); code != 2 {
+		t.Errorf("missing file exit=%d, want 2", code)
+	}
+}

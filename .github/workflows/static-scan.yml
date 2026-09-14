@@ -22,7 +22,7 @@ on:
       - "examples/vulnerable/**"
       - ".github/workflows/static-scan.yml"
   schedule:
-    - cron: "30 6 * * 1" # 7 хоног тутам — scanner хувилбар шинэчлэгдэхэд зөрүүг барина
+    - cron: "30 6 * * *" # ӨДӨР ТУТАМ — scanner хувилбар шинэчлэгдэхэд зөрүүг барина
 
 permissions:
   contents: read

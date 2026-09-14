@@ -208,6 +208,8 @@ tatar-kuber scan        --kubeconfig | --context | -f | --raw-dir  [--namespace 
 tatar-kuber report      -o json | sarif | html  [--fail-on HIGH]
 tatar-kuber gate        --input scan-result.json [--policy .tatar-kuber.yaml] [--fail-on high] [--min-score N]
 tatar-kuber doctor      # which scanners are installed, versions, supported modes
+tatar-kuber diff        --old prev/scan-result.json --new out/scan-result.json
+                        # trending: new / fixed / worsened / improved  [--fail-on-new high] [-o json]
 tatar-kuber verify-lab  --input scan-result.json --expected expected-findings.json
 tatar-kuber version
 ```
@@ -320,6 +322,23 @@ load (a rule with no selector, an invalid `downgrade_to` or a missing reason is 
 than a silently dead rule). Suppressions that never matched anything, and policy rules naming a
 control that does not exist, are now reported instead of hiding a typo. SARIF findings that carry a
 file path now emit a real file:line location, so GitHub Code Scanning annotates the right line.
+
+
+**v1.0.3 — trending.** An audit is not a one-off: you scan, they fix, you scan again. At that point
+"26 findings" says nothing — 26 unchanged and 20-fixed-plus-20-new look identical in a total.
+`diff --old a.json --new b.json` compares two scans by the **stable finding ID**
+(`StableID(control, resource, namespace)`), so the same issue getting worse is reported as
+*worsened*, not as one finding disappearing and another appearing: new / fixed / worsened /
+improved / unchanged, with per-severity and score deltas. `--fail-on-new high` gives CI an exit
+code; `-o json` gives a machine-readable delta.
+
+A falling count is not automatically good news — a scanner that dies produces the same shape. So
+`diff` also compares `metadata.scanner_runs`: a scanner that produced findings before and produces
+none now is flagged **COVERAGE REGRESSED**, and the drop is explained rather than read as progress.
+This is the v1.0.0 failure mode turned into a check. Comparisons that cannot be trusted — a
+different cluster, a different mode, or one side scanned with `--no-rollup` (which changes
+`resource` and therefore every ID) — are reported as warnings instead of silently producing a
+misleading diff.
 
 Where it's headed — v2 (audit-grade PDF + compliance mapping + trending), v3 (continuous +
 dashboard): see the [**Roadmap**](ROADMAP.md).
@@ -505,6 +524,8 @@ tatar-kuber scan        --kubeconfig | --context | -f | --raw-dir  [--namespace 
 tatar-kuber report      -o json | sarif | html  [--fail-on HIGH]
 tatar-kuber gate        --input scan-result.json [--policy .tatar-kuber.yaml] [--fail-on high] [--min-score N]
 tatar-kuber doctor      # ямар scanner суусан, хувилбар, дэмжих горим
+tatar-kuber diff        --old prev/scan-result.json --new out/scan-result.json
+                        # тренд: шинэ / зассан / дордсон / сайжирсан  [--fail-on-new high] [-o json]
 tatar-kuber verify-lab  --input scan-result.json --expected expected-findings.json
 tatar-kuber version
 ```
@@ -627,6 +648,22 @@ token-оор тулгана, `nonprod` / `preprod` нь dev болно. Blind-sh
 rule болохын оронд хатуу алдаа). Юунд ч таараагүй suppression, мөн байхгүй control-ыг нэрлэсэн
 бодлогын rule нь одоо мэдээлэгдэнэ — үсгийн алдаа нуугдахгүй. Файлын зам агуулсан SARIF finding
 одоо бодит file:line орон зайг гаргах тул GitHub Code Scanning зөв мөр дээр тэмдэглэнэ.
+
+
+**v1.0.3 — тренд.** Аудит бол нэг удаагийн ажил биш: шалгана, засна, дахин шалгана. Тэр үед
+"26 finding" гэсэн тоо юу ч хэлэхгүй — 26 нь хэвээрээ байгаа ч, 20 зассан дээр 20 шинэ гарсан ч
+нийт тоонд ижил харагдана. `diff --old a.json --new b.json` нь хоёр scan-ыг **тогтвортой finding
+ID**-гаар (`StableID(control, resource, namespace)`) тулгадаг тул ижил асуудал дордсоныг
+*дордсон* гэж хэлнэ, "хуучин нь арилж шинэ нь гарлаа" гэж биш: шинэ / зассан / дордсон /
+сайжирсан / хэвээр, severity тус бүрийн ба онооны зөрүүтэй. CI-д `--fail-on-new high` нь exit
+code өгнө, `-o json` нь машин уншигдах зөрүү.
+
+Тоо буурах нь өөрөө сайн мэдээ биш — scanner унасан ч яг ийм дүр зураг гарна. Тиймээс `diff` нь
+`metadata.scanner_runs`-ыг мөн тулгана: өмнө finding өгч байсан scanner одоо 0 өгвөл **ХАМРАХ
+ХҮРЭЭ БУУРСАН** гэж тэмдэглэж, буурсан шалтгааныг хэлнэ — "ахиц" гэж уншигдахгүй. Энэ бол
+v1.0.0-ийн алдааг шалгалт болгож хувиргасан хэрэг. Итгэх боломжгүй харьцуулалтыг — өөр cluster,
+өөр горим, эсвэл нэг тал нь `--no-rollup`-аар (энэ нь `resource`-ыг, улмаар ID бүрийг өөрчилдөг) —
+чимээгүй өнгөрөөхгүй, анхааруулга болгож гаргана.
 
 Хаашаа явж байгаа — v2 (аудитын PDF + compliance mapping + trending), v3 (тасралтгүй +
 dashboard): [**Замын зураг**](ROADMAP.md)-г үз.

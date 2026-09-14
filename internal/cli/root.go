@@ -19,6 +19,7 @@ Commands:
   scan      Cluster/manifest шалгах эсвэл цуглуулсан raw-г нэгтгэж scan-result.json үүсгэнэ
   report    scan-result.json-оос тайлан (json|sarif|html) үүсгэнэ
   gate      scan-result.json-ыг .tatar-kuber.yaml бодлоготой тулгаж CI-д pass/fail (exit code)
+  diff      Хоёр scan-result.json-ыг тулгаж юу шинэ / зассан / дордсоныг харуулна
   doctor    Scanner binary-ууд суусан эсэх, хувилбар, горимыг шалгана
   verify-lab expected-findings.json-той тулгаж regression шалгана
   update    (төлөвлөсөн, v2) Scanner binary-уудыг татаж, баталгаажуулж шинэчилнэ
@@ -30,6 +31,7 @@ Commands:
   tatar-kuber scan --raw-dir ./raw --cluster prod -o ./out                 # Offline (Mode A)
   tatar-kuber report --input ./out/scan-result.json -o html --out report.html
   tatar-kuber gate --input ./out/scan-result.json --fail-on high              # CI gate
+  tatar-kuber diff --old ./prev/scan-result.json --new ./out/scan-result.json # Trending
 `
 
 // Execute — entrypoint.
@@ -47,6 +49,8 @@ func Execute() int {
 		return cmdDoctor(os.Args[2:])
 	case "gate":
 		return cmdGate(os.Args[2:])
+	case "diff":
+		return cmdDiff(os.Args[2:])
 	case "verify-lab":
 		return cmdVerifyLab(os.Args[2:])
 	case "update":
