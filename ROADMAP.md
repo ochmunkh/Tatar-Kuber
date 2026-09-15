@@ -110,6 +110,22 @@ Theme: **from point-in-time CLI to a living security posture service.**
 - **Notifications & integrations** — Slack / Teams / email on new-critical or regression; export
   to Jira / DefectDojo; webhook events.
 - **Team features** — org policies, RBAC, audit log (open-core boundary begins here).
+- **MCP server (read-only first)** — expose the posture as tools an AI assistant can call, so an
+  engineer can ask "what changed since last week" or "why is this CRITICAL" in plain language.
+  TATAR-Kuber is unusually well suited to this: the answer to "why" is already machine-readable
+  (`canonical_control`, `found_by`, `confidence`, `risk_factors`, `attack`), so the model reads
+  rather than guesses. Deliberate constraints, decided up front:
+  - **Read-only to start.** Tools that analyse an existing `scan-result.json` (`top_risks`,
+    `findings(filter)`, `explain(id)`, `diff`) come first — fast, no credentials, no blast radius.
+    A live `scan` holds a kubeconfig and takes minutes; it comes last, behind an explicit
+    confirmation, and never returns the kubeconfig itself.
+  - **Summarise, never dump.** A 300-finding result would fill the model's context. Every tool
+    filters or aggregates; none returns the whole file.
+  - **Findings are data, not instructions.** Image names, annotations, secret matches and scanner
+    messages are attacker-influenced strings. The server marks them as untrusted content, so a
+    security tool never becomes the injection path into the assistant.
+  - Order: after v2. MCP is a distribution channel, not the differentiator — mapping accuracy is.
+    An AI-connected tool that answers confidently and wrongly is worse than no integration.
 
 ---
 
@@ -242,6 +258,22 @@ v1.0.0-ийн бодит live run-ыг аудит хийхэд 11 finding бүг
 - **Мэдэгдэл ба интеграци** — шинэ-critical/регресст Slack / Teams / имэйл; Jira / DefectDojo руу
   export; webhook.
 - **Багийн боломжууд** — байгууллагын бодлого, RBAC, аудит лог (open-core хил эндээс эхэлнэ).
+- **MCP сервер (эхлээд зөвхөн уншдаг)** — posture-ыг AI туслах дуудаж болох tool болгон гаргана:
+  инженер "өнгөрсөн долоо хоногоос юу өөрчлөгдсөн бэ", "энэ яагаад CRITICAL вэ" гэж энгийн хэлээр
+  асууна. TATAR-Kuber үүнд ер бусын сайн тохирно: "яагаад" гэсэн асуултын хариу нь аль хэдийн
+  машин уншигдах хэлбэртэй (`canonical_control`, `found_by`, `confidence`, `risk_factors`,
+  `attack`) тул загвар таамаглахын оронд УНШИНА. Эхнээс нь тогтоосон хязгаарлалт:
+  - **Эхлээд зөвхөн уншдаг.** Байгаа `scan-result.json`-ыг задлах tool-ууд (`top_risks`,
+    `findings(filter)`, `explain(id)`, `diff`) эхэлнэ — хурдан, credential-гүй, эрсдэлгүй. Амьд
+    `scan` нь kubeconfig барьж, хэдэн минут ажилладаг тул хамгийн сүүлд, тодорхой
+    баталгаажуулалтын ард; kubeconfig-ийг өөрийг нь хэзээ ч буцаахгүй.
+  - **Хураангуйл, бүхлээр нь бүү өг.** 300 finding-тэй үр дүн загварын контекстийг дүүргэнэ. Tool
+    бүр шүүх эсвэл нэгтгэх ёстой; аль нь ч бүтэн файлыг буцаахгүй.
+  - **Finding бол өгөгдөл, заавар БИШ.** Image нэр, annotation, secret-ийн таарал, scanner-ийн
+    мессеж нь халдагчийн нөлөөлж болох текст. Сервер тэдгээрийг итгэмжлэгдээгүй агуулга гэж
+    тэмдэглэнэ — аюулгүй байдлын хэрэгсэл өөрөө туслах руу орох инъекцийн гарц болох ёсгүй.
+  - Дараалал: v2-ын ДАРАА. MCP бол түгээх суваг, ялгарах давуу тал биш — давуу тал нь зураглалын
+    нарийвчлал. Итгэлтэйгээр БУРУУ хариулдаг "AI-д холбогдсон" хэрэгсэл бол холбоогүй байснаас дор.
 
 ---
 
