@@ -1,14 +1,22 @@
 # TATAR-Kuber CI/CD gatekeeper policy (.tatar-kuber.yaml)
+# Copy this file to .tatar-kuber.yaml in your repo root.
 # Хуулж аваад .tatar-kuber.yaml болгож repo-нхаа үндэст байрлуулна.
+# `tatar-kuber gate --input scan-result.json` reads it and decides pass/fail.
 # `tatar-kuber gate --input scan-result.json` энэ файлыг уншиж pass/fail шийднэ.
 
+# A finding at this severity or above fails the gate (exit 1).
+# Values: critical | high | medium | low  (case-insensitive)
 # Энэ severity болон дээш түвшний олдвор байвал gate унана (exit 1).
-# Утга: critical | high | medium | low
+# Утга: critical | high | medium | low  (үсгийн том/жижигт үл хамаарна)
 fail_on: high
 
+# (Optional) Fail when the cluster score is below this. 0 = disabled.
 # (Сонголт) Cluster score үүнээс доош бол унана. 0 = хэрэгсэхгүй.
 min_score: 0
 
+# (Optional) Accepted risks — excluded from the gate, with an audit trail.
+# `control` is required; add resource/namespace to narrow it.
+# `expires` (YYYY-MM-DD) — the suppression lapses on that date and the finding returns.
 # (Сонголт) Хүлээн зөвшөөрсөн эрсдэлүүд — gate-ээс хасна (аудитын мөр үлдээнэ).
 # control заавал; resource/namespace нарийвчлах бол нэмнэ.
 # expires (YYYY-MM-DD) — хугацаа дуусвал suppress автоматаар цуцлагдана.

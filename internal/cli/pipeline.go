@@ -2,7 +2,7 @@ package cli
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 	"os"
 	"path/filepath"
 
@@ -67,7 +67,7 @@ func loadRawDir(dir string) ([]scanner.RawResult, map[string]int, error) {
 		raws = append(raws, scanner.RawResult{Scanner: n, Format: "json", Data: data})
 	}
 	if len(raws) == 0 {
-		return nil, nil, fmt.Errorf("%s дотор scanner raw JSON олдсонгүй", dir)
+		return nil, nil, errors.New(msg("err.rawdir.empty", dir))
 	}
 
 	// versions.json (сонголт): scanner -> version

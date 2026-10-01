@@ -1,6 +1,6 @@
 #!/bin/sh
 # TATAR-Kuber суулгагч.
-#   curl -fsSL https://raw.githubusercontent.com/ochmunkh/Tatar-Kuber/main/install.sh | sh
+#   curl -fsSL https://raw.githubusercontent.com/ochmunkh/Tatar-Kuber/master/install.sh | sh
 # Хувьсагч:
 #   VERSION=v1.0.0   тодорхой хувилбар (default: хамгийн сүүлийн)
 #   BIN_DIR=~/.local/bin   суулгах хавтас (default: /usr/local/bin, эрхгүй бол ~/.local/bin)

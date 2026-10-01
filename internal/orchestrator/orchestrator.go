@@ -270,24 +270,43 @@ func (p *Pipeline) Process(raws []scanner.RawResult, m Meta) (finding.ScanResult
 	return res, nil
 }
 
+// Problem төрлүүд.
+const (
+	ProblemNoFindings = "no_findings" // ажилласан ч 0 finding normalize хийгдсэнгүй
+	ProblemFailed     = "failed"      // унасан / timeout болсон
+)
+
+// Problem — анхаарал татсан scanner run.
+//
+// Энэ багц БИЧВЭР биш, КОД буцаана: CLI нь `--lang`-аар сонгогдсон хэл дээр
+// хэвлэдэг тул анхааруулгын бичвэр нэг л газар (CLI-ийн мессежийн каталогт)
+// амьдрах ёстой. diff.Warning-ийн Code талбартай ижил зарчим.
+type Problem struct {
+	Scanner  string
+	Code     string // ProblemNoFindings | ProblemFailed
+	Unmapped string // ProblemNoFindings: canonical зураглалгүй rule-ууд (хоосон байж болно)
+	Status   string // ProblemFailed: scanner_run-ий төлөв
+	Error    string // ProblemFailed: scanner_run-ий алдаа
+}
+
 // Problems — scanner_runs дотроос анхаарал татах (finding өгөөгүй/унасан) бичлэгүүд.
 // CLI эдгээрийг stderr-т анхааруулга болгон хэвлэнэ — "0 finding" чимээгүй өнгөрөхгүй.
-func Problems(runs []finding.ScannerRun) []string {
-	var out []string
+func Problems(runs []finding.ScannerRun) []Problem {
+	var out []Problem
 	for _, r := range runs {
 		switch r.Status {
 		case "ok", "ingested":
 			if r.Findings == 0 {
-				msg := r.Scanner + ": ажилласан ч 0 finding normalize хийгдсэнгүй"
+				p := Problem{Scanner: r.Scanner, Code: ProblemNoFindings}
 				if r.UnmappedCount > 0 {
-					msg += " (canonical зураглалгүй rule: " + joinMax(r.UnmappedRules, 5) + ")"
+					p.Unmapped = joinMax(r.UnmappedRules, 5)
 				}
-				out = append(out, msg)
+				out = append(out, p)
 			}
 		case "unsupported", "unavailable":
 			// хэвийн — doctor харуулна
 		default:
-			out = append(out, r.Scanner+": "+r.Status+" — "+r.Error)
+			out = append(out, Problem{Scanner: r.Scanner, Code: ProblemFailed, Status: r.Status, Error: r.Error})
 		}
 	}
 	return out

@@ -19,7 +19,7 @@ TATAR-Kuber is early-stage and there is lots of high-impact work available.
 ```bash
 git clone https://github.com/ochmunkh/Tatar-Kuber && cd Tatar-Kuber
 go build ./...
-go test ./...          # 15 packages, must stay green
+go test ./...          # 19 packages, must stay green
 python3 scripts/validate_registry.py   # canonical registry sanity
 ```
 
@@ -35,9 +35,45 @@ please keep it that way.
 
 A maintainer will review. Please be patient and kind — see the Code of Conduct.
 
+## The engineering documents (`.docx` **and** `.md`)
+
+`docs/` holds six engineering specifications, and each one is committed twice: as the Word
+file it is written in (`05_CLI-Specification.docx`) and as the Markdown rendered from it
+(`05_CLI-Specification.md`). Both are read — GitHub will not render a `.docx` in the
+browser, and Markdown is what search, review and `git diff` can actually work with.
+
+**Either file may be edited, but the other must be regenerated before merge.** One command
+does it:
+
+```bash
+make docs                  # regenerate all six docs/*.md from their .docx
+bash scripts/docs.sh       # the same thing, without make
+```
+
+CI runs `bash scripts/docs.sh --check`, which regenerates the Markdown into a temporary
+directory and fails when it differs from what is committed. It compares **content**, never
+modification times — git does not store timestamps, so after a fresh clone every file
+carries the checkout time and an mtime comparison would pass or fail at random.
+
+**The asymmetry is real, so plan around it.** `scripts/docx-to-md.py` converts
+`.docx` → `.md`, and there is no converter in the other direction. An edit made in the
+Markdown therefore cannot be propagated back into the Word file: the next `make docs`
+overwrites it, and until then the CI check reports the pair as out of sync. Concretely:
+
+- **Editing the `.docx` is the direction that survives.** Edit in Word, run `make docs`,
+  commit both files.
+- **Editing the `.md` is fine for drafting or for showing a reviewer what you mean**, but
+  the same change has to be re-applied in the `.docx` before merge, or it is lost. This is
+  not a round trip and the tooling will not make it one.
+
+Each generated `.md` says the same thing in its own header, so a file opened out of context
+still tells the reader where it came from.
+
 ## Adding a scanner adapter (step by step)
 
-This is the recommended first contribution. See `docs/03-Scanner-Adapter-Interface.md`.
+This is the recommended first contribution. See
+[`docs/03_Scanner-Adapter-Interface.md`](docs/03_Scanner-Adapter-Interface.md), the rendered
+copy of `03_Scanner-Adapter-Interface.docx`.
 
 1. Create `internal/scanner/<name>/<name>.go` implementing `scanner.ScannerAdapter`
    (`Name`, `Available`, `Version`, `Supports`, `Scan`, `Normalize`).
@@ -99,7 +135,7 @@ release tooling. `TestVersionsAgree` catches the two that matter; the rest are m
 Then:
 
 ```bash
-go test ./...                      # 17 packages, including the golden corpus
+go test ./...                      # 19 packages, including the golden corpus
 git tag -a vX.Y.Z -m "..." && git push origin vX.Y.Z
 ```
 
@@ -165,5 +201,19 @@ Go 1.22+ шаардлагатай. Module path жижиг үсэгтэй (`githu
 
 **Ажлын урсгал:** fork → `feat/...` салбар → фокустай өөрчлөлт → `go test ./...` ногоон →
 Pull Request (юу, яагаад хийснийг тайлбарла). Maintainer хянана.
+
+**Инженерийн баримтууд (`.docx` ба `.md`):** `docs/` доторх зургаан тодорхойлолт тус бүр
+ХОЁР хувиар commit хийгддэг — бичигддэг Word файл (`05_CLI-Specification.docx`) ба түүнээс
+рендерлэсэн Markdown (`05_CLI-Specification.md`). Аль нэгийг нь засаж болох ч merge хийхээс
+ӨМНӨ нөгөөг нь дахин үүсгэнэ: `make docs` (эсвэл `bash scripts/docs.sh`). CI нь
+`bash scripts/docs.sh --check`-ээр агуулгыг нь тулгаж, зөрвөл унана — цагийн тэмдгийг биш,
+АГУУЛГЫГ (git timestamp хадгалдаггүй тул шинэ clone дээр mtime-ийн харьцуулалт санамсаргүй
+үр дүн өгнө).
+
+Хөрвүүлэлт НЭГ чиглэлтэй: `scripts/docx-to-md.py` нь `.docx` → `.md` хийдэг, буцах
+хөрвүүлэгч алга. Тиймээс **үлддэг чиглэл нь `.docx`** — Word дээр засаад `make docs`
+ажиллуулж хоёуланг нь commit хийнэ. `.md`-г ноорог болгох, хянагчид санаагаа үзүүлэхэд
+ашиглаж болно, гэхдээ ижил өөрчлөлтийг merge хийхээс өмнө `.docx` дээр давтахгүй бол
+дараагийн `make docs` түүнийг дарж алга болгоно.
 
 Асуудал/санал: `.github/ISSUE_TEMPLATE/` доторх template ашиглана. Code of Conduct-ыг дагана уу.

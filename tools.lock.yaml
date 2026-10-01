@@ -1,0 +1,84 @@
+# tools.lock.yaml — the default scanner pins shipped with TATAR-Kuber.
+#
+# Copy this to ~/.tatar-kuber/tools.lock.yaml (or point --home at a directory
+# containing it) and `tatar-kuber update` will install exactly these releases.
+# `update` rewrites the copy it uses, adding an `installed:` line per scanner;
+# this file is the reviewed starting point, not that working copy.
+#
+#   version    the release to install
+#   sha256     the checksum of the DOWNLOADED ARTEFACT (archive or bare binary)
+#              for linux/amd64, as the upstream project publishes it. `update`
+#              refuses to install a scanner that has none.
+#   cosign     "unverified" — signature checking is not implemented yet, so
+#              this file never says "verified".
+#
+# PROVENANCE — how each checksum below was obtained, on 2026-09-30:
+#
+#   1. the latest stable release was read from the project's GitHub releases API
+#   2. the linux/amd64 artefact was downloaded
+#   3. its SHA256 was computed locally
+#   4. that value was compared, byte for byte, against the checksum file the
+#      project itself publishes on the same release
+#
+# Step 4 is the one that matters: a checksum computed from a download you
+# already have proves only that the file did not change in transit to you. All
+# three pins below matched their published value exactly.
+#
+# These pins are for linux/amd64. `update` on another platform resolves a
+# different asset, whose checksum is NOT in this file, and will refuse until
+# someone pins it the same way.
+
+tools:
+  # https://github.com/aquasecurity/trivy/releases/tag/v0.74.0
+  # published in trivy_0.74.0_checksums.txt — matched
+  trivy:
+    version: "0.74.0"
+    sha256:  "2ae6fe3ee734b7fdf11335663e18c75ea12dccc76062f09f164a3b0f8be4371a"
+    cosign:  "unverified"
+
+  # https://github.com/kubescape/kubescape/releases/tag/v4.0.15
+  # published in checksums.sha256 — matched. That file is also cosign-signed
+  # (checksums.sha256.sig + .pem), which `update` cannot check yet.
+  #
+  # NOTE v4 renamed every asset. The v3 names the catalogue used to carry
+  # (kubescape-ubuntu-latest and friends) do not exist on any v4 release.
+  kubescape:
+    version: "4.0.15"
+    sha256:  "011569dbcde85afc96cf63262e4f967166b6680fd70a623e9065334b6767b244"
+    cosign:  "unverified"
+
+  # https://github.com/derailed/popeye/releases/tag/v0.22.1
+  # published in checksums.sha256 — matched
+  popeye:
+    version: "0.22.1"
+    sha256:  "d58a3c0ba45805d452c32628320eecdcb5172fd5f42c82e12aeecc7a17eb930b"
+    cosign:  "unverified"
+
+  # checkov is DELIBERATELY LEFT UNPINNED, and `update` therefore refuses to
+  # install it. This is the designed-for state, not an oversight:
+  #
+  #   bridgecrewio/checkov publishes NO checksum file, NO signature and NO
+  #   build attestation for its GitHub release archives. Release 3.3.20 ships
+  #   four .zip assets and nothing else; the release notes contain no digest;
+  #   GitHub's attestations endpoint returns 404 for the artefact.
+  #
+  # So there is nothing to check a checksum against. Writing the SHA256 of a
+  # zip downloaded here would record what arrived on one machine on one day and
+  # dress it up as a supply-chain assertion, which is exactly the "pin nobody
+  # ever reviewed" this file exists to avoid. For the record, the linux/amd64
+  # zip of 3.3.20 hashed to
+  #   4e630ff1f25ebb5de9d7adbfe90a869e8356e25f80f4ab456d6fb273358b4e67
+  # on 2026-09-30 — usable as a second opinion, not as a pin.
+  #
+  # Ways out, for whoever picks this up:
+  #   * install checkov from PyPI instead, where every file has a recorded
+  #     hash and `pip install --require-hashes` can enforce it. It is a wheel
+  #     rather than a self-contained binary, so the adapter would need to know
+  #     that.
+  #   * ask bridgecrewio to publish checksums for the release archives.
+  #   * accept trust-on-first-use for this one scanner, deliberately, and say
+  #     so here.
+  checkov:
+    version: "3.3.20"
+    sha256:  ""
+    cosign:  "unverified"

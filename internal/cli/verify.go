@@ -21,29 +21,33 @@ type expectedSpec struct {
 // cmdVerifyLab — scan-result.json-ыг expected-findings.json-той тулгана.
 // PASS -> exit 0; дутуу control эсвэл finding цөөн -> exit 1.
 func cmdVerifyLab(args []string) int {
+	if _, code := setLang(args); code != 0 {
+		return code
+	}
 	fs := flag.NewFlagSet("verify-lab", flag.ExitOnError)
-	input := fs.String("input", "scan-result.json", "scan-result.json зам")
-	expected := fs.String("expected", "expected-findings.json", "expected-findings.json зам")
+	input := fs.String("input", "scan-result.json", msg("flag.input"))
+	expected := fs.String("expected", "expected-findings.json", msg("flag.verify.expected"))
+	addLangFlag(fs, "flag.lang")
 	_ = fs.Parse(args)
 
 	rb, err := os.ReadFile(*input)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "алдаа:", err)
+		errln(err)
 		return 2
 	}
 	var res finding.ScanResult
 	if err := json.Unmarshal(rb, &res); err != nil {
-		fmt.Fprintln(os.Stderr, "scan-result.json parse:", err)
+		errln(msg("verify.parse.result"), err)
 		return 2
 	}
 	eb, err := os.ReadFile(*expected)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "алдаа:", err)
+		errln(err)
 		return 2
 	}
 	var exp expectedSpec
 	if err := json.Unmarshal(eb, &exp); err != nil {
-		fmt.Fprintln(os.Stderr, "expected-findings.json parse:", err)
+		errln(msg("verify.parse.expected"), err)
 		return 2
 	}
 
@@ -58,25 +62,25 @@ func cmdVerifyLab(args []string) int {
 		}
 	}
 
-	fmt.Printf("verify-lab: %s\n", exp.Scenario)
-	fmt.Printf("  controls: expected %d, missing %d\n", len(exp.Controls), len(missing))
-	fmt.Printf("  findings: actual %d\n", res.Summary.TotalFindings)
+	fmt.Print(msg("verify.scenario", exp.Scenario))
+	fmt.Print(msg("verify.controls", len(exp.Controls), len(missing)))
+	fmt.Print(msg("verify.findings", res.Summary.TotalFindings))
 
 	fail := false
 	if len(missing) > 0 {
 		fail = true
-		fmt.Printf("  MISSING controls:\n")
+		fmt.Print(msg("verify.missing.header"))
 		for _, m := range missing {
 			fmt.Printf("    - %s\n", m)
 		}
 	}
 	if exp.Total != nil && res.Summary.TotalFindings != *exp.Total {
 		fail = true
-		fmt.Printf("  total findings: expected %d, actual %d\n", *exp.Total, res.Summary.TotalFindings)
+		fmt.Print(msg("verify.total", *exp.Total, res.Summary.TotalFindings))
 	}
 	if exp.MinFindings > 0 && res.Summary.TotalFindings < exp.MinFindings {
 		fail = true
-		fmt.Printf("  findings %d < expected min %d\n", res.Summary.TotalFindings, exp.MinFindings)
+		fmt.Print(msg("verify.min", res.Summary.TotalFindings, exp.MinFindings))
 	}
 	for _, sev := range []string{"CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO"} {
 		want, ok := exp.Counts[sev]
@@ -88,13 +92,13 @@ func cmdVerifyLab(args []string) int {
 		if act != want {
 			mark, fail = "MISMATCH", true
 		}
-		fmt.Printf("  %-8s expected %d, actual %d  [%s]\n", sev, want, act, mark)
+		fmt.Print(msg("verify.count", sev, want, act, mark))
 	}
 
 	if fail {
-		fmt.Println("RESULT: FAIL")
+		fmt.Println(msg("verify.fail"))
 		return 1
 	}
-	fmt.Println("RESULT: PASS")
+	fmt.Println(msg("verify.pass"))
 	return 0
 }

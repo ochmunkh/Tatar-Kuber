@@ -15,30 +15,43 @@ import (
 )
 
 func cmdReport(args []string) int {
+	// explicitLang — хэрэглэгч хэлээ ТОДОРХОЙ зааж өгсөн эсэх. `--lang`-гүй үед
+	// CLI-ийн өөрийн мөрүүд default (англи) хэлээр гарах боловч ТАЙЛАН өөрөө
+	// scan-д сонгосон хэлээрээ үлдэнэ — энэ нь v1.0.3-ийн гэрээ (нэг scan,
+	// хоёр хэл) бөгөөд буцаад нийцтэй байдал.
+	explicitLang, code := setLang(args)
+	if code != 0 {
+		return code
+	}
 	fs := flag.NewFlagSet("report", flag.ExitOnError)
-	input := fs.String("input", "scan-result.json", "scan-result.json зам")
-	format := fs.String("o", "html", "формат: json|sarif|html")
-	out := fs.String("out", "", "гаралтын файл (default: stdout, html бол report.html)")
-	failOn := fs.String("fail-on", "", "энэ severity-с дээш finding байвал exit 1: CRITICAL|HIGH|MEDIUM|LOW")
-	lang := fs.String("lang", "", "тайлангийн хэл: en | mn (default: scan-д сонгосон хэл)")
-	registry := fs.String("registry", "", "canonical-controls.yaml зам (--lang-тай хамт; default: шигтгэсэн)")
+	input := fs.String("input", "scan-result.json", msg("flag.input"))
+	// --format нь -o-ийн бүтэн нэр. `scan -o` бол ХАВТАС, `report -o` бол ФОРМАТ
+	// байсан тул README-ийн хажуу хажуугийн хоёр мөрөнд нэг флаг хоёр өөр зүйл
+	// гэж харагдаж байв. -o хэвээр ажиллана (CI эвдрэхгүй), харин баримтад
+	// бүтэн нэрийг ашиглана.
+	format := fs.String("o", "html", msg("flag.report.format"))
+	fs.StringVar(format, "format", "html", msg("flag.report.format.long"))
+	out := fs.String("out", "", msg("flag.report.out"))
+	failOn := fs.String("fail-on", "", msg("flag.report.failon"))
+	addLangFlag(fs, "flag.report.lang")
+	registry := fs.String("registry", "", msg("flag.report.registry"))
 	_ = fs.Parse(args)
 
 	data, err := os.ReadFile(*input)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "алдаа:", err)
+		errln(err)
 		return 2
 	}
 	var res finding.ScanResult
 	if err := jsonUnmarshal(data, &res); err != nil {
-		fmt.Fprintln(os.Stderr, "scan-result.json parse алдаа:", err)
+		errln(msg("report.parse.failed"), err)
 		return 2
 	}
 
 	// Хэл бол ГАРАЛТЫН шинж чанар — scan-ы биш. Нэг scan-result.json-оос хоёр
 	// хэл дээрх тайланг scan-ыг дахин ажиллуулалгүйгээр гаргана.
-	if *lang != "" {
-		if code := relang(&res, *lang, *registry); code != 0 {
+	if explicitLang {
+		if code := relang(&res, uiLang, *registry); code != 0 {
 			return code
 		}
 	}
@@ -52,7 +65,7 @@ func cmdReport(args []string) int {
 	if target != "" {
 		f, err := os.Create(target)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "алдаа:", err)
+			errln(err)
 			return 2
 		}
 		defer f.Close()
@@ -67,19 +80,25 @@ func cmdReport(args []string) int {
 	case "html":
 		err = htmlrep.Render(w, res)
 	default:
-		fmt.Fprintln(os.Stderr, "тодорхойгүй формат:", *format)
+		fmt.Fprintln(os.Stderr, msg("report.format.unknown"), *format)
 		return 3
 	}
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "render алдаа:", err)
+		errln(msg("report.render.failed"), err)
 		return 2
 	}
 	if target != "" {
-		fmt.Println("тайлан бичигдлээ:", target)
+		fmt.Println(msg("report.wrote", target))
 	}
 
-	if *failOn != "" && exceedsThreshold(res, finding.Severity(*failOn)) {
-		return 1
+	// Босгыг ШУУД finding.Severity() болгож хөрвүүлэхгүй: "critical" (жижиг
+	// үсгээр — action.yml, .tatar-kuber.yaml.example, README бүгд ингэж бичдэг)
+	// нь Rank 0 болж, `>= 0` нь INFO хүртэл БҮХ finding-тэй таарч, "high-аас
+	// дээшид унана" гэсэн gate "бүхэнд унана" болж хувирдаг байв.
+	if *failOn != "" {
+		if th, ok := parseSeverityThreshold(*failOn, "--fail-on"); ok && exceedsThreshold(res, th) {
+			return 1
+		}
 	}
 	return 0
 }
@@ -96,19 +115,18 @@ func cmdReport(args []string) int {
 func relang(res *finding.ScanResult, lang, registryPath string) int {
 	path, err := resolveRegistry(registryPath)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "алдаа:", err)
+		errln(err)
 		return 2
 	}
 	reg, err := loadRegistry(path)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "алдаа:", err)
+		errln(err)
 		return 2
 	}
 	// Байхгүй хэлийг ЧИМЭЭГҮЙ en рүү унагавал хэрэглэгч буруу хэлээр гаргасныг
 	// мэдэхгүй өнгөрнө. Тиймээс шууд зогсоож, юу байгааг нь хэлнэ.
 	if !reg.HasLang(lang) {
-		fmt.Fprintf(os.Stderr, "алдаа: registry-д '%s' хэл алга (байгаа: %s)\n",
-			lang, strings.Join(reg.Languages(), ", "))
+		errln(msg("report.lang.missing", lang, strings.Join(reg.Languages(), ", ")))
 		return 3
 	}
 
@@ -119,7 +137,7 @@ func relang(res *finding.ScanResult, lang, registryPath string) int {
 	// сэлгэгдэнэ. Гэхдээ registry-д байхгүй control-ийн гарчиг scanner-ийн эх
 	// текстээрээ үлдэх тул тайланд холимог хэл үлдэж болзошгүйг нуухгүй.
 	if n := untranslatable(res.Findings, reg); n > 0 {
-		fmt.Fprintf(os.Stderr, "анхаар: %d finding registry-д алга — гарчиг нь scanner-ийн эх хэлээрээ үлдэв\n", n)
+		warnln(msg("report.untranslatable", n))
 	}
 	return 0
 }

@@ -11,30 +11,8 @@ import (
 	"github.com/ochmunkh/tatar-kuber/internal/finding"
 )
 
-// diffLabels — хоёр хэлт шошго (тайлантай ижил зарчим: --lang en|mn).
-type diffLabels struct {
-	Header, Score, Findings, Changes, Scanners, Warnings string
-	New, Fixed, Worsened, Improved, Unchanged            string
-	NoChange, Identical, Regressed, FailNew, Legend      string
-}
-
-var diffMN = diffLabels{
-	Header: "TATAR-Kuber diff", Score: "Эрсдэлийн оноо", Findings: "Finding",
-	Changes: "Өөрчлөлт", Scanners: "Scanner хамрах хүрээ", Warnings: "Анхааруулга",
-	New: "шинэ", Fixed: "зассан", Worsened: "дордсон", Improved: "сайжирсан", Unchanged: "хэвээр",
-	NoChange: "Өөрчлөлт алга.", Identical: "result_hash ижил — өгөгдөл огт хөдөлсөнгүй.",
-	Regressed: "ХАМРАХ ХҮРЭЭ БУУРСАН", FailNew: "шинэ finding нь босгоос өндөр",
-	Legend: "+ шинэ  ↑ дордсон  − зассан  ↓ сайжирсан",
-}
-
-var diffEN = diffLabels{
-	Header: "TATAR-Kuber diff", Score: "Risk score", Findings: "Findings",
-	Changes: "Changes", Scanners: "Scanner coverage", Warnings: "Warnings",
-	New: "new", Fixed: "fixed", Worsened: "worsened", Improved: "improved", Unchanged: "unchanged",
-	NoChange: "No changes.", Identical: "identical result_hash — nothing moved.",
-	Regressed: "COVERAGE REGRESSED", FailNew: "new finding at or above threshold",
-	Legend: "+ new  ↑ worsened  − fixed  ↓ improved",
-}
+// Шошгууд нь бусад бүх CLI бичвэрийн хамт messages.go-ийн каталогт ("diff.*")
+// байдаг: хоёр хэлийг зэрэгцээ хоёр газар барих нь тэднийг чимээгүй зөрүүлдэг.
 
 var changeMark = map[diff.Change]string{
 	diff.ChangeNew: "+", diff.ChangeWorsened: "↑", diff.ChangeFixed: "−",
@@ -45,17 +23,21 @@ var changeMark = map[diff.Change]string{
 //
 //	exit 0 — OK; exit 1 — --fail-on-new босго давсан; exit 2/3 — алдаа.
 func cmdDiff(args []string) int {
+	if _, code := setLang(args); code != 0 {
+		return code
+	}
 	fs := flag.NewFlagSet("diff", flag.ExitOnError)
-	oldPath := fs.String("old", "", "өмнөх scan-result.json (заавал)")
-	newPath := fs.String("new", "", "шинэ scan-result.json (заавал)")
-	format := fs.String("o", "text", "гаралт: text|json")
-	lang := fs.String("lang", "mn", "хэл: mn|en")
-	failOnNew := fs.String("fail-on-new", "", "шинэ finding энэ severity-с дээш байвал exit 1: critical|high|medium|low")
-	all := fs.Bool("all", false, "өөрчлөгдөөгүй finding-үүдийг ч хэвлэх")
+	oldPath := fs.String("old", "", msg("flag.diff.old"))
+	newPath := fs.String("new", "", msg("flag.diff.new"))
+	format := fs.String("o", "text", msg("flag.diff.format"))
+	fs.StringVar(format, "format", "text", msg("flag.diff.format.long"))
+	addLangFlag(fs, "flag.lang")
+	failOnNew := fs.String("fail-on-new", "", msg("flag.diff.failonnew"))
+	all := fs.Bool("all", false, msg("flag.diff.all"))
 	_ = fs.Parse(args)
 
 	if *oldPath == "" || *newPath == "" {
-		fmt.Fprintln(os.Stderr, "алдаа: --old ба --new заавал")
+		errln(msg("diff.old.new.required"))
 		return 3
 	}
 	oldRes, code := loadScan(*oldPath)
@@ -73,56 +55,47 @@ func cmdDiff(args []string) int {
 		enc := json.NewEncoder(os.Stdout)
 		enc.SetIndent("", "  ")
 		if err := enc.Encode(r); err != nil {
-			fmt.Fprintln(os.Stderr, "алдаа:", err)
+			errln(err)
 			return 2
 		}
 	} else {
-		printDiff(r, *lang, *all)
+		printDiff(r, *all)
 	}
 
 	if *failOnNew != "" {
-		threshold := finding.NormalizeSeverity(strings.ToUpper(*failOnNew))
-		if finding.Rank(threshold) == 0 {
-			fmt.Fprintf(os.Stderr, "анхаар: --fail-on-new='%s' танигдсангүй — хэрэгсэхгүй\n", *failOnNew)
+		threshold, ok := parseSeverityThreshold(*failOnNew, "--fail-on-new")
+		if !ok {
 			return 0
 		}
 		if maxNew := r.MaxNewSeverity(); finding.Rank(maxNew) >= finding.Rank(threshold) {
-			fmt.Fprintf(os.Stderr, "\nFAIL: %s (%s >= %s)\n", labelsFor(*lang).FailNew, maxNew, threshold)
+			fmt.Fprintf(os.Stderr, "\nFAIL: %s (%s >= %s)\n", msg("diff.failnew"), maxNew, threshold)
 			return 1
 		}
 	}
 	return 0
 }
 
-func labelsFor(lang string) diffLabels {
-	if lang == "en" {
-		return diffEN
-	}
-	return diffMN
-}
-
 func loadScan(path string) (finding.ScanResult, int) {
 	var res finding.ScanResult
 	b, err := os.ReadFile(path)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "алдаа:", err)
+		errln(err)
 		return res, 2
 	}
 	if err := json.Unmarshal(b, &res); err != nil {
-		fmt.Fprintf(os.Stderr, "алдаа: %s parse: %v\n", path, err)
+		errln(msg("diff.parse", path, err))
 		return res, 2
 	}
 	return res, 0
 }
 
-func printDiff(r diff.Result, lang string, all bool) {
-	L := labelsFor(lang)
-	fmt.Printf("%s — %s\n", L.Header, shortWhen(r.OldAt, r.NewAt))
+func printDiff(r diff.Result, all bool) {
+	fmt.Printf("%s — %s\n", msg("diff.header"), shortWhen(r.OldAt, r.NewAt))
 	fmt.Println(strings.Repeat("─", 64))
 
 	// Оноо ба нийт тоо.
-	fmt.Printf("%-22s %6d → %-6d %s\n", L.Score, r.OldScore, r.NewScore, signed(r.ScoreDelta))
-	fmt.Printf("%-22s %6d → %-6d %s\n", L.Findings, r.OldTotal, r.NewTotal, signed(r.NewTotal-r.OldTotal))
+	fmt.Printf("%-22s %6d → %-6d %s\n", msg("diff.score"), r.OldScore, r.NewScore, signed(r.ScoreDelta))
+	fmt.Printf("%-22s %6d → %-6d %s\n", msg("diff.findings"), r.OldTotal, r.NewTotal, signed(r.NewTotal-r.OldTotal))
 
 	// Severity тус бүрээр.
 	fmt.Println()
@@ -136,13 +109,13 @@ func printDiff(r diff.Result, lang string, all bool) {
 	}
 
 	// Өөрчлөлтийн хураангуй.
-	fmt.Printf("\n%s: %s %d · %s %d · %s %d · %s %d · %s %d\n", L.Changes,
-		L.New, r.Counts[diff.ChangeNew], L.Worsened, r.Counts[diff.ChangeWorsened],
-		L.Fixed, r.Counts[diff.ChangeFixed], L.Improved, r.Counts[diff.ChangeImproved],
-		L.Unchanged, r.Counts[diff.ChangeUnchanged])
+	fmt.Printf("\n%s: %s %d · %s %d · %s %d · %s %d · %s %d\n", msg("diff.changes"),
+		msg("diff.new"), r.Counts[diff.ChangeNew], msg("diff.worsened"), r.Counts[diff.ChangeWorsened],
+		msg("diff.fixed"), r.Counts[diff.ChangeFixed], msg("diff.improved"), r.Counts[diff.ChangeImproved],
+		msg("diff.unchanged"), r.Counts[diff.ChangeUnchanged])
 
 	if r.SameResult {
-		fmt.Printf("\n%s\n", L.Identical)
+		fmt.Printf("\n%s\n", msg("diff.identical"))
 	}
 
 	// Мөр бүрчлэн.
@@ -152,7 +125,7 @@ func printDiff(r diff.Result, lang string, all bool) {
 			continue
 		}
 		if shown == 0 {
-			fmt.Printf("\n%s\n", L.Legend)
+			fmt.Printf("\n%s\n", msg("diff.legend"))
 			fmt.Println(strings.Repeat("─", 64))
 		}
 		shown++
@@ -167,17 +140,17 @@ func printDiff(r diff.Result, lang string, all bool) {
 		fmt.Printf("%s %-11s %-16s %s%s\n", changeMark[it.Change], sev, it.CanonicalControl, ns, it.Resource)
 	}
 	if shown == 0 {
-		fmt.Printf("\n%s\n", L.NoChange)
+		fmt.Printf("\n%s\n", msg("diff.nochange"))
 	}
 
 	// Scanner хамрах хүрээ — тоо буурсан нь scanner унаснаас болсон эсэхийг харуулна.
 	if len(r.Scanners) > 0 {
-		fmt.Printf("\n%s\n", L.Scanners)
+		fmt.Printf("\n%s\n", msg("diff.scanners"))
 		fmt.Println(strings.Repeat("─", 64))
 		for _, d := range r.Scanners {
 			flag := ""
 			if d.Regressed {
-				flag = "  ← " + L.Regressed
+				flag = "  ← " + msg("diff.regressed")
 			}
 			// Тал нь огт ажиллаагүй бол тоог 0 гэж БИШ, "—" гэж харуулна:
 			// 0 гэдэг нь "олдсонгүй", "—" нь "мэдэгдэхгүй".
@@ -188,10 +161,10 @@ func printDiff(r diff.Result, lang string, all bool) {
 	}
 
 	if len(r.Warnings) > 0 {
-		fmt.Printf("\n%s\n", L.Warnings)
+		fmt.Printf("\n%s\n", msg("diff.warnings"))
 		fmt.Println(strings.Repeat("─", 64))
 		for _, w := range r.Warnings {
-			fmt.Println("  ! " + w.Text(lang))
+			fmt.Println("  ! " + w.Text(uiLang))
 		}
 	}
 }

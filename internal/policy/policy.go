@@ -6,6 +6,7 @@ package policy
 import (
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/ochmunkh/tatar-kuber/internal/finding"
@@ -51,30 +52,36 @@ func Load(path string) (Policy, error) {
 	return p, nil
 }
 
+// normalizedFailOn — fail_on-ыг ТОМ/жижиг үсгээс үл хамааран severity болгоно
+// ("low", "Low", "LOW", бүр "LoW" ч ижил). Танигдахгүй бол "" буцаана.
+//
+// Энэ бол босгыг уншдаг ЦОР ЗӨВХӨН цэг: ValidFailOn() ба threshold() хоёул
+// үүгээр дамжина, тул "танигдсан" гэж мэдэгдээд өөр босго хэрэглэх зөрөө
+// үүсэх боломжгүй. Өмнө нь хоёулаа тус тусдаа яг таарах жижиг/ТОМ бичиглэлийг
+// л зөвшөөрдөг байсан: `fail_on: Low` танигдахгүй → чимээгүйгээр `high` болж,
+// LOW ба MEDIUM олдвор gate-ийг унагахаа болино. Босго СУЛРУУЛАХ тал руу
+// чимээгүй өөрчлөгдөх нь энэ хэрэгслийн хамгийн эсэргүүцэх зан.
+//
+// INFO-г ЗӨРИУД хүлээж авахгүй: баримтжуулсан олонлог нь critical|high|medium|low
+// (README, --fail-on флагийн тайлбар, action.yml) — түүнээс өргөтгөх нь өөр асуудал.
+func normalizedFailOn(raw string) finding.Severity {
+	switch s := finding.NormalizeSeverity(strings.ToUpper(raw)); s {
+	case finding.SeverityCritical, finding.SeverityHigh, finding.SeverityMedium, finding.SeverityLow:
+		return s
+	}
+	return ""
+}
+
 // ValidFailOn — fail_on утга танигдах эсэх (танигдахгүй бол threshold high-г ашиглана,
 // CLI анхааруулга хэвлэнэ — чимээгүй default руу унахгүй).
-func (p Policy) ValidFailOn() bool {
-	switch p.FailOn {
-	case "critical", "CRITICAL", "high", "HIGH", "medium", "MEDIUM", "low", "LOW":
-		return true
-	}
-	return false
-}
+func (p Policy) ValidFailOn() bool { return normalizedFailOn(p.FailOn) != "" }
 
 // threshold — fail_on severity-ийн rank (танигдахгүй бол high).
 func (p Policy) threshold() int {
-	switch p.FailOn {
-	case "critical", "CRITICAL":
-		return finding.Rank(finding.SeverityCritical)
-	case "high", "HIGH":
-		return finding.Rank(finding.SeverityHigh)
-	case "medium", "MEDIUM":
-		return finding.Rank(finding.SeverityMedium)
-	case "low", "LOW":
-		return finding.Rank(finding.SeverityLow)
-	default:
-		return finding.Rank(finding.SeverityHigh)
+	if s := normalizedFailOn(p.FailOn); s != "" {
+		return finding.Rank(s)
 	}
+	return finding.Rank(finding.SeverityHigh)
 }
 
 // matches — suppression тухайн finding-д тохирч байгаа эсэх.
@@ -134,8 +141,19 @@ type Result struct {
 	Score         int
 	MinScore      int
 	ScoreViolated bool
-	Reasons       []string
+
+	// Reasons — gate унасан шалтгаануудын ТОГТМОЛ КОД (бичвэр биш).
+	// CLI нь `--lang`-аар сонгогдсон хэл дээр хэвлэдэг тул шалтгааны бичвэр
+	// нэг л газар — CLI-ийн мессежийн каталогт — амьдрах ёстой. Кодод хэрэгтэй
+	// тоонууд (Violations, FailOn, Score, MinScore) энэ бүтцэд аль хэдийн бий.
+	Reasons []string
 }
+
+// Result.Reasons-д гарах кодууд.
+const (
+	ReasonThreshold = "threshold" // босго давсан олдвор бий
+	ReasonMinScore  = "min_score" // cluster score шаардсанаас доогуур
+)
 
 // Evaluate — scan үр дүнг бодлоготой тулгаж pass/fail шийднэ.
 func (p Policy) Evaluate(res finding.ScanResult, now time.Time) Result {
@@ -186,12 +204,12 @@ func (p Policy) Evaluate(res finding.ScanResult, now time.Time) Result {
 
 	if len(out.Violations) > 0 {
 		out.Passed = false
-		out.Reasons = append(out.Reasons, fmt.Sprintf("%d олдвор '%s' болон дээш түвшинд байна", len(out.Violations), p.FailOn))
+		out.Reasons = append(out.Reasons, ReasonThreshold)
 	}
 	if p.MinScore > 0 && res.Summary.RiskScore < p.MinScore {
 		out.Passed = false
 		out.ScoreViolated = true
-		out.Reasons = append(out.Reasons, fmt.Sprintf("cluster score %d < шаардлагатай %d", res.Summary.RiskScore, p.MinScore))
+		out.Reasons = append(out.Reasons, ReasonMinScore)
 	}
 	return out
 }
