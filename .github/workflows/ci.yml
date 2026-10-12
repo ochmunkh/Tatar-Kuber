@@ -58,3 +58,42 @@ jobs:
         with:
           sarif_file: gosec.sarif
           category: gosec
+
+  # Регрессийн тор — Lab корпусыг ЭНЭ commit-ийн engine-ээр дахин тоглуулна.
+  #
+  # ЯАГААД: Tatar-Kuber-Lab бол регрессийн суурь, гэвч түүний workflow зөвхөн LAB руу
+  # push хийхэд ажилладаг байв. Өөрөөр хэлбэл engine дээрх өөрчлөлт зураглал, dedup,
+  # rollup, оноолтыг эвдсэн ч Lab чимээгүй хэвээр — тор буруу талдаа өлгөөстэй байсан.
+  # Хамгаалалт нь хамгаалах ёстой зүйлийнхээ хажууд биш газар байвал хамгаалалт биш.
+  #
+  # Унавал: гаралт expected/expected-findings.json-оос зөрсөн гэсэн үг. Өөрчлөлт
+  # зориуд бол Lab дээрх expected файлыг тусад нь PR-аар шинэчилнэ — энэ job-ыг
+  # алгасах нь зөв хариулт биш.
+  lab:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout engine
+        uses: actions/checkout@v4
+
+      - name: Checkout lab
+        uses: actions/checkout@v4
+        with:
+          repository: ochmunkh/Tatar-Kuber-Lab
+          path: lab
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "stable"
+          cache: true
+
+      # Нийтлэгдсэн хувилбар биш, ЭНЭ commit-ээс барина — эс бөгөөс тест нь өөрийгөө
+      # шалгахын оронд хуучин binary-г шалгана.
+      - name: Build tatar-kuber from this commit
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/bin"
+          go build -o "$GITHUB_WORKSPACE/bin/tatar-kuber" ./cmd/tatar-kuber
+          echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Run the lab (doctor · scan · report ×3 · gate · verify-lab)
+        run: ./run-lab.sh
+        working-directory: lab
