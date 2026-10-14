@@ -1,0 +1,29 @@
+flowchart TB
+    subgraph scan["cli.scan"]
+        direction TB
+        orch["orchestrator<br/>(parallel)"]
+        raw[("raw/*.json<br/>нотолгоо")]
+        sc["scanner/*.Scan()"]
+        nm["scanner/*.Normalize()<br/>→ []Finding"]
+        rollup["rollup.Apply()<br/>Pod → эзэмшигч controller"]
+        dedup["dedup.Deduplicate()<br/>нэг асуудал, found_by нэгдэл"]
+        blind["blindshot.Apply()<br/>severity downgrade + annotate"]
+        risk["risk.ApplyScores()<br/>finding penalty + cluster оноо"]
+        out[("scan-result.json<br/>+ result_hash")]
+
+        orch --> sc --> raw
+        orch --> nm --> rollup --> dedup --> blind --> risk --> out
+    end
+
+    subgraph report["cli.report"]
+        direction TB
+        load["load scan-result.json"]
+        rend["report.Render(json | sarif | html)"]
+        load --> rend
+    end
+
+    out -.-> load
+
+    rollup -. "--no-rollup бол алгасна" .-> dedup
+    raw -. "--no-raw бол хадгалахгүй" .-> out
+    rend -. "--lang en|mn" .-> rend

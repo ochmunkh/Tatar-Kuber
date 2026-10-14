@@ -4,8 +4,8 @@
 Popeye) so you can run the full TATAR-Kuber pipeline offline — no cluster, no scanner install:
 
 ```bash
-tatar-kuber scan   --raw-dir examples/demo -o out
-tatar-kuber report --input out/scan-result.json -o html --out report.html
+tatar-kuber scan   --raw-dir examples/demo --out-dir out
+tatar-kuber report --input out/scan-result.json --format html --out report.html
 ```
 
 This is the dataset used by the committed `report/` example, the

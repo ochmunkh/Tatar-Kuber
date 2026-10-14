@@ -18,12 +18,16 @@ import (
 //
 //	exit 0 — PASSED, exit 1 — FAILED, exit 2/3 — алдаа.
 func cmdGate(args []string) int {
+	if _, code := setLang(args); code != 0 {
+		return code
+	}
 	fs := flag.NewFlagSet("gate", flag.ExitOnError)
-	input := fs.String("input", "scan-result.json", "scan-result.json зам")
-	policyPath := fs.String("policy", ".tatar-kuber.yaml", "бодлогын файл")
-	failOn := fs.String("fail-on", "", "severity босго (файлыг дарна): critical|high|medium|low")
-	minScore := fs.Int("min-score", 0, "cluster score доод хязгаар (файлыг дарна; 0 = хэрэгсэхгүй)")
-	baseline := fs.String("baseline", "", "өмнөх scan-result.json — зөвхөн ШИНЭ ба ДОРДСОН олдворт унана")
+	input := fs.String("input", "scan-result.json", msg("flag.input"))
+	policyPath := fs.String("policy", ".tatar-kuber.yaml", msg("flag.gate.policy"))
+	failOn := fs.String("fail-on", "", msg("flag.gate.failon"))
+	minScore := fs.Int("min-score", 0, msg("flag.gate.minscore"))
+	baseline := fs.String("baseline", "", msg("flag.gate.baseline"))
+	addLangFlag(fs, "flag.lang")
 	_ = fs.Parse(args)
 	// Флагийг ЗӨВХӨН хэрэглэгч тодорхой өгсөн үед policy файлыг дарна. Өмнө нь
 	// default утга (--min-score 0, action.yml-ийн --fail-on high) файлын утгыг
@@ -33,18 +37,18 @@ func cmdGate(args []string) int {
 
 	data, err := os.ReadFile(*input)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "алдаа:", err)
+		errln(err)
 		return 2
 	}
 	var res finding.ScanResult
 	if err := json.Unmarshal(data, &res); err != nil {
-		fmt.Fprintln(os.Stderr, "алдаа: scan-result.json parse:", err)
+		errln(msg("gate.parse.failed"), err)
 		return 2
 	}
 
 	pol, err := policy.Load(*policyPath)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "алдаа:", err)
+		errln(err)
 		return 2
 	}
 	if setFlags["fail-on"] && *failOn != "" {
@@ -54,7 +58,7 @@ func cmdGate(args []string) int {
 		pol.MinScore = *minScore
 	}
 	if !pol.ValidFailOn() {
-		fmt.Fprintf(os.Stderr, "анхаар: fail_on='%s' танигдсангүй (critical|high|medium|low) — 'high' гэж үзнэ\n", pol.FailOn)
+		warnln(msg("gate.failon.unrecognised", pol.FailOn))
 	}
 
 	r := pol.Evaluate(res, time.Now())
@@ -93,13 +97,13 @@ func cmdGate(args []string) int {
 	fmt.Printf("\n\n")
 
 	for _, s := range r.InvalidRules {
-		fmt.Fprintf(os.Stderr, "анхаар: suppression '%s' expires формат буруу (%s) — YYYY-MM-DD байх ёстой\n", s.Control, s.Expires)
+		warnln(msg("gate.suppression.expires.invalid", s.Control, s.Expires))
 	}
 	for _, s := range r.ExpiredRules {
-		fmt.Fprintf(os.Stderr, "анхаар: suppression '%s' хугацаа дууссан (%s) — дахин идэвхжсэнгүй\n", s.Control, s.Expires)
+		warnln(msg("gate.suppression.expired", s.Control, s.Expires))
 	}
 	for _, s := range r.UnknownRules {
-		fmt.Fprintf(os.Stderr, "анхаар: suppression '%s' canonical registry-д БАЙХГҮЙ control руу заасан — бичиглэлийн алдаа байж магадгүй\n", s.Control)
+		warnln(msg("gate.suppression.unknown", s.Control))
 	}
 	// Танигдахгүй control-ууд дээр "тохироогүй" гэж давхар анхааруулахгүй —
 	// шалтгаан аль хэдийн хэлэгдсэн.
@@ -115,11 +119,11 @@ func cmdGate(args []string) int {
 		if s.Resource != "" {
 			scope += " " + s.Resource
 		}
-		fmt.Fprintf(os.Stderr, "анхаар: suppression '%s' ямар ч олдворт тохироогүй — асуудал зассан эсвэл resource дахин нэрлэгдсэн байж магадгүй (хуучирсан дүрмийг устгана уу)\n", scope)
+		warnln(msg("gate.suppression.unused", scope))
 	}
 
 	if len(r.Violations) > 0 {
-		fmt.Printf("Босго давсан %d олдвор:\n", len(r.Violations))
+		fmt.Print(msg("gate.violations", len(r.Violations)))
 		for _, f := range r.Violations {
 			ns := ""
 			if f.Namespace != "" {
@@ -131,20 +135,30 @@ func cmdGate(args []string) int {
 	}
 
 	if r.Passed {
-		fmt.Println("✓ GATE PASSED")
+		fmt.Println(msg("gate.passed"))
 		return 0
 	}
-	fmt.Println("✗ GATE FAILED —", joinReasons(r.Reasons))
+	fmt.Println(msg("gate.failed"), joinReasons(r))
 	return 1
 }
 
-func joinReasons(rs []string) string {
+// joinReasons — gate унасан шалтгаануудыг хэрэглэгчийн хэл рүү буулгаж нийлүүлнэ.
+// policy багц нь БИЧВЭР биш, КОД буцаадаг тул тоон утгуудыг Result-аас нь энд
+// авна — ингэснээр шалтгааны бичвэр CLI-ийн каталогт, нэг газар үлдэнэ.
+func joinReasons(r policy.Result) string {
 	out := ""
-	for i, r := range rs {
+	for i, code := range r.Reasons {
 		if i > 0 {
 			out += "; "
 		}
-		out += r
+		switch code {
+		case policy.ReasonThreshold:
+			out += msg("gate.reason.threshold", len(r.Violations), r.FailOn)
+		case policy.ReasonMinScore:
+			out += msg("gate.reason.minscore", r.Score, r.MinScore)
+		default:
+			out += code
+		}
 	}
 	return out
 }
@@ -177,15 +191,14 @@ func applyBaseline(r *policy.Result, pol policy.Policy, res finding.ScanResult, 
 
 	var blockers []string
 	for _, w := range d.Warnings {
-		fmt.Fprintf(os.Stderr, "анхаар: baseline — %s\n", w.Text("mn"))
+		warnln(msg("gate.baseline.warn", w.Text(uiLang)))
 		if baselineUntrusted[w.Code] {
 			blockers = append(blockers, w.Code)
 		}
 	}
 	if len(blockers) > 0 {
-		fmt.Fprintf(os.Stderr, "алдаа: baseline итгэх боломжгүй (%s) — ХЭРЭГСЭХГҮЙ, бүх олдворыг тооцно\n",
-			strings.Join(blockers, ", "))
-		return "(baseline хэрэгсэгдсэнгүй)", 0
+		errln(msg("gate.baseline.untrusted", strings.Join(blockers, ", ")))
+		return msg("gate.baseline.ignored"), 0
 	}
 
 	// Шинэ ба дордсон finding-үүд.
@@ -214,7 +227,7 @@ func applyBaseline(r *policy.Result, pol policy.Policy, res finding.ScanResult, 
 	r.Passed = nr.Passed
 	r.Reasons = nr.Reasons
 
-	return fmt.Sprintf("baseline: %d өмнөх олдвор тооцоогүй, шинэ+дордсон %d",
+	return msg("gate.baseline.note",
 		skipped, len(d.Items)-d.Counts[diff.ChangeUnchanged]-d.Counts[diff.ChangeFixed]-d.Counts[diff.ChangeImproved]), 0
 }
 

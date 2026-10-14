@@ -28,6 +28,22 @@ jobs:
       - name: Test
         run: go test ./... -count=1
 
+      # CONTRIBUTING.md-д setup ба adapter нэмэх алхам хоёуланд шаардлагатай гэж
+      # бичигдсэн байсан ч ямар ч workflow ажиллуулдаггүй байв → хэзээ ч
+      # мөрдөгддөггүй шаардлага. Registry бол canonical гэрээ тул үргэлж шалгана.
+      - name: Validate canonical registry
+        run: python3 scripts/validate_registry.py
+
+      # The .docx and the .md of each engineering document are BOTH committed
+      # and either one may be edited (CONTRIBUTING.md), so the pair has to be
+      # back in sync before merge. Checked by CONTENT — regenerate the Markdown
+      # and compare — never by modification time: git does not store
+      # timestamps, so after a fresh clone every file carries the checkout time
+      # and an mtime comparison would pass or fail at random. Content also
+      # catches the case that matters, a .md edited by hand.
+      - name: Docs in sync (.docx -> .md)
+        run: bash scripts/docs.sh --check
+
   security:
     runs-on: ubuntu-latest
     permissions:

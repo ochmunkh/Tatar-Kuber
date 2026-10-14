@@ -1,6 +1,6 @@
 # TATAR-Kuber slim image (multi-stage, эх кодоос).
 #   docker build -t tatar-kuber .
-#   docker run --rm -v "$PWD:/work" -w /work tatar-kuber scan --raw-dir ./raw -o .
+#   docker run --rm -v "$PWD:/work" -w /work tatar-kuber scan --raw-dir ./raw --out-dir .
 # Тэмдэглэл: энэ образ нь orchestrator (tatar-kuber)-ийг л агуулна. Live scan-д
 # scanner CLI-ууд (trivy, kubescape, ...) тусад нь шаардлагатай; offline ingest,
 # report, gate нь энэ образ дотор бүрэн ажиллана (registry шигтгэгдсэн).

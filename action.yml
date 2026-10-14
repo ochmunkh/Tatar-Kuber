@@ -1,45 +1,65 @@
 name: "TATAR-Kuber"
-description: "Kubernetes security posture gate — Trivy · Kubescape · Checkov · Popeye нэг стандарт тайлан + CI gate + SARIF"
+description: |-
+  Kubernetes security posture gate — Trivy · Kubescape · Checkov · Popeye unified into one standard report + CI gate + SARIF.
+  Kubernetes аюулгүй байдлын gate — Trivy · Kubescape · Checkov · Popeye-г нэг стандарт тайлан + CI gate + SARIF болгоно.
 branding:
   icon: "shield"
   color: "green"
 
 inputs:
   path:
-    description: "Local manifest/Helm зам (Mode A static scan)"
+    description: |-
+      Local manifest/Helm path (Mode A static scan).
+      Локал manifest/Helm зам (Mode A static scan).
     required: false
     default: "."
   raw-dir:
-    description: "Урьдчилан цуглуулсан scanner raw JSON-уудын хавтас (offline ingest). Заавал бол path-г орлоно."
+    description: |-
+      Directory of pre-collected scanner raw JSON (offline ingest). When set, it replaces `path`.
+      Урьдчилан цуглуулсан scanner raw JSON-уудын хавтас (offline ingest). Заавал бол path-г орлоно.
     required: false
     default: ""
   fail-on:
-    description: "Gate severity босго: critical | high | medium | low. Хоосон бол .tatar-kuber.yaml (эсвэл default high)."
+    description: |-
+      Gate severity threshold: critical | high | medium | low (case-insensitive). Empty = use .tatar-kuber.yaml (or default high).
+      Gate severity босго: critical | high | medium | low (үсгийн том/жижигт үл хамаарна). Хоосон бол .tatar-kuber.yaml (эсвэл default high).
     required: false
     default: ""
   min-score:
-    description: "Cluster score доод хязгаар. Хоосон бол .tatar-kuber.yaml-ын утга (0 = хэрэгсэхгүй)."
+    description: |-
+      Minimum cluster score. Empty = use the .tatar-kuber.yaml value (0 = disabled).
+      Cluster score доод хязгаар. Хоосон бол .tatar-kuber.yaml-ын утга (0 = хэрэгсэхгүй).
     required: false
     default: ""
   policy:
-    description: ".tatar-kuber.yaml бодлогын файл"
+    description: |-
+      Path to the .tatar-kuber.yaml policy file.
+      .tatar-kuber.yaml бодлогын файл.
     required: false
     default: ".tatar-kuber.yaml"
   version:
-    description: "tatar-kuber хувилбар (go install tag). default: latest"
+    description: |-
+      tatar-kuber version (go install tag). Default: latest.
+      tatar-kuber хувилбар (go install tag). Default: latest.
     required: false
     default: "latest"
   registry:
-    description: "canonical-controls.yaml зам. Хоосон бол binary-д шигтгэсэн registry (ихэнх repo-д энэ л зөв)."
+    description: |-
+      Path to canonical-controls.yaml. Leave empty to use the registry embedded in the binary — correct for almost every repo.
+      canonical-controls.yaml зам. Хоосон бол binary-д шигтгэсэн registry (ихэнх repo-д энэ л зөв).
     required: false
     default: ""
 
 outputs:
   sarif:
-    description: "Үүсгэсэн SARIF файлын зам"
+    description: |-
+      Path to the generated SARIF file.
+      Үүсгэсэн SARIF файлын зам.
     value: ${{ steps.run.outputs.sarif }}
   result:
-    description: "scan-result.json-ы зам"
+    description: |-
+      Path to scan-result.json.
+      scan-result.json-ы зам.
     value: ${{ steps.run.outputs.result }}
 
 runs:

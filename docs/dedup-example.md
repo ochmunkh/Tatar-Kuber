@@ -9,7 +9,7 @@ This example is real: it is produced from the demo data shipped in
 [`examples/demo/`](../examples/demo). Reproduce it in ~5 seconds:
 
 ```bash
-tatar-kuber scan --raw-dir examples/demo -o out
+tatar-kuber scan --raw-dir examples/demo --out-dir out
 # → out/scan-result.json  (look for TATAR-CON-001 on deployment/api)
 ```
 
@@ -87,7 +87,7 @@ TATAR-Kuber-ийн гол онцлог: хэд хэдэн scanner **нэг resou
 гарна. ~5 секундэд давтах:
 
 ```bash
-tatar-kuber scan --raw-dir examples/demo -o out
+tatar-kuber scan --raw-dir examples/demo --out-dir out
 # → out/scan-result.json  (TATAR-CON-001 / deployment/api-г хар)
 ```
 

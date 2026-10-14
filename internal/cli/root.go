@@ -10,62 +10,54 @@ import (
 // Version — build-time-д тохируулагдана (-ldflags).
 var Version = "1.0.3-dev"
 
-const usage = `TATAR-Kuber — Kubernetes security posture assessment framework
-
-Ашиглах:
-  tatar-kuber <command> [flags]
-
-Commands:
-  scan      Cluster/manifest шалгах эсвэл цуглуулсан raw-г нэгтгэж scan-result.json үүсгэнэ
-  report    scan-result.json-оос тайлан (json|sarif|html) үүсгэнэ; --lang-аар хэлийг сэлгэнэ
-  gate      scan-result.json-ыг .tatar-kuber.yaml бодлоготой тулгаж CI-д pass/fail (exit code)
-  diff      Хоёр scan-result.json-ыг тулгаж юу шинэ / зассан / дордсоныг харуулна
-  doctor    Scanner binary-ууд суусан эсэх, хувилбар, горимыг шалгана
-  verify-lab expected-findings.json-той тулгаж regression шалгана
-  update    (төлөвлөсөн, v2) Scanner binary-уудыг татаж, баталгаажуулж шинэчилнэ
-  version   Хувилбар харуулна
-
-Жишээ:
-  tatar-kuber doctor
-  tatar-kuber scan --kubeconfig ~/.kube/config --namespace prod -o ./out   # Live Mode B
-  tatar-kuber scan --raw-dir ./raw --cluster prod -o ./out                 # Offline (Mode A)
-  tatar-kuber report --input ./out/scan-result.json -o html --out report.html
-  tatar-kuber report --input ./out/scan-result.json -o html --lang mn --out mn.html # нэг scan, өөр хэл
-  tatar-kuber gate --input ./out/scan-result.json --fail-on high              # CI gate
-  tatar-kuber diff --old ./prev/scan-result.json --new ./out/scan-result.json # Trending
-`
-
 // Execute — entrypoint.
 func Execute() int {
-	if len(os.Args) < 2 {
-		fmt.Print(usage)
+	// Хэлийг эхлээд: usage болон "тодорхойгүй команд" хоёр нь команд сонгогдохоос
+	// ӨМНӨ хэвлэгддэг тул `tatar-kuber --lang mn --help` ажиллах ёстой.
+	if _, code := setLang(os.Args[1:]); code != 0 {
+		return code
+	}
+	// Глобал `--lang` хосыг командын нэр ОЛОХЫН ТУЛД хасна — эс тэгвээс
+	// os.Args[1] нь "--lang" хэвээр үлдэж, доорх switch түүнийг команд гэж үзнэ.
+	rest := stripLeadingLang(os.Args[1:])
+	// ...гэхдээ команд руу дамжуулахдаа БУЦААЖ НААНА. Команд бүр setLang-ыг
+	// дахин дууддаг (`report --lang de` нь хаана ч бичигдсэн хэрэглээний алдаа
+	// байхын тулд), тэр дуудлага эхлээд uiLang-ыг default руу буцаадаг. Флагийг
+	// хасчихвал хоёр дахь дуудлага түүнийг олохгүй, `--lang mn doctor` нь
+	// англиар хэвлэдэг байв — харин `doctor --lang mn` монголоор. `--lang`-ыг
+	// команд бүр өөрийн FlagSet дээрээ бүртгүүлдэг тул наасан нь зүгээр.
+	lead := os.Args[1 : len(os.Args)-len(rest)]
+	args := append([]string{os.Args[0]}, rest...)
+	if len(args) < 2 {
+		fmt.Print(msg("usage"))
 		return 3
 	}
-	switch os.Args[1] {
+	cmdArgs := append(append([]string{}, lead...), args[2:]...)
+
+	switch args[1] {
 	case "scan":
-		return cmdScan(os.Args[2:])
+		return cmdScan(cmdArgs)
 	case "report":
-		return cmdReport(os.Args[2:])
+		return cmdReport(cmdArgs)
 	case "doctor":
-		return cmdDoctor(os.Args[2:])
+		return cmdDoctor(cmdArgs)
 	case "gate":
-		return cmdGate(os.Args[2:])
+		return cmdGate(cmdArgs)
 	case "diff":
-		return cmdDiff(os.Args[2:])
+		return cmdDiff(cmdArgs)
 	case "verify-lab":
-		return cmdVerifyLab(os.Args[2:])
+		return cmdVerifyLab(cmdArgs)
 	case "update":
-		fmt.Fprintln(os.Stderr, "update: v1-д хэрэгжээгүй (төлөвлөгөө: download -> checksum/cosign баталгаажуулалт -> tools.lock.yaml). Одоогоор scanner-уудыг өөрөө суулгаж `tatar-kuber doctor`-оор шалгана уу.")
-		return 2
+		return cmdUpdate(cmdArgs)
 	case "version":
 		fmt.Printf("TATAR-Kuber %s\n", Version)
 		return 0
 	case "-h", "--help", "help":
-		fmt.Print(usage)
+		fmt.Print(msg("usage"))
 		return 0
 	default:
-		fmt.Fprintf(os.Stderr, "тодорхойгүй команд: %s\n\n", os.Args[1])
-		fmt.Print(usage)
+		fmt.Fprintf(os.Stderr, "%s\n\n", msg("err.command.unknown", os.Args[1]))
+		fmt.Print(msg("usage"))
 		return 3
 	}
 }

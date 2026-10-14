@@ -1,46 +1,127 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "TATAR-Kuber Finding",
+  "$id": "https://raw.githubusercontent.com/ochmunkh/Tatar-Kuber/master/pkg/schema/tatar-schema-v1.json",
+  "title": "TATAR-Kuber Scan Result",
+  "description": "scan-result.json — TATAR-Kuber-ийн солилцооны формат (Unified Schema v1). report / gate / diff / verify-lab бүгд ҮҮНИЙГ уншдаг, adopter нь baseline болгож commit хийдэг тул энэ бол гэрээ. pkg/schema/schema_test.go нь Go бүтэцтэй зөрөхөд унана.",
   "type": "object",
-  "required": ["id","canonical_control","resource","type","category","severity","title","description","remediation","found_by","confidence","blind_shot","status","first_seen","last_seen"],
+  "required": ["schema_version", "metadata", "summary", "findings"],
   "properties": {
-    "id":                { "type": "string", "pattern": "^TK-[0-9a-f]{12}$", "description": "Тогтвортой content-hash ID: TK- + SHA256(canonical_control|resource|namespace)-ийн эхний 12 hex (48 бит)" },
-    "canonical_control": { "type": "string", "pattern": "^TATAR-[A-Z]+-[0-9]{3}$" },
-    "resource":          { "type": "string" },
-    "namespace":         { "type": "string" },
-    "type":              { "enum": ["misconfiguration","vulnerability","secret","rbac","network","hygiene"] },
-    "category":          { "type": "string" },
-    "severity":          { "enum": ["CRITICAL","HIGH","MEDIUM","LOW","INFO"] },
-    "original_severity": { "enum": ["CRITICAL","HIGH","MEDIUM","LOW","INFO"] },
-    "title":             { "type": "string" },
-    "description":       { "type": "string" },
-    "remediation":       { "type": "string" },
-    "found_by":          { "type": "array", "items": { "type": "string" }, "minItems": 1 },
-    "confidence":        { "enum": ["HIGH","MEDIUM","LOW"] },
-    "blind_shot":        { "type": "boolean" },
-    "blind_shot_reason": { "type": "string" },
-    "risk_contribution": { "type": "number" },
-    "status":            { "enum": ["OPEN","ACKNOWLEDGED","MITIGATION_PLANNED","FIXED","VERIFIED","CLOSED"] },
-    "owner":             { "type": "string" },
-    "first_seen":        { "type": "string", "format": "date-time" },
-    "last_seen":         { "type": "string", "format": "date-time" },
-    "references":        { "type": "array", "items": { "type": "string" } },
-    "raw_refs":          { "type": "array", "items": {
-        "type": "object",
-        "required": ["scanner","rule_id"],
-        "properties": { "scanner": {"type":"string"}, "rule_id": {"type":"string"} }
-    }},
-    "evidence":          { "type": "array", "items": {
-        "type": "object",
-        "properties": { "scanner": {"type":"string"}, "path": {"type":"string"}, "value": {"type":"string"}, "detail": {"type":"string"} }
-    }},
-    "risk_factors":      { "type": "object",
-        "properties": { "base_weight": {"type":"number"}, "asset_context": {"type":"number"}, "exposure": {"type":"number"}, "confidence": {"type":"number"}, "contribution": {"type":"number"} }
+    "schema_version": { "type": "string", "description": "Схемийн хувилбар (ж: tatar-v1)" },
+    "metadata":        { "$ref": "#/$defs/metadata" },
+    "summary":         { "$ref": "#/$defs/summary" },
+    "findings":        { "type": "array", "items": { "$ref": "#/$defs/finding" } }
+  },
+  "$defs": {
+    "metadata": {
+      "type": "object",
+      "required": ["scan_id","cluster_name","scan_mode","tatar_version","scanner_versions","started_at","finished_at","result_hash"],
+      "properties": {
+        "scan_id":          { "type": "string" },
+        "cluster_name":     { "type": "string" },
+        "scan_mode":        { "enum": ["local","remote","offline"], "description": "local (-f манифест) | remote (амьд cluster) | offline (--raw-dir ingest)" },
+        "lang":             { "type": "string", "description": "тайлангийн хэл: en | mn" },
+        "tatar_version":    { "type": "string" },
+        "scanner_versions": { "type": "object", "additionalProperties": { "type": "string" } },
+        "scanner_runs":     { "type": "array", "description": "scanner бүрийн бодит үр дүн — '0 finding' нь 'цэвэр' үү, 'scanner ажиллаагүй' юу гэдгийг ялгана", "items": {
+            "type": "object",
+            "required": ["scanner","status","findings"],
+            "properties": {
+              "scanner":        { "type": "string" },
+              "status":         { "enum": ["ok","unavailable","unsupported","error","timeout","parse_error","ingested"] },
+              "version":        { "type": "string" },
+              "duration_ms":    { "type": "integer" },
+              "error":          { "type": "string" },
+              "raw_bytes":      { "type": "integer" },
+              "findings":       { "type": "integer", "description": "normalize хийгдсэн (dedup-ээс ӨМНӨХ) тоо" },
+              "unmapped_rules": { "type": "array", "items": { "type": "string" } },
+              "unmapped_count": { "type": "integer" }
+            }
+        }},
+        "rollup":           { "type": "object", "description": "Pod -> эзэмшигч controller зөөлт (тоо буурсан нь 'зассан' гэсэн үг биш)", "properties": {
+            "moved": { "type": "integer" },
+            "pods":  { "type": "array", "items": { "type": "string" } }
+        }},
+        "started_at":       { "type": "string", "format": "date-time" },
+        "finished_at":      { "type": "string", "format": "date-time" },
+        "result_hash":      { "type": "string", "description": "Агуулгын hash — тайлан дахин үүсгэхэд хүчинтэй хэвээр байх ёстой" },
+        "inventory":        { "type": "object", "additionalProperties": { "type": "integer" } }
+      }
     },
-    "attack":            { "type": "array", "description": "MITRE ATT&CK techniques this weakness MAY ENABLE (exposure, not detection)", "items": {
-        "type": "object",
-        "required": ["technique","tactic"],
-        "properties": { "technique": {"type":"string"}, "name": {"type":"string"}, "tactic": {"type":"string"} }
-    }}
+    "summary": {
+      "type": "object",
+      "required": ["counts","blind_shot","risk_score","risk_band","total_findings"],
+      "properties": {
+        "counts":         { "type": "object", "additionalProperties": { "type": "integer" } },
+        "blind_shot":     { "type": "integer" },
+        "risk_score":     { "type": "integer" },
+        "risk_band":      { "type": "string" },
+        "total_findings": { "type": "integer" },
+        "risk_breakdown": { "type": "object", "description": "Оноо хэрхэн гарсны бүрэн тайлбар (explainable score)", "properties": {
+            "total_penalty":      { "type": "number" },
+            "high_penalty":       { "type": "number" },
+            "low_penalty_raw":    { "type": "number" },
+            "low_penalty_capped": { "type": "number" },
+            "low_pool_cap":       { "type": "number" },
+            "scale":              { "type": "number" },
+            "formula":            { "type": "string" },
+            "top_contributors":   { "type": "array", "items": {
+                "type": "object",
+                "properties": {
+                  "id":                { "type": "string" },
+                  "canonical_control": { "type": "string" },
+                  "resource":          { "type": "string" },
+                  "severity":          { "enum": ["CRITICAL","HIGH","MEDIUM","LOW","INFO"] },
+                  "contribution":      { "type": "number" },
+                  "share":             { "type": "number" }
+                }
+            }}
+        }}
+      }
+    },
+    "finding": {
+      "title": "TATAR-Kuber Finding",
+      "type": "object",
+      "required": ["id","canonical_control","resource","type","category","severity","title","description","remediation","found_by","confidence","blind_shot","status","first_seen","last_seen"],
+      "properties": {
+        "id":                { "type": "string", "pattern": "^TK-[0-9a-f]{12}$", "description": "Тогтвортой content-hash ID: TK- + SHA256(canonical_control|resource|namespace)-ийн эхний 12 hex (48 бит)" },
+        "canonical_control": { "type": "string", "pattern": "^TATAR-[A-Z]+-[0-9]{3}$" },
+        "resource":          { "type": "string" },
+        "namespace":         { "type": "string" },
+        "type":              { "enum": ["misconfiguration","vulnerability","secret","rbac","network","hygiene"] },
+        "category":          { "type": "string" },
+        "severity":          { "enum": ["CRITICAL","HIGH","MEDIUM","LOW","INFO"] },
+        "original_severity": { "enum": ["CRITICAL","HIGH","MEDIUM","LOW","INFO"] },
+        "title":             { "type": "string" },
+        "description":       { "type": "string" },
+        "remediation":       { "type": "string" },
+        "found_by":          { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "confidence":        { "enum": ["HIGH","MEDIUM","LOW"] },
+        "blind_shot":        { "type": "boolean" },
+        "blind_shot_reason": { "type": "string" },
+        "risk_contribution": { "type": "number" },
+        "status":            { "enum": ["OPEN","ACKNOWLEDGED","MITIGATION_PLANNED","FIXED","VERIFIED","CLOSED"] },
+        "owner":             { "type": "string" },
+        "first_seen":        { "type": "string", "format": "date-time" },
+        "last_seen":         { "type": "string", "format": "date-time" },
+        "references":        { "type": "array", "items": { "type": "string" } },
+        "raw_refs":          { "type": "array", "items": {
+            "type": "object",
+            "required": ["scanner","rule_id"],
+            "properties": { "scanner": {"type":"string"}, "rule_id": {"type":"string"} }
+        }},
+        "evidence":          { "type": "array", "items": {
+            "type": "object",
+            "properties": { "scanner": {"type":"string"}, "path": {"type":"string"}, "value": {"type":"string"}, "detail": {"type":"string"} }
+        }},
+        "risk_factors":      { "type": "object",
+            "properties": { "base_weight": {"type":"number"}, "asset_context": {"type":"number"}, "exposure": {"type":"number"}, "confidence": {"type":"number"}, "contribution": {"type":"number"} }
+        },
+        "attack":            { "type": "array", "description": "MITRE ATT&CK techniques this weakness MAY ENABLE (exposure, not detection)", "items": {
+            "type": "object",
+            "required": ["technique","tactic"],
+            "properties": { "technique": {"type":"string"}, "name": {"type":"string"}, "tactic": {"type":"string"} }
+        }}
+      }
+    }
   }
 }

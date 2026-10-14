@@ -4,7 +4,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/ochmunkh/tatar-kuber/internal/scanner"
@@ -13,23 +12,27 @@ import (
 // cmdDoctor — Live Mode B-д шаардлагатай scanner binary-ууд суусан эсэхийг
 // шалгаж, хувилбар болон дэмждэг горимыг харуулна.
 func cmdDoctor(args []string) int {
+	if _, code := setLang(args); code != 0 {
+		return code
+	}
 	fs := flag.NewFlagSet("doctor", flag.ExitOnError)
-	registry := fs.String("registry", "", "canonical-controls.yaml зам")
+	registry := fs.String("registry", "", msg("flag.registry"))
+	addLangFlag(fs, "flag.lang")
 	_ = fs.Parse(args)
 
 	regPath, err := resolveRegistry(*registry)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "алдаа:", err)
+		errln(err)
 		return 3
 	}
 	p, err := buildPipeline(regPath)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "алдаа:", err)
+		errln(err)
 		return 2
 	}
 
-	fmt.Print("TATAR-Kuber doctor — scanner бэлэн байдал\n\n")
-	fmt.Printf("  %-11s %-9s %-12s %s\n", "SCANNER", "СУУСАН", "ХУВИЛБАР", "ГОРИМ")
+	fmt.Print(msg("doctor.header"))
+	fmt.Printf("  %-11s %-9s %-12s %s\n", "SCANNER", msg("doctor.col.installed"), msg("doctor.col.version"), msg("doctor.col.mode"))
 	fmt.Println("  " + dash(11) + " " + dash(9) + " " + dash(12) + " " + dash(14))
 
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
@@ -38,11 +41,11 @@ func cmdDoctor(args []string) int {
 	available := 0
 	for _, a := range p.Adapters() {
 		ok, _ := a.Available()
-		status := "үгүй"
+		status := msg("doctor.no")
 		ver := "-"
 		if ok {
 			available++
-			status = "тийм"
+			status = msg("doctor.yes")
 			if v, err := a.Version(ctx); err == nil && v != "" {
 				ver = v
 			}
@@ -53,10 +56,10 @@ func cmdDoctor(args []string) int {
 	fmt.Println()
 	switch {
 	case available == 0:
-		fmt.Println("Ямар ч scanner суугаагүй байна. Offline горим ашиглаж болно: tatar-kuber scan --raw-dir ./raw")
+		fmt.Println(msg("doctor.none"))
 		return 1
 	default:
-		fmt.Printf("%d scanner бэлэн. Live scan: tatar-kuber scan --kubeconfig ~/.kube/config\n", available)
+		fmt.Print(msg("doctor.ready", available))
 		return 0
 	}
 }
