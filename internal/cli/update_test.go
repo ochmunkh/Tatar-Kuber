@@ -6,7 +6,20 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	updater "github.com/ochmunkh/tatar-kuber/internal/update"
 )
+
+// requireUpdatable — `update` нь каталогийн артефакт байж байж ажиллана. Windows-д
+// ямар ч scanner пиннэсэн артефактгүй тул энэ тестүүд exit 0 биш, зөв татгалзалыг
+// харна. Тэр татгалзалыг TestCLI_UpdateRefusesUnsupportedPlatform шалгана — энд
+// алгасах нь булж нуусан хэрэг биш.
+func requireUpdatable(t *testing.T, scanner string) {
+	t.Helper()
+	if !updater.SupportedHere(scanner) {
+		t.Skipf("%s: энэ платформд каталогийн артефакт алга — update татгалзана", scanner)
+	}
+}
 
 // ── `update` дээрх CLI давхарга ──────────────────────────────────────────────
 //
@@ -44,6 +57,7 @@ func captureStdout(t *testing.T, fn func()) string {
 
 // --dry-run нь татах ЁСТОЙ зүйлээ хэвлээд зогсоно: файл үүсгэхгүй.
 func TestCLI_UpdateDryRunWritesNothing(t *testing.T) {
+	requireUpdatable(t, "trivy")
 	home := t.TempDir()
 	var code int
 	out := captureStdout(t, func() {
@@ -68,6 +82,7 @@ func TestCLI_UpdateDryRunWritesNothing(t *testing.T) {
 
 // --check мөн адил: зөвхөн уншиж хэвлэнэ.
 func TestCLI_UpdateCheckWritesNothing(t *testing.T) {
+	requireUpdatable(t, "trivy")
 	home := t.TempDir()
 	var code int
 	out := captureStdout(t, func() {
@@ -99,6 +114,7 @@ func TestCLI_UpdateUnknownScannerIsUsageError(t *testing.T) {
 // `tatar-kuber update` нь dispatcher-т холбогдсон байх ёстой: v1-д энэ нь
 // "хэрэгжээгүй" гэж exit 2 буцаадаг байсан.
 func TestCLI_UpdateIsWiredIntoTheDispatcher(t *testing.T) {
+	requireUpdatable(t, "trivy")
 	orig := os.Args
 	defer func() { os.Args = orig; setLang(nil) }()
 
@@ -108,6 +124,17 @@ func TestCLI_UpdateIsWiredIntoTheDispatcher(t *testing.T) {
 	captureStdout(t, func() { code = Execute() })
 	if code != 0 {
 		t.Errorf("Execute(update --dry-run) = %d, want 0 (v1-д 2 буцаадаг байв)", code)
+	}
+}
+
+// Пиннэсэн артефактгүй платформ дээр update нь ТАТГАЛЗАХ ёстой, бас түүнийгээ
+// платформын асуудал гэж хэлэх ёстой — аль нэг scanner-ийн гэм мэт биш.
+func TestCLI_UpdateRefusesUnsupportedPlatform(t *testing.T) {
+	if updater.SupportedHere("trivy") {
+		t.Skip("энэ платформыг каталог дэмждэг — татгалзах зам шалгахгүй")
+	}
+	if code := cmdUpdate([]string{"--scanner", "trivy", "--check", "--home", t.TempDir()}); code != 2 {
+		t.Errorf("update --check дэмждээгүй платформ дээр exit=%d, 2 байх ёстой", code)
 	}
 }
 

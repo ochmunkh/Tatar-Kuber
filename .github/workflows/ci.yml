@@ -44,6 +44,31 @@ jobs:
       - name: Docs in sync (.docx -> .md)
         run: bash scripts/docs.sh --check
 
+  # Windows дээр бас ажиллах ёстой.
+  #
+  # ЯАГААД: бүх workflow ubuntu-latest дээр явдаг байсан тул 2026-10-14-ных
+  # байдлаар master дээр `go test ./...` нь Windows дээр хоёр багц дээр унаж
+  # байсныг CI мэдээгүй. GoReleaser Windows хоёрлог гаргадаг, бас зохиогч нь
+  # өөрөө Windows дээр ажилладаг — харагдахгүй байсан нь зөвхөн CI.
+  build-test-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "stable"
+          cache: true
+
+      - name: Build
+        run: go build ./...
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Test
+        run: go test ./... -count=1
+
   security:
     runs-on: ubuntu-latest
     permissions:

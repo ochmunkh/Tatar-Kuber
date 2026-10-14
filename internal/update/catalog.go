@@ -113,6 +113,18 @@ func Scanners() []string {
 	return out
 }
 
+// SupportedHere — does the catalogue publish an asset for the platform this
+// binary is running on? There are no Windows assets pinned for any scanner, so
+// `update` cannot work there; callers (and tests) ask rather than assume.
+func SupportedHere(scanner string) bool {
+	t, ok := lookup(scanner)
+	if !ok {
+		return false
+	}
+	_, ok = t.Assets[CurrentPlatform().String()]
+	return ok
+}
+
 // lookup — the catalogue entry for a scanner name.
 func lookup(name string) (tool, bool) {
 	for _, t := range catalogue {

@@ -122,6 +122,14 @@ func updateError(err error) int {
 		errln(msg("err.update.scanner.unknown", unknown.Name, strings.Join(unknown.Known, ", ")))
 		return 3
 	}
+	// A platform nobody pinned is a property of the COMMAND, not of whichever
+	// scanner happened to be resolved first. "trivy: no release asset for
+	// windows/amd64" reads as a trivy problem; it is not.
+	var plat *updater.UnsupportedPlatformError
+	if errors.As(err, &plat) {
+		errln(msg("err.update.platform", plat.Platform.String(), strings.Join(plat.Available, ", ")))
+		return 2
+	}
 	errln(err)
 	return 2
 }

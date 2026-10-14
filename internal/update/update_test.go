@@ -13,6 +13,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
 	"testing"
@@ -198,7 +199,10 @@ func TestApply_DownloadVerifyInstallLock(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if fi.Mode().Perm()&0o111 == 0 {
+	// Windows дээр гүйцэтгэх бит гэж байдаггүй: Go-гийн os.Chmod тэнд зөвхөн
+	// read-only тугийг хөдөлгөдөг. Ассертыг алгасана — суулгалтын бусад бүх
+	// шалгалт (агуулга, LICENSE, хүсэлтийн тоо) хэвээр ажиллана.
+	if runtime.GOOS != "windows" && fi.Mode().Perm()&0o111 == 0 {
 		t.Errorf("installed binary is not executable: %v", fi.Mode())
 	}
 	// The rest of the tarball comes along: the licence next to the binary is

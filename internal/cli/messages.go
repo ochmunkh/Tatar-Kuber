@@ -593,6 +593,16 @@ var catalog = map[string]canonical.I18n{
 		"en": "unknown scanner '%s' (known: %s)",
 		"mn": "'%s' scanner танигдсангүй (байгаа: %s)",
 	},
+	// Хувилбар бүрт checksum тогтоогдсон байх шаардлагатай тул каталог одоогоор
+	// linux ба darwin-ыг л мэднэ. Windows дээр "аль нэгэн scanner олдсонгүй" гэхгүй,
+	// команд өөрөө энэ платформ дээр ажиллахгүй гэдгээ шууд хэлнэ.
+	"err.update.platform": {
+		"en": "update does not support %s: no scanner in the catalogue publishes a pinned asset for it " +
+			"(supported: %s). Install the scanners with your package manager and run `tatar-kuber doctor`.",
+		"mn": "update нь %s-ыг дэмждэггүй: каталогийн ямар ч scanner түүнд зориулсан пиннэсэн " +
+			"артефакт нийтэлдэггүй (дэмждэг: %s). Scanner-уудаа багц удирдлагаараа суулгаад " +
+			"`tatar-kuber doctor` ажиллуулна уу.",
+	},
 
 	// ── verify-lab ─────────────────────────────────────────────────────────
 	//
