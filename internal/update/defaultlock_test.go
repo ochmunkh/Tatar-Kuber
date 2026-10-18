@@ -73,13 +73,35 @@ func TestDefaultLock_EveryPinIsWellFormed(t *testing.T) {
 			t.Errorf("%s: cosign = %q, want %q — signature checking is not implemented, "+
 				"so the shipped lock must never claim otherwise", name, e.Cosign, CosignUnverified)
 		}
-		sum := strings.TrimSpace(e.SHA256)
-		if sum == "" {
+		// EVERY platform the catalogue publishes an asset for must be pinned.
+		// One value used to stand for all of them: true on linux/amd64, a
+		// MISMATCH everywhere else, which read as a corrupt download rather
+		// than as an unpinned platform.
+		tool, _ := lookup(name)
+		if len(e.SHA256.ByPlatform) == 0 && strings.TrimSpace(e.SHA256.Legacy) == "" {
 			unpinned = append(unpinned, name)
 			continue
 		}
-		if !sha256Hex.MatchString(sum) {
-			t.Errorf("%s: sha256 = %q, want 64 lower-case hex characters", name, sum)
+		if e.SHA256.Legacy != "" {
+			t.Errorf("%s: sha256 is a bare string — the shipped lock is read on every "+
+				"platform, so it must key its pins by platform", name)
+		}
+		for _, pl := range tool.platforms() {
+			sum, ok := e.SHA256.ByPlatform[pl]
+			if !ok {
+				t.Errorf("%s: no pin for %s, which the catalogue publishes an asset for", name, pl)
+				continue
+			}
+			if !sha256Hex.MatchString(strings.TrimSpace(sum)) {
+				t.Errorf("%s %s: sha256 = %q, want 64 lower-case hex characters", name, pl, sum)
+			}
+		}
+		// A pin for a platform the catalogue does not publish is a leftover:
+		// it can never be used and will quietly go stale.
+		for pl := range e.SHA256.ByPlatform {
+			if _, ok := tool.Assets[pl]; !ok {
+				t.Errorf("%s: pinned %s, but the catalogue publishes no asset for it", name, pl)
+			}
 		}
 		// Installed is written by Apply on the machine that runs it. The
 		// shipped file is a starting point, so it must not claim an install.

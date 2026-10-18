@@ -132,7 +132,7 @@ func Resolve(opts Options) ([]Plan, error) {
 		// only when the lock's version is the version being installed.
 		sum := ""
 		if locked && entry.Version == version {
-			sum = entry.SHA256
+			sum = entry.SHA256.Get(plat)
 		}
 		plans = append(plans, Plan{
 			Scanner:   name,
@@ -253,14 +253,16 @@ func Apply(ctx context.Context, opts Options) ([]Result, error) {
 		if err != nil {
 			return nil, fmt.Errorf("%s: %w", u.plan.Scanner, err)
 		}
-		lock.Tools[u.plan.Scanner] = LockEntry{
-			Version: u.plan.Version,
-			SHA256:  u.plan.SHA256,
-			Cosign:  cosignStatus(u.sigChecked),
-			// Only Apply ever writes this, which is what makes --check able to
-			// tell "pinned in the lock" from "actually installed".
-			Installed: u.plan.Version,
-		}
+		// Merge rather than replace: a lock pins every platform, and an install
+		// on one of them must not drop the pins for the other three.
+		entry := lock.Tools[u.plan.Scanner]
+		entry.SHA256.Set(u.plan.Platform, u.plan.SHA256)
+		entry.Version = u.plan.Version
+		entry.Cosign = cosignStatus(u.sigChecked)
+		// Only Apply ever writes this, which is what makes --check able to tell
+		// "pinned in the lock" from "actually installed".
+		entry.Installed = u.plan.Version
+		lock.Tools[u.plan.Scanner] = entry
 		results = append(results, Result{Plan: u.plan, BinPath: bin, SigChecked: u.sigChecked})
 	}
 	if err := SaveLock(LockPath(opts.Home), lock); err != nil {

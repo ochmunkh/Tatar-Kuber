@@ -25,9 +25,9 @@ const (
 // artefact is what upstream publishes a checksum for, so that is the only value
 // a human can compare against a release page.
 type LockEntry struct {
-	Version string `yaml:"version"`
-	SHA256  string `yaml:"sha256"`
-	Cosign  string `yaml:"cosign"`
+	Version string    `yaml:"version"`
+	SHA256  SHA256Set `yaml:"sha256"`
+	Cosign  string    `yaml:"cosign"`
 
 	// Installed — the version Apply actually put on disk, written ONLY by
 	// Apply. Kept separate from Version because Version is a pin: a
@@ -38,12 +38,67 @@ type LockEntry struct {
 	Installed string `yaml:"installed,omitempty"`
 }
 
+// SHA256Set — one scanner's checksums, keyed by platform ("linux/amd64").
+//
+// A release publishes a DIFFERENT artefact per platform, so a single checksum
+// pins exactly one of them. The lock shipped with this repo is copied to every
+// machine, and while it carried one value that value was true on linux/amd64
+// and a MISMATCH everywhere else: a refusal that read as corruption rather
+// than as "nobody pinned this platform".
+//
+// A bare string is still accepted, because that is what `update` wrote before
+// this change. Such a file was produced by update ON the machine reading it,
+// so the value is taken to belong to the current platform; the next successful
+// update rewrites it in the keyed form and the ambiguity goes away.
+type SHA256Set struct {
+	ByPlatform map[string]string
+	Legacy     string
+}
+
+func (s *SHA256Set) UnmarshalYAML(n *yaml.Node) error {
+	if n.Kind == yaml.ScalarNode {
+		s.Legacy = n.Value
+		return nil
+	}
+	return n.Decode(&s.ByPlatform)
+}
+
+// Get — the checksum pinned for this platform, or "" when none is.
+func (s SHA256Set) Get(p Platform) string {
+	if v, ok := s.ByPlatform[p.String()]; ok {
+		return v
+	}
+	return s.Legacy
+}
+
+// Set — record a checksum for one platform, leaving the others alone. A lock
+// that has pins for four platforms must not lose three of them because an
+// install ran on the fourth.
+func (s *SHA256Set) Set(p Platform, sum string) {
+	if s.ByPlatform == nil {
+		s.ByPlatform = map[string]string{}
+	}
+	s.ByPlatform[p.String()] = sum
+	s.Legacy = ""
+}
+
+// platforms — pinned platforms, sorted, for a stable file.
+func (s SHA256Set) platforms() []string {
+	out := make([]string, 0, len(s.ByPlatform))
+	for k := range s.ByPlatform {
+		out = append(out, k)
+	}
+	sort.Strings(out)
+	return out
+}
+
 // Lock — ~/.tatar-kuber/tools.lock.yaml, in the shape Doc #6 §7 documents.
 //
 // It is both input and output: `tatar-kuber update` installs the version the
 // lock pins ("бүх scanner-ыг lock хувилбар руу", Doc #5 §5) and rewrites the
-// file with what it actually installed. The file is per-machine, which is why
-// one sha256 per tool is enough — it pins this platform's artefact.
+// file with what it actually installed. Checksums are keyed by platform: the
+// copy shipped with the repo is read on every platform, so one value cannot
+// serve them all.
 type Lock struct {
 	Tools map[string]LockEntry `yaml:"tools"`
 }
@@ -90,9 +145,10 @@ func SaveLock(path string, l Lock) error {
 	var b strings.Builder
 	b.WriteString("# tools.lock.yaml — written by `tatar-kuber update`.\n")
 	b.WriteString("#\n")
-	b.WriteString("# version / sha256 pin one scanner release. sha256 is the checksum of the\n")
-	b.WriteString("# DOWNLOADED ARTEFACT (archive or bare binary) as the upstream project\n")
-	b.WriteString("# publishes it, and `update` refuses to install a scanner that has none.\n")
+	b.WriteString("# version / sha256 pin one scanner release. sha256 is keyed by platform and\n")
+	b.WriteString("# is the checksum of the DOWNLOADED ARTEFACT (archive or bare binary) as the\n")
+	b.WriteString("# upstream project publishes it. `update` refuses to install a scanner with\n")
+	b.WriteString("# no pin for the platform it is running on.\n")
 	b.WriteString("#\n")
 	b.WriteString("# cosign: \"" + CosignUnverified + "\" means the signature was NOT checked.\n")
 	b.WriteString("# cosign verification is not implemented yet (planned for v2), so this file\n")
@@ -107,7 +163,16 @@ func SaveLock(path string, l Lock) error {
 		e := l.Tools[n]
 		fmt.Fprintf(&b, "  %s:\n", n)
 		fmt.Fprintf(&b, "    version: %q\n", e.Version)
-		fmt.Fprintf(&b, "    sha256:  %q\n", e.SHA256)
+		if plats := e.SHA256.platforms(); len(plats) > 0 {
+			fmt.Fprintf(&b, "    sha256:\n")
+			for _, pl := range plats {
+				fmt.Fprintf(&b, "      %-13s %q\n", pl+":", e.SHA256.ByPlatform[pl])
+			}
+		} else {
+			// No pin at all (checkov today): an empty map and an empty string
+			// are the same state, and both have to round-trip.
+			fmt.Fprintf(&b, "    sha256:  %q\n", e.SHA256.Legacy)
+		}
 		fmt.Fprintf(&b, "    cosign:  %q\n", e.Cosign)
 		// Omitted rather than written empty: an absent line is how a pin that
 		// has never been installed is represented, and writing installed: ""

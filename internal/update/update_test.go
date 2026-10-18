@@ -13,6 +13,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"reflect"
 	"runtime"
 	"strings"
 	"sync"
@@ -168,6 +169,11 @@ func installedBinaries(t *testing.T, home string) []string {
 
 // ── the happy path ───────────────────────────────────────────────────────────
 
+// legacyPin — хуучин хэлбэрийн нэг утгатай sha256. Эдгээр тестүүд платформаас
+// хамаарахгүй тул яг тэр хэлбэрээр үлдээв: тэгэхээсээ давхар ашгийг өгнө —
+// `update` өмнө бичсэн lock файлууд уншигдсаар байгааг шалгана.
+func legacyPin(sum string) SHA256Set { return SHA256Set{Legacy: sum} }
+
 func TestApply_DownloadVerifyInstallLock(t *testing.T) {
 	binary := []byte("#!/bin/sh\necho trivy 9.9.9\n")
 	artefact := tarGzWith(t, "trivy", binary)
@@ -176,7 +182,7 @@ func TestApply_DownloadVerifyInstallLock(t *testing.T) {
 
 	home := t.TempDir()
 	if err := SaveLock(LockPath(home), Lock{Tools: map[string]LockEntry{
-		"trivy": {Version: "1.2.3", SHA256: sum(artefact), Cosign: CosignUnverified},
+		"trivy": {Version: "1.2.3", SHA256: legacyPin(sum(artefact)), Cosign: CosignUnverified},
 	}}); err != nil {
 		t.Fatal(err)
 	}
@@ -220,8 +226,22 @@ func TestApply_DownloadVerifyInstallLock(t *testing.T) {
 		t.Fatal(err)
 	}
 	e := lock.Tools["trivy"]
-	if e.Version != "1.2.3" || e.SHA256 != sum(artefact) {
+	if e.Version != "1.2.3" {
 		t.Errorf("lock entry = %+v", e)
+	}
+	// Keyed by platform, and by EXACTLY the one that was installed: an install
+	// on one platform must neither be readable as a pin for another nor wipe
+	// the pins Apply did not touch.
+	if e.SHA256.Legacy != "" {
+		t.Errorf("Apply wrote a bare sha256 — the pin has to name its platform")
+	}
+	if len(e.SHA256.ByPlatform) != 1 {
+		t.Errorf("Apply pinned %d platforms, want 1: %+v", len(e.SHA256.ByPlatform), e.SHA256.ByPlatform)
+	}
+	for pl, got := range e.SHA256.ByPlatform {
+		if got != sum(artefact) {
+			t.Errorf("pin for %s = %q, want %q", pl, got, sum(artefact))
+		}
 	}
 	if e.Cosign != CosignUnverified {
 		t.Errorf("lock cosign = %q, want %q — the stub verifier must never claim a signature was checked",
@@ -248,8 +268,8 @@ func TestApply_RawAndZipAssets(t *testing.T) {
 
 	home := t.TempDir()
 	if err := SaveLock(LockPath(home), Lock{Tools: map[string]LockEntry{
-		"kubescape": {Version: "1.0.0", SHA256: sum(raw)},
-		"checkov":   {Version: "2.0.0", SHA256: sum(bundle)},
+		"kubescape": {Version: "1.0.0", SHA256: legacyPin(sum(raw))},
+		"checkov":   {Version: "2.0.0", SHA256: legacyPin(sum(bundle))},
 	}}); err != nil {
 		t.Fatal(err)
 	}
@@ -283,7 +303,7 @@ func TestApply_ChecksumMismatchInstallsNothing(t *testing.T) {
 	home := t.TempDir()
 	pinned := sum([]byte("a different artefact entirely"))
 	before := Lock{Tools: map[string]LockEntry{
-		"trivy": {Version: "1.2.3", SHA256: pinned, Cosign: CosignUnverified},
+		"trivy": {Version: "1.2.3", SHA256: legacyPin(pinned), Cosign: CosignUnverified},
 	}}
 	if err := SaveLock(LockPath(home), before); err != nil {
 		t.Fatal(err)
@@ -329,8 +349,8 @@ func TestApply_OneMismatchInstallsNoneOfThem(t *testing.T) {
 
 	home := t.TempDir()
 	if err := SaveLock(LockPath(home), Lock{Tools: map[string]LockEntry{
-		"trivy":  {Version: "1.0.0", SHA256: sum(good)},
-		"popeye": {Version: "2.0.0", SHA256: sum([]byte("not what is served"))},
+		"trivy":  {Version: "1.0.0", SHA256: legacyPin(sum(good))},
+		"popeye": {Version: "2.0.0", SHA256: legacyPin(sum([]byte("not what is served")))},
 	}}); err != nil {
 		t.Fatal(err)
 	}
@@ -350,7 +370,7 @@ func TestApply_HTTPErrorInstallsNothing(t *testing.T) {
 
 	home := t.TempDir()
 	if err := SaveLock(LockPath(home), Lock{Tools: map[string]LockEntry{
-		"trivy": {Version: "1.2.3", SHA256: sum([]byte("anything"))},
+		"trivy": {Version: "1.2.3", SHA256: legacyPin(sum([]byte("anything")))},
 	}}); err != nil {
 		t.Fatal(err)
 	}
@@ -391,7 +411,7 @@ func TestResolve_TheLockDecidesTheVersion(t *testing.T) {
 	useCatalogue(t, mockTool("trivy", "2.0.0", "https://example.invalid/trivy-{v}.tar.gz", ArchiveTarGz))
 	home := t.TempDir()
 	if err := SaveLock(LockPath(home), Lock{Tools: map[string]LockEntry{
-		"trivy": {Version: "1.0.0", SHA256: "deadbeef"},
+		"trivy": {Version: "1.0.0", SHA256: legacyPin("deadbeef")},
 	}}); err != nil {
 		t.Fatal(err)
 	}
@@ -414,7 +434,7 @@ func TestResolve_AChecksumWithoutItsVersionPinsNothing(t *testing.T) {
 	useCatalogue(t, mockTool("trivy", "2.0.0", "https://example.invalid/trivy-{v}.tar.gz", ArchiveTarGz))
 	home := t.TempDir()
 	if err := SaveLock(LockPath(home), Lock{Tools: map[string]LockEntry{
-		"trivy": {SHA256: "deadbeef"},
+		"trivy": {SHA256: legacyPin("deadbeef")},
 	}}); err != nil {
 		t.Fatal(err)
 	}
@@ -496,8 +516,8 @@ func TestResolve_UnsupportedPlatform(t *testing.T) {
 func TestLock_RoundTripsAndIsStable(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "tools.lock.yaml")
 	in := Lock{Tools: map[string]LockEntry{
-		"popeye": {Version: "0.21.5", SHA256: "bbbb", Cosign: CosignUnverified},
-		"trivy":  {Version: "0.53.0", SHA256: "aaaa", Cosign: CosignUnverified},
+		"popeye": {Version: "0.21.5", SHA256: legacyPin("bbbb"), Cosign: CosignUnverified},
+		"trivy":  {Version: "0.53.0", SHA256: legacyPin("aaaa"), Cosign: CosignUnverified},
 	}}
 	if err := SaveLock(path, in); err != nil {
 		t.Fatal(err)
@@ -510,7 +530,7 @@ func TestLock_RoundTripsAndIsStable(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(out.Tools) != 2 || out.Tools["trivy"] != in.Tools["trivy"] {
+	if len(out.Tools) != 2 || !reflect.DeepEqual(out.Tools["trivy"], in.Tools["trivy"]) {
 		t.Fatalf("round trip = %+v", out.Tools)
 	}
 	// Rewriting an unchanged lock must produce an unchanged file, or every run
@@ -627,7 +647,7 @@ func TestApply_RecordsAVerifierThatDoesCheck(t *testing.T) {
 
 	home := t.TempDir()
 	if err := SaveLock(LockPath(home), Lock{Tools: map[string]LockEntry{
-		"trivy": {Version: "1.2.3", SHA256: sum(artefact)},
+		"trivy": {Version: "1.2.3", SHA256: legacyPin(sum(artefact))},
 	}}); err != nil {
 		t.Fatal(err)
 	}
@@ -665,9 +685,9 @@ func TestApply_KeepsLockEntriesItDidNotTouch(t *testing.T) {
 	)
 
 	home := t.TempDir()
-	popeye := LockEntry{Version: "0.9.0", SHA256: "cafe", Cosign: CosignUnverified}
+	popeye := LockEntry{Version: "0.9.0", SHA256: legacyPin("cafe"), Cosign: CosignUnverified}
 	if err := SaveLock(LockPath(home), Lock{Tools: map[string]LockEntry{
-		"trivy":  {Version: "1.2.3", SHA256: sum(artefact), Cosign: CosignUnverified},
+		"trivy":  {Version: "1.2.3", SHA256: legacyPin(sum(artefact)), Cosign: CosignUnverified},
 		"popeye": popeye,
 	}}); err != nil {
 		t.Fatal(err)
@@ -680,7 +700,7 @@ func TestApply_KeepsLockEntriesItDidNotTouch(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if lock.Tools["popeye"] != popeye {
+	if !reflect.DeepEqual(lock.Tools["popeye"], popeye) {
 		t.Errorf("popeye entry = %+v, want %+v — an untouched pin was lost", lock.Tools["popeye"], popeye)
 	}
 }
@@ -700,7 +720,7 @@ func TestApply_AnUnusableArchiveLeavesTheOthersUntouched(t *testing.T) {
 	useCatalogue(t, mockTool("trivy", "1.0.0", srvOld.URL+"/trivy-{v}.tar.gz", ArchiveTarGz))
 	home := t.TempDir()
 	if err := SaveLock(LockPath(home), Lock{Tools: map[string]LockEntry{
-		"trivy": {Version: "1.0.0", SHA256: sum(old)},
+		"trivy": {Version: "1.0.0", SHA256: legacyPin(sum(old))},
 	}}); err != nil {
 		t.Fatal(err)
 	}
@@ -721,8 +741,8 @@ func TestApply_AnUnusableArchiveLeavesTheOthersUntouched(t *testing.T) {
 		mockTool("popeye", "2.0.0", srv.URL+"/popeye-{v}.tar.gz", ArchiveTarGz),
 	)
 	if err := SaveLock(LockPath(home), Lock{Tools: map[string]LockEntry{
-		"trivy":  {Version: "2.0.0", SHA256: sum(newTrivy), Installed: "1.0.0"},
-		"popeye": {Version: "2.0.0", SHA256: sum(noBinary)},
+		"trivy":  {Version: "2.0.0", SHA256: legacyPin(sum(newTrivy)), Installed: "1.0.0"},
+		"popeye": {Version: "2.0.0", SHA256: legacyPin(sum(noBinary))},
 	}}); err != nil {
 		t.Fatal(err)
 	}
@@ -758,7 +778,7 @@ func TestResolve_APinIsNotAnInstall(t *testing.T) {
 	useCatalogue(t, mockTool("trivy", "1.2.3", "https://example.invalid/trivy-{v}.tar.gz", ArchiveTarGz))
 	home := t.TempDir()
 	if err := SaveLock(LockPath(home), Lock{Tools: map[string]LockEntry{
-		"trivy": {Version: "1.2.3", SHA256: sum([]byte("x"))}, // pinned, never installed
+		"trivy": {Version: "1.2.3", SHA256: legacyPin(sum([]byte("x")))}, // pinned, never installed
 	}}); err != nil {
 		t.Fatal(err)
 	}
@@ -785,7 +805,7 @@ func TestApply_RecordsWhatItInstalledSeparatelyFromThePin(t *testing.T) {
 	useCatalogue(t, mockTool("trivy", "1.2.3", srv.URL+"/trivy-{v}.tar.gz", ArchiveTarGz))
 	home := t.TempDir()
 	if err := SaveLock(LockPath(home), Lock{Tools: map[string]LockEntry{
-		"trivy": {Version: "1.2.3", SHA256: sum(artefact)},
+		"trivy": {Version: "1.2.3", SHA256: legacyPin(sum(artefact))},
 	}}); err != nil {
 		t.Fatal(err)
 	}
@@ -817,7 +837,7 @@ func TestApply_AnUpperCasePinIsNotAMismatch(t *testing.T) {
 	useCatalogue(t, mockTool("trivy", "1.2.3", srv.URL+"/trivy-{v}.tar.gz", ArchiveTarGz))
 	home := t.TempDir()
 	if err := SaveLock(LockPath(home), Lock{Tools: map[string]LockEntry{
-		"trivy": {Version: "1.2.3", SHA256: strings.ToUpper(sum(artefact))},
+		"trivy": {Version: "1.2.3", SHA256: legacyPin(strings.ToUpper(sum(artefact)))},
 	}}); err != nil {
 		t.Fatal(err)
 	}
@@ -827,7 +847,7 @@ func TestApply_AnUpperCasePinIsNotAMismatch(t *testing.T) {
 	// A genuinely wrong checksum is still a mismatch, whatever its case.
 	home2 := t.TempDir()
 	if err := SaveLock(LockPath(home2), Lock{Tools: map[string]LockEntry{
-		"trivy": {Version: "1.2.3", SHA256: strings.ToUpper(sum([]byte("something else")))},
+		"trivy": {Version: "1.2.3", SHA256: legacyPin(strings.ToUpper(sum([]byte("something else"))))},
 	}}); err != nil {
 		t.Fatal(err)
 	}
