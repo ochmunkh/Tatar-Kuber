@@ -49,7 +49,7 @@ type Control struct {
 	Type            string                    `yaml:"type"`
 	DefaultSeverity string                    `yaml:"default_severity"`
 	Status          string                    `yaml:"status"` // active | deprecated
-	Description     string                    `yaml:"description"`
+	Description     I18n                      `yaml:"description"`
 	Remediation     I18n                      `yaml:"remediation"`
 	References      []string                  `yaml:"references"`
 	Attack          []finding.AttackTechnique `yaml:"attack,omitempty"` // энэ control БОЛОМЖТОЙ БОЛГОХ MITRE ATT&CK техник(үүд)

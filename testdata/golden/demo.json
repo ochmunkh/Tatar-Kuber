@@ -194,7 +194,7 @@
       "severity": "CRITICAL",
       "original_severity": "CRITICAL",
       "title": "cluster-admin binding overuse",
-      "description": "",
+      "description": "A subject is bound directly to cluster-admin.",
       "remediation": "Restrict cluster-admin; use specific scoped roles.",
       "found_by": [
         "kubescape"
@@ -237,7 +237,7 @@
       "severity": "HIGH",
       "original_severity": "HIGH",
       "title": "Allow privilege escalation",
-      "description": "",
+      "description": "allowPrivilegeEscalation=true lets a process gain more privileges than the one that started it.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -286,7 +286,7 @@
       "severity": "HIGH",
       "original_severity": "HIGH",
       "title": "Dangerous capabilities added",
-      "description": "",
+      "description": "Dangerous Linux capabilities such as SYS_ADMIN or NET_ADMIN are added to the container.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -332,7 +332,7 @@
       "severity": "HIGH",
       "original_severity": "HIGH",
       "title": "Privileged container enabled",
-      "description": "",
+      "description": "The container runs with privileged=true, which disables most isolation and gives it access to every device on the node.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -381,7 +381,7 @@
       "severity": "HIGH",
       "original_severity": "HIGH",
       "title": "Host network enabled",
-      "description": "",
+      "description": "hostNetwork=true puts the pod on the node's network, bypassing network isolation.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -477,7 +477,7 @@
       "severity": "HIGH",
       "original_severity": "HIGH",
       "title": "Allow privilege escalation",
-      "description": "",
+      "description": "allowPrivilegeEscalation=true lets a process gain more privileges than the one that started it.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -526,7 +526,7 @@
       "severity": "HIGH",
       "original_severity": "HIGH",
       "title": "Allow privilege escalation",
-      "description": "",
+      "description": "allowPrivilegeEscalation=true lets a process gain more privileges than the one that started it.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -575,7 +575,7 @@
       "severity": "HIGH",
       "original_severity": "HIGH",
       "title": "Dangerous capabilities added",
-      "description": "",
+      "description": "Dangerous Linux capabilities such as SYS_ADMIN or NET_ADMIN are added to the container.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -621,7 +621,7 @@
       "severity": "HIGH",
       "original_severity": "HIGH",
       "title": "Dangerous capabilities added",
-      "description": "",
+      "description": "Dangerous Linux capabilities such as SYS_ADMIN or NET_ADMIN are added to the container.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -667,7 +667,7 @@
       "severity": "HIGH",
       "original_severity": "HIGH",
       "title": "Allow privilege escalation",
-      "description": "",
+      "description": "allowPrivilegeEscalation=true lets a process gain more privileges than the one that started it.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -783,7 +783,7 @@
       "severity": "HIGH",
       "original_severity": "HIGH",
       "title": "Allow privilege escalation",
-      "description": "",
+      "description": "allowPrivilegeEscalation=true lets a process gain more privileges than the one that started it.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -832,7 +832,7 @@
       "severity": "HIGH",
       "original_severity": "HIGH",
       "title": "Host PID namespace shared",
-      "description": "",
+      "description": "hostPID=true exposes the node's process namespace to the container.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -881,7 +881,7 @@
       "severity": "HIGH",
       "original_severity": "HIGH",
       "title": "Dangerous capabilities added",
-      "description": "",
+      "description": "Dangerous Linux capabilities such as SYS_ADMIN or NET_ADMIN are added to the container.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -927,7 +927,7 @@
       "severity": "HIGH",
       "original_severity": "HIGH",
       "title": "Dangerous capabilities added",
-      "description": "",
+      "description": "Dangerous Linux capabilities such as SYS_ADMIN or NET_ADMIN are added to the container.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -1022,7 +1022,7 @@
       "severity": "HIGH",
       "original_severity": "HIGH",
       "title": "Wildcard permissions in role",
-      "description": "",
+      "description": "A role grants wildcard (*) resources or verbs.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -1071,7 +1071,7 @@
       "severity": "HIGH",
       "original_severity": "HIGH",
       "title": "Excessive / risky permissions",
-      "description": "",
+      "description": "A role grants risky permissions such as reading secrets, pods/exec, or escalate/bind.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -1125,7 +1125,7 @@
       "severity": "MEDIUM",
       "original_severity": "MEDIUM",
       "title": "Read-only root filesystem disabled",
-      "description": "",
+      "description": "readOnlyRootFilesystem=false leaves the container's root filesystem writable.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -1167,7 +1167,7 @@
       "severity": "MEDIUM",
       "original_severity": "MEDIUM",
       "title": "Missing securityContext",
-      "description": "",
+      "description": "No securityContext is defined on the pod or container, so every hardening default is left to the runtime.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -1209,7 +1209,7 @@
       "severity": "MEDIUM",
       "original_severity": "MEDIUM",
       "title": "Missing securityContext",
-      "description": "",
+      "description": "No securityContext is defined on the pod or container, so every hardening default is left to the runtime.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -1251,7 +1251,7 @@
       "severity": "MEDIUM",
       "original_severity": "MEDIUM",
       "title": "Service account token auto-mounted",
-      "description": "",
+      "description": "automountServiceAccountToken=true mounts a token the workload may not need.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -1300,7 +1300,7 @@
       "severity": "MEDIUM",
       "original_severity": "MEDIUM",
       "title": "Service account token auto-mounted",
-      "description": "",
+      "description": "automountServiceAccountToken=true mounts a token the workload may not need.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -1349,7 +1349,7 @@
       "severity": "MEDIUM",
       "original_severity": "MEDIUM",
       "title": "Missing securityContext",
-      "description": "",
+      "description": "No securityContext is defined on the pod or container, so every hardening default is left to the runtime.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -1391,7 +1391,7 @@
       "severity": "MEDIUM",
       "original_severity": "MEDIUM",
       "title": "Read-only root filesystem disabled",
-      "description": "",
+      "description": "readOnlyRootFilesystem=false leaves the container's root filesystem writable.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -1433,7 +1433,7 @@
       "severity": "MEDIUM",
       "original_severity": "MEDIUM",
       "title": "Read-only root filesystem disabled",
-      "description": "",
+      "description": "readOnlyRootFilesystem=false leaves the container's root filesystem writable.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -1475,7 +1475,7 @@
       "severity": "MEDIUM",
       "original_severity": "MEDIUM",
       "title": "Default seccomp profile not set",
-      "description": "",
+      "description": "No seccompProfile is set, so system calls are not restricted.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -1517,7 +1517,7 @@
       "severity": "MEDIUM",
       "original_severity": "MEDIUM",
       "title": "Container running as root",
-      "description": "",
+      "description": "The container runs as UID 0 (root).",
       "evidence": [
         {
           "scanner": "checkov",
@@ -1559,7 +1559,7 @@
       "severity": "MEDIUM",
       "original_severity": "MEDIUM",
       "title": "Read-only root filesystem disabled",
-      "description": "",
+      "description": "readOnlyRootFilesystem=false leaves the container's root filesystem writable.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -1601,7 +1601,7 @@
       "severity": "MEDIUM",
       "original_severity": "MEDIUM",
       "title": "Container running as root",
-      "description": "",
+      "description": "The container runs as UID 0 (root).",
       "evidence": [
         {
           "scanner": "checkov",
@@ -1643,7 +1643,7 @@
       "severity": "MEDIUM",
       "original_severity": "MEDIUM",
       "title": "Default seccomp profile not set",
-      "description": "",
+      "description": "No seccompProfile is set, so system calls are not restricted.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -1685,7 +1685,7 @@
       "severity": "MEDIUM",
       "original_severity": "MEDIUM",
       "title": "Container running as root",
-      "description": "",
+      "description": "The container runs as UID 0 (root).",
       "evidence": [
         {
           "scanner": "checkov",
@@ -1769,7 +1769,7 @@
       "severity": "MEDIUM",
       "original_severity": "MEDIUM",
       "title": "Default seccomp profile not set",
-      "description": "",
+      "description": "No seccompProfile is set, so system calls are not restricted.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -1811,7 +1811,7 @@
       "severity": "MEDIUM",
       "original_severity": "MEDIUM",
       "title": "Image uses :latest tag",
-      "description": "",
+      "description": "The image uses the :latest tag, so a deploy is not reproducible.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -1876,7 +1876,7 @@
       "severity": "MEDIUM",
       "original_severity": "MEDIUM",
       "title": "Service account token auto-mounted",
-      "description": "",
+      "description": "automountServiceAccountToken=true mounts a token the workload may not need.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -1925,7 +1925,7 @@
       "severity": "MEDIUM",
       "original_severity": "MEDIUM",
       "title": "Default seccomp profile not set",
-      "description": "",
+      "description": "No seccompProfile is set, so system calls are not restricted.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -1967,7 +1967,7 @@
       "severity": "MEDIUM",
       "original_severity": "MEDIUM",
       "title": "Missing securityContext",
-      "description": "",
+      "description": "No securityContext is defined on the pod or container, so every hardening default is left to the runtime.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -2009,7 +2009,7 @@
       "severity": "MEDIUM",
       "original_severity": "MEDIUM",
       "title": "Service account token auto-mounted",
-      "description": "",
+      "description": "automountServiceAccountToken=true mounts a token the workload may not need.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -2058,7 +2058,7 @@
       "severity": "MEDIUM",
       "original_severity": "MEDIUM",
       "title": "Missing NetworkPolicy",
-      "description": "",
+      "description": "The namespace has no NetworkPolicy, so traffic between pods is unrestricted.",
       "remediation": "Define a NetworkPolicy for each namespace.",
       "found_by": [
         "kubescape"
@@ -2101,7 +2101,7 @@
       "severity": "MEDIUM",
       "original_severity": "MEDIUM",
       "title": "Default seccomp profile not set",
-      "description": "",
+      "description": "No seccompProfile is set, so system calls are not restricted.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -2143,7 +2143,7 @@
       "severity": "MEDIUM",
       "original_severity": "MEDIUM",
       "title": "Missing securityContext",
-      "description": "",
+      "description": "No securityContext is defined on the pod or container, so every hardening default is left to the runtime.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -2185,7 +2185,7 @@
       "severity": "MEDIUM",
       "original_severity": "MEDIUM",
       "title": "Read-only root filesystem disabled",
-      "description": "",
+      "description": "readOnlyRootFilesystem=false leaves the container's root filesystem writable.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -2227,7 +2227,7 @@
       "severity": "MEDIUM",
       "original_severity": "MEDIUM",
       "title": "Container running as root",
-      "description": "",
+      "description": "The container runs as UID 0 (root).",
       "evidence": [
         {
           "scanner": "checkov",
@@ -2269,7 +2269,7 @@
       "severity": "MEDIUM",
       "original_severity": "MEDIUM",
       "title": "Service account token auto-mounted",
-      "description": "",
+      "description": "automountServiceAccountToken=true mounts a token the workload may not need.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -2318,7 +2318,7 @@
       "severity": "MEDIUM",
       "original_severity": "MEDIUM",
       "title": "Default service account in use",
-      "description": "",
+      "description": "The default service account is in use where a dedicated one should be.",
       "evidence": [
         {
           "scanner": "popeye",
@@ -2361,7 +2361,7 @@
       "severity": "MEDIUM",
       "original_severity": "MEDIUM",
       "title": "Container running as root",
-      "description": "",
+      "description": "The container runs as UID 0 (root).",
       "evidence": [
         {
           "scanner": "checkov",
@@ -2402,7 +2402,7 @@
       "severity": "MEDIUM",
       "original_severity": "MEDIUM",
       "title": "Missing NetworkPolicy",
-      "description": "",
+      "description": "The namespace has no NetworkPolicy, so traffic between pods is unrestricted.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -2450,7 +2450,7 @@
       "severity": "MEDIUM",
       "original_severity": "MEDIUM",
       "title": "Missing NetworkPolicy",
-      "description": "",
+      "description": "The namespace has no NetworkPolicy, so traffic between pods is unrestricted.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -2498,7 +2498,7 @@
       "severity": "MEDIUM",
       "original_severity": "MEDIUM",
       "title": "Missing NetworkPolicy",
-      "description": "",
+      "description": "The namespace has no NetworkPolicy, so traffic between pods is unrestricted.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -2546,7 +2546,7 @@
       "severity": "MEDIUM",
       "original_severity": "MEDIUM",
       "title": "Missing NetworkPolicy",
-      "description": "",
+      "description": "The namespace has no NetworkPolicy, so traffic between pods is unrestricted.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -2594,7 +2594,7 @@
       "severity": "MEDIUM",
       "original_severity": "MEDIUM",
       "title": "Missing NetworkPolicy",
-      "description": "",
+      "description": "The namespace has no NetworkPolicy, so traffic between pods is unrestricted.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -2643,7 +2643,7 @@
       "severity": "LOW",
       "original_severity": "LOW",
       "title": "imagePullPolicy not set correctly",
-      "description": "",
+      "description": "imagePullPolicy is unset, or set to a value that does not match the tag in use.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -2685,7 +2685,7 @@
       "severity": "LOW",
       "original_severity": "LOW",
       "title": "Missing CPU/memory limits",
-      "description": "",
+      "description": "No resources.limits are set, so one workload can starve the others on the node.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -2739,7 +2739,7 @@
       "severity": "LOW",
       "original_severity": "LOW",
       "title": "Missing liveness probe",
-      "description": "",
+      "description": "No livenessProbe is defined.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -2781,7 +2781,7 @@
       "severity": "LOW",
       "original_severity": "LOW",
       "title": "Missing readiness probe",
-      "description": "",
+      "description": "No readinessProbe is defined.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -2823,7 +2823,7 @@
       "severity": "LOW",
       "original_severity": "LOW",
       "title": "Missing liveness probe",
-      "description": "",
+      "description": "No livenessProbe is defined.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -2865,7 +2865,7 @@
       "severity": "LOW",
       "original_severity": "LOW",
       "title": "Missing readiness probe",
-      "description": "",
+      "description": "No readinessProbe is defined.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -2907,7 +2907,7 @@
       "severity": "LOW",
       "original_severity": "LOW",
       "title": "imagePullPolicy not set correctly",
-      "description": "",
+      "description": "imagePullPolicy is unset, or set to a value that does not match the tag in use.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -2949,7 +2949,7 @@
       "severity": "LOW",
       "original_severity": "LOW",
       "title": "Missing CPU/memory limits",
-      "description": "",
+      "description": "No resources.limits are set, so one workload can starve the others on the node.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -3003,7 +3003,7 @@
       "severity": "LOW",
       "original_severity": "LOW",
       "title": "Missing liveness probe",
-      "description": "",
+      "description": "No livenessProbe is defined.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -3045,7 +3045,7 @@
       "severity": "LOW",
       "original_severity": "LOW",
       "title": "Missing CPU/memory limits",
-      "description": "",
+      "description": "No resources.limits are set, so one workload can starve the others on the node.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -3099,7 +3099,7 @@
       "severity": "LOW",
       "original_severity": "LOW",
       "title": "imagePullPolicy not set correctly",
-      "description": "",
+      "description": "imagePullPolicy is unset, or set to a value that does not match the tag in use.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -3141,7 +3141,7 @@
       "severity": "LOW",
       "original_severity": "LOW",
       "title": "Missing liveness probe",
-      "description": "",
+      "description": "No livenessProbe is defined.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -3183,7 +3183,7 @@
       "severity": "LOW",
       "original_severity": "LOW",
       "title": "Missing liveness probe",
-      "description": "",
+      "description": "No livenessProbe is defined.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -3225,7 +3225,7 @@
       "severity": "LOW",
       "original_severity": "LOW",
       "title": "Missing readiness probe",
-      "description": "",
+      "description": "No readinessProbe is defined.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -3283,7 +3283,7 @@
       "severity": "LOW",
       "original_severity": "LOW",
       "title": "Missing readiness probe",
-      "description": "",
+      "description": "No readinessProbe is defined.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -3325,7 +3325,7 @@
       "severity": "LOW",
       "original_severity": "LOW",
       "title": "Missing CPU/memory limits",
-      "description": "",
+      "description": "No resources.limits are set, so one workload can starve the others on the node.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -3395,7 +3395,7 @@
       "severity": "LOW",
       "original_severity": "LOW",
       "title": "imagePullPolicy not set correctly",
-      "description": "",
+      "description": "imagePullPolicy is unset, or set to a value that does not match the tag in use.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -3437,7 +3437,7 @@
       "severity": "LOW",
       "original_severity": "LOW",
       "title": "Missing CPU/memory limits",
-      "description": "",
+      "description": "No resources.limits are set, so one workload can starve the others on the node.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -3491,7 +3491,7 @@
       "severity": "LOW",
       "original_severity": "LOW",
       "title": "Missing readiness probe",
-      "description": "",
+      "description": "No readinessProbe is defined.",
       "evidence": [
         {
           "scanner": "checkov",
@@ -3533,7 +3533,7 @@
       "severity": "INFO",
       "original_severity": "INFO",
       "title": "Orphan / dead service (no endpoints)",
-      "description": "",
+      "description": "The service has no matching endpoints.",
       "evidence": [
         {
           "scanner": "popeye",
@@ -3575,7 +3575,7 @@
       "severity": "INFO",
       "original_severity": "INFO",
       "title": "Unused ConfigMap / Secret",
-      "description": "",
+      "description": "The ConfigMap or Secret is not referenced by any workload.",
       "evidence": [
         {
           "scanner": "popeye",

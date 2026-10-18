@@ -39,7 +39,9 @@ controls:
   type: misconfiguration
   default_severity: HIGH
   status: active
-  description: Container privileged=true эрхтэй ажиллаж, node-ийн бүх төхөөрөмжид хандах боломжтой.
+  description:
+    en: "The container runs with privileged=true, which disables most isolation and gives it access to every device on the node."
+    mn: "Container privileged=true эрхтэй ажиллаж, node-ийн бүх төхөөрөмжид хандах боломжтой."
   remediation:
     en: Set securityContext.privileged=false.
     mn: securityContext.privileged=false болгоно.
@@ -71,7 +73,9 @@ controls:
   type: misconfiguration
   default_severity: MEDIUM
   status: active
-  description: Container UID 0 (root)-оор ажиллаж байна.
+  description:
+    en: "The container runs as UID 0 (root)."
+    mn: "Container UID 0 (root)-оор ажиллаж байна."
   remediation:
     en: Set securityContext.runAsNonRoot=true.
     mn: securityContext.runAsNonRoot=true тохируулна.
@@ -95,7 +99,9 @@ controls:
   type: misconfiguration
   default_severity: HIGH
   status: active
-  description: allowPrivilegeEscalation=true — процесс эрхээ өсгөх боломжтой.
+  description:
+    en: "allowPrivilegeEscalation=true lets a process gain more privileges than the one that started it."
+    mn: "allowPrivilegeEscalation=true — процесс эрхээ өсгөх боломжтой."
   remediation:
     en: Set securityContext.allowPrivilegeEscalation=false.
     mn: securityContext.allowPrivilegeEscalation=false.
@@ -121,7 +127,9 @@ controls:
   type: misconfiguration
   default_severity: HIGH
   status: active
-  description: SYS_ADMIN, NET_ADMIN зэрэг аюултай Linux capability нэмэгдсэн.
+  description:
+    en: "Dangerous Linux capabilities such as SYS_ADMIN or NET_ADMIN are added to the container."
+    mn: "SYS_ADMIN, NET_ADMIN зэрэг аюултай Linux capability нэмэгдсэн."
   remediation:
     en: Drop unnecessary capabilities; start by dropping ALL.
     mn: Шаардлагагүй capability-г drop хийнэ; ALL-ыг drop эхлэлээ.
@@ -149,7 +157,9 @@ controls:
   type: misconfiguration
   default_severity: HIGH
   status: active
-  description: hostPID=true — host-ийн процессын namespace ил гарсан.
+  description:
+    en: "hostPID=true exposes the node's process namespace to the container."
+    mn: "hostPID=true — host-ийн процессын namespace ил гарсан."
   remediation:
     en: Set hostPID=false.
     mn: hostPID=false.
@@ -175,7 +185,9 @@ controls:
   type: misconfiguration
   default_severity: HIGH
   status: active
-  description: hostNetwork=true — сүлжээний тусгаарлалтыг тойрч гарна.
+  description:
+    en: "hostNetwork=true puts the pod on the node's network, bypassing network isolation."
+    mn: "hostNetwork=true — сүлжээний тусгаарлалтыг тойрч гарна."
   remediation:
     en: Set hostNetwork=false.
     mn: hostNetwork=false.
@@ -201,7 +213,9 @@ controls:
   type: misconfiguration
   default_severity: HIGH
   status: active
-  description: hostPath volume mount — host файлын системд хандах эрсдэл.
+  description:
+    en: "A hostPath volume is mounted, giving the container access to the node's filesystem."
+    mn: "hostPath volume mount — host файлын системд хандах эрсдэл."
   remediation:
     en: Avoid hostPath; mount readOnly if required.
     mn: hostPath ашиглахаас зайлсхийх; шаардвал readOnly.
@@ -222,7 +236,9 @@ controls:
   type: misconfiguration
   default_severity: MEDIUM
   status: active
-  description: Container/Pod securityContext тодорхойлоогүй.
+  description:
+    en: "No securityContext is defined on the pod or container, so every hardening default is left to the runtime."
+    mn: "Container/Pod securityContext тодорхойлоогүй."
   remediation:
     en: Add a securityContext block with hardening settings.
     mn: securityContext блок нэмж hardening тохируулна.
@@ -244,7 +260,9 @@ controls:
   type: misconfiguration
   default_severity: MEDIUM
   status: active
-  description: readOnlyRootFilesystem=false — filesystem бичигдэх боломжтой.
+  description:
+    en: "readOnlyRootFilesystem=false leaves the container's root filesystem writable."
+    mn: "readOnlyRootFilesystem=false — filesystem бичигдэх боломжтой."
   remediation:
     en: Set securityContext.readOnlyRootFilesystem=true.
     mn: securityContext.readOnlyRootFilesystem=true.
@@ -266,7 +284,9 @@ controls:
   type: misconfiguration
   default_severity: LOW
   status: active
-  description: resources.limits тодорхойлоогүй — noisy-neighbor/DoS эрсдэл.
+  description:
+    en: "No resources.limits are set, so one workload can starve the others on the node."
+    mn: "resources.limits тодорхойлоогүй — noisy-neighbor/DoS эрсдэл."
   remediation:
     en: Set resources.limits.cpu and .memory.
     mn: resources.limits.cpu болон .memory тохируулна.
@@ -298,7 +318,9 @@ controls:
   type: misconfiguration
   default_severity: MEDIUM
   status: active
-  description: seccompProfile тохируулаагүй — syscall хязгаарлалт байхгүй.
+  description:
+    en: "No seccompProfile is set, so system calls are not restricted."
+    mn: "seccompProfile тохируулаагүй — syscall хязгаарлалт байхгүй."
   remediation:
     en: Set seccompProfile.type=RuntimeDefault.
     mn: seccompProfile.type=RuntimeDefault.
@@ -321,7 +343,9 @@ controls:
   type: rbac
   default_severity: CRITICAL
   status: active
-  description: Subject-д cluster-admin эрх шууд олгогдсон.
+  description:
+    en: "A subject is bound directly to cluster-admin."
+    mn: "Subject-д cluster-admin эрх шууд олгогдсон."
   remediation:
     en: Restrict cluster-admin; use specific scoped roles.
     mn: cluster-admin-ийг хязгаарлаж, тодорхой scoped role ашиглана.
@@ -348,7 +372,9 @@ controls:
   type: rbac
   default_severity: HIGH
   status: active
-  description: Role-д * (resources/verbs) wildcard эрх байна.
+  description:
+    en: "A role grants wildcard (*) resources or verbs."
+    mn: "Role-д * (resources/verbs) wildcard эрх байна."
   remediation:
     en: Narrow permissions to specific resources/verbs.
     mn: Эрхийг тодорхой resource/verb болгож нарийсгана.
@@ -374,7 +400,9 @@ controls:
   default_severity: HIGH
   status: active
   heuristic: true
-  description: secrets get, pods/exec, escalate/bind зэрэг эрсдэлтэй эрх.
+  description:
+    en: "A role grants risky permissions such as reading secrets, pods/exec, or escalate/bind."
+    mn: "secrets get, pods/exec, escalate/bind зэрэг эрсдэлтэй эрх."
   remediation:
     en: Clean up permissions using least-privilege.
     mn: Least-privilege зарчмаар эрхийг цэвэрлэнэ.
@@ -405,7 +433,9 @@ controls:
   type: rbac
   default_severity: HIGH
   status: active
-  description: system:anonymous эсвэл system:unauthenticated-д эрх олгогдсон.
+  description:
+    en: "Permissions are granted to system:anonymous or system:unauthenticated."
+    mn: "system:anonymous эсвэл system:unauthenticated-д эрх олгогдсон."
   remediation:
     en: Remove anonymous/unauthenticated bindings.
     mn: Anonymous binding-уудыг устгана.
@@ -425,7 +455,9 @@ controls:
   type: rbac
   default_severity: MEDIUM
   status: active
-  description: default service account ашиглагдаж байна (тусгай SA байх ёстой).
+  description:
+    en: "The default service account is in use where a dedicated one should be."
+    mn: "default service account ашиглагдаж байна (тусгай SA байх ёстой)."
   remediation:
     en: Create a dedicated least-privilege SA per workload.
     mn: Workload бүрт тусгай, least-privilege SA үүсгэнэ.
@@ -445,7 +477,9 @@ controls:
   type: network
   default_severity: MEDIUM
   status: active
-  description: Namespace-д NetworkPolicy тодорхойлоогүй — pod хоорондын урсгал нээлттэй.
+  description:
+    en: "The namespace has no NetworkPolicy, so traffic between pods is unrestricted."
+    mn: "Namespace-д NetworkPolicy тодорхойлоогүй — pod хоорондын урсгал нээлттэй."
   remediation:
     en: Define a NetworkPolicy for each namespace.
     mn: Namespace бүрт NetworkPolicy тодорхойлно.
@@ -472,7 +506,9 @@ controls:
   type: network
   default_severity: HIGH
   status: active
-  description: default-deny ingress/egress бодлого байхгүй.
+  description:
+    en: "There is no default-deny ingress/egress policy."
+    mn: "default-deny ingress/egress бодлого байхгүй."
   remediation:
     en: Add a default-deny NetworkPolicy.
     mn: default-deny NetworkPolicy нэмнэ.
@@ -493,7 +529,9 @@ controls:
   default_severity: MEDIUM
   status: active
   heuristic: true
-  description: LoadBalancer/NodePort service гадагш ил гарсан.
+  description:
+    en: "A LoadBalancer or NodePort service exposes the workload outside the cluster."
+    mn: "LoadBalancer/NodePort service гадагш ил гарсан."
   remediation:
     en: Limit exposure as needed and add ingress policy.
     mn: Ил гаргалтыг шаардлагатайгаар хязгаарлаж, ingress бодлого нэмнэ.
@@ -512,7 +550,9 @@ controls:
   type: network
   default_severity: HIGH
   status: active
-  description: Ingress HTTPS-ийн оронд HTTP ашиглаж байна.
+  description:
+    en: "The ingress serves HTTP rather than HTTPS."
+    mn: "Ingress HTTPS-ийн оронд HTTP ашиглаж байна."
   remediation:
     en: Configure TLS on the ingress.
     mn: Ingress-д TLS тохируулна.
@@ -530,7 +570,9 @@ controls:
   type: vulnerability
   default_severity: CRITICAL
   status: active
-  description: Container image-д мэдэгдэж буй CRITICAL CVE илэрсэн.
+  description:
+    en: "The container image contains a known CRITICAL CVE."
+    mn: "Container image-д мэдэгдэж буй CRITICAL CVE илэрсэн."
   remediation:
     en: Update the base image/package or apply a patch.
     mn: Base image/багцыг шинэчилж эсвэл patch хийнэ.
@@ -549,7 +591,9 @@ controls:
   type: vulnerability
   default_severity: HIGH
   status: active
-  description: Container image-д мэдэгдэж буй HIGH CVE илэрсэн.
+  description:
+    en: "The container image contains a known HIGH CVE."
+    mn: "Container image-д мэдэгдэж буй HIGH CVE илэрсэн."
   remediation:
     en: Update the base image/package.
     mn: Base image/багцыг шинэчилнэ.
@@ -568,7 +612,9 @@ controls:
   type: misconfiguration
   default_severity: MEDIUM
   status: active
-  description: Image :latest tag ашиглаж байна — давтагдашгүй deploy.
+  description:
+    en: "The image uses the :latest tag, so a deploy is not reproducible."
+    mn: "Image :latest tag ашиглаж байна — давтагдашгүй deploy."
   remediation:
     en: Use a specific version (digest/tag).
     mn: Тодорхой хувилбар (digest/tag) ашиглана.
@@ -595,7 +641,9 @@ controls:
   type: misconfiguration
   default_severity: MEDIUM
   status: active
-  description: Зөвшөөрөгдөөгүй registry-ээс image татагдсан.
+  description:
+    en: "The image comes from a registry that is not on the approved list."
+    mn: "Зөвшөөрөгдөөгүй registry-ээс image татагдсан."
   remediation:
     en: Use only approved registries.
     mn: Зөвхөн зөвшөөрөгдсөн registry ашиглана.
@@ -614,7 +662,9 @@ controls:
   type: secret
   default_severity: HIGH
   status: active
-  description: Нууц утга env хувьсагчаар шууд ил гарсан.
+  description:
+    en: "A secret value is passed directly in an environment variable."
+    mn: "Нууц утга env хувьсагчаар шууд ил гарсан."
   remediation:
     en: Use Kubernetes Secrets with volume mounts.
     mn: Kubernetes Secret + volume mount ашиглана.
@@ -640,7 +690,9 @@ controls:
   type: secret
   default_severity: HIGH
   status: active
-  description: Image эсвэл manifest дотор secret шууд бичигдсэн.
+  description:
+    en: "A secret is written directly into the image or the manifest."
+    mn: "Image эсвэл manifest дотор secret шууд бичигдсэн."
   remediation:
     en: Move the secret out of code into a secret store.
     mn: Secret-ийг кодоос салгаж secret store руу шилжүүлнэ.
@@ -659,7 +711,9 @@ controls:
   type: secret
   default_severity: MEDIUM
   status: active
-  description: automountServiceAccountToken=true — шаардлагагүй token ил.
+  description:
+    en: "automountServiceAccountToken=true mounts a token the workload may not need."
+    mn: "automountServiceAccountToken=true — шаардлагагүй token ил."
   remediation:
     en: Set automountServiceAccountToken=false.
     mn: automountServiceAccountToken=false.
@@ -686,7 +740,9 @@ controls:
   type: secret
   default_severity: MEDIUM
   status: active
-  description: ConfigMap-д нууц өгөгдөл хадгалагдсан (Secret байх ёстой).
+  description:
+    en: "Sensitive data is stored in a ConfigMap, which is not encrypted, rather than in a Secret."
+    mn: "ConfigMap-д нууц өгөгдөл хадгалагдсан (Secret байх ёстой)."
   remediation:
     en: Move sensitive data into a Secret.
     mn: Нууц өгөгдлийг Secret руу шилжүүлнэ.
@@ -705,7 +761,9 @@ controls:
   type: hygiene
   default_severity: LOW
   status: active
-  description: readinessProbe тодорхойлоогүй.
+  description:
+    en: "No readinessProbe is defined."
+    mn: "readinessProbe тодорхойлоогүй."
   remediation:
     en: Add a readinessProbe.
     mn: readinessProbe нэмнэ.
@@ -726,7 +784,9 @@ controls:
   type: hygiene
   default_severity: LOW
   status: active
-  description: livenessProbe тодорхойлоогүй.
+  description:
+    en: "No livenessProbe is defined."
+    mn: "livenessProbe тодорхойлоогүй."
   remediation:
     en: Add a livenessProbe.
     mn: livenessProbe нэмнэ.
@@ -747,7 +807,9 @@ controls:
   type: hygiene
   default_severity: INFO
   status: active
-  description: Service-д тохирох endpoint байхгүй.
+  description:
+    en: "The service has no matching endpoints."
+    mn: "Service-д тохирох endpoint байхгүй."
   remediation:
     en: Delete the service or fix its selector.
     mn: Service-ийг устгах эсвэл selector-ыг засна.
@@ -767,7 +829,9 @@ controls:
   type: hygiene
   default_severity: INFO
   status: active
-  description: Ашиглагдаагүй ConfigMap эсвэл Secret.
+  description:
+    en: "The ConfigMap or Secret is not referenced by any workload."
+    mn: "Ашиглагдаагүй ConfigMap эсвэл Secret."
   remediation:
     en: Delete the unused object.
     mn: Ашиглагдаагүй объектыг устгана.
@@ -787,7 +851,9 @@ controls:
   type: hygiene
   default_severity: LOW
   status: active
-  description: imagePullPolicy тохируулаагүй эсвэл буруу.
+  description:
+    en: "imagePullPolicy is unset, or set to a value that does not match the tag in use."
+    mn: "imagePullPolicy тохируулаагүй эсвэл буруу."
   remediation:
     en: Set imagePullPolicy explicitly to IfNotPresent/Always.
     mn: imagePullPolicy-г IfNotPresent/Always болгож тодорхой заана.

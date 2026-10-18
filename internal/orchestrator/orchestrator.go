@@ -353,10 +353,33 @@ func ApplyLang(fs []finding.Finding, reg *canonical.Registry, lang string) {
 		if r := ctrl.Remediation.Get(lang); r != "" {
 			fs[i].Remediation = r
 		}
+		// Scanner-ийн өөрийн тайлбарыг ДАРАХГҮЙ: тэр нь тухайн олдворын тухай
+		// тодорхой зүйл хэлдэг (аль CVE, аль нууц), control-ынх нь ерөнхий.
+		// Зөвхөн хоосон үед нь хэл солих боломжтой.
+		if d := ctrl.Description.Get(lang); d != "" && isControlDescription(fs[i].Description, ctrl) {
+			fs[i].Description = d
+		}
 		if len(ctrl.Attack) > 0 {
 			fs[i].Attack = ctrl.Attack // MITRE ATT&CK: сул тал → боломжтой болгох техник
 		}
 	}
+}
+
+// isControlDescription — олдворын тайлбар нь control-аас ирсэн үү (ямар нэг хэлээр),
+// эсвэл scanner өөрөө бичсэн үү.
+//
+// Scanner-ийн тайлбарыг дарах нь мэдээлэл устгах байсан: "CVE-2024-1234 —
+// openssl" гэсэн тодорхой зүйл ерөнхий текстээр солигдох ёсгүй.
+func isControlDescription(d string, ctrl canonical.Control) bool {
+	if d == "" {
+		return true
+	}
+	for _, l := range []string{"en", "mn"} {
+		if d == ctrl.Description.Get(l) {
+			return true
+		}
+	}
+	return false
 }
 
 func summarize(fs []finding.Finding, score int, band string) finding.Summary {

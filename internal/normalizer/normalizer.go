@@ -50,6 +50,14 @@ func Build(rs *canonical.Resolver, scanner, ruleID string, ctx canonical.Resolve
 	}
 	ts := now()
 	conf, confReason := risk.ConfidenceOf(1, ctrl.Heuristic)
+	// Scanner өөрөө тайлбар өгөөгүй бол canonical control-ынх ыг авна. Эс бөгөс
+	// байдал нь: demo корпус дээр 75 олдворын 70 нь тайлбаргүй байсан атлаа
+	// registry дотор control бүрт нямбай бичсэн тайлбар байсан — хэзээ ч
+	// уншигдахгүй үхмэл жин.
+	desc := m.Description
+	if desc == "" {
+		desc = ctrl.Description.Get("en")
+	}
 
 	ev := m.Evidence
 	for i := range ev {
@@ -68,7 +76,7 @@ func Build(rs *canonical.Resolver, scanner, ruleID string, ctx canonical.Resolve
 		Severity:         sev,
 		OriginalSeverity: sev,
 		Title:            title,
-		Description:      m.Description,
+		Description:      desc,
 		Evidence:         m.Evidence,
 		Remediation:      rem,
 		FoundBy:          []string{scanner},
