@@ -86,6 +86,15 @@ copy of `03_Scanner-Adapter-Interface.docx`.
 5. Register the adapter in `internal/cli/pipeline.go` and `internal/orchestrator`.
 6. Run `go test ./...` and `python3 scripts/validate_registry.py`.
 
+## The published schema
+
+`pkg/schema/tatar-schema-v1.json` is the contract for `scan-result.json`:
+adopters commit one as a baseline and `gate --baseline` reads it months later.
+Adding an optional property is fine; adding to any `required` list, removing a
+property or changing what one means is not. `pkg/schema/VERSIONING.md` says
+which is which and what a v2 would have to do; `compat_test.go` freezes every
+`required` list so the breaking case cannot happen by accident.
+
 ## Canonical controls & mappings
 
 - `TATAR-*` control IDs are an **immutable contract** (SARIF, history, diff depend on them).
