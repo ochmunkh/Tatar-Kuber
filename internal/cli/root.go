@@ -45,6 +45,8 @@ func Execute() int {
 		return cmdGate(cmdArgs)
 	case "diff":
 		return cmdDiff(cmdArgs)
+	case "top":
+		return cmdTop(cmdArgs)
 	case "verify-lab":
 		return cmdVerifyLab(cmdArgs)
 	case "update":

@@ -589,6 +589,46 @@ var catalog = map[string]canonical.I18n{
 		"en": "tools.lock.yaml written: %s",
 		"mn": "tools.lock.yaml бичигдлээ: %s",
 	},
+	// ── top ─────────────────────────────────────────────────────────────────
+	//
+	// Эрэмбэлэлтийн ДҮРЭМ нь гаралтын хэсэг — тайлбаргүй эрэмбэ нь тайлбаргүй
+	// оноотой адил муу.
+	"flag.top.limit": {
+		"en": "how many rows per table (default: 10)",
+		"mn": "хүснэгт тусбүрд хэдэн мөр (default: 10)",
+	},
+	"top.empty": {
+		"en": "No findings in this scan — nothing to rank.",
+		"mn": "Энэ scan-д олдвор алга — эрэмбэлэх зүйлгүй.",
+	},
+	"top.header": {
+		"en": "TATAR-Kuber top — where to start, over %d findings\n",
+		"mn": "TATAR-Kuber top — %d олдвороос хаанаас эхлэх вэ\n",
+	},
+	"top.resources.header": {
+		"en": "\nBy resource — one workload fixed, these findings gone.\n" +
+			"Ranked by the sum of severity ranks (CRITICAL 5 … INFO 1), then by count.\n\n",
+		"mn": "\nResource-ыг дагасан — нэг ажлын ачааллыг засахад эдгээр олдвор арилна.\n" +
+			"Severity rank-уудын нийлбэрээр (CRITICAL 5 … INFO 1), тэнцвэл тоогоор.\n\n",
+	},
+	"top.controls.header": {
+		"en": "\nBy control — one issue repeated; fix the template or policy once.\n" +
+			"Ranked by how many distinct resources carry it, then by severity.\n\n",
+		"mn": "\nControl-ыг дагасан — нэг зөрчил давтагдсан; template эсвэл policy-г нэг удаа засна.\n" +
+			"Хэдэн өөр resource дээр гарсанаар, тэнцвэл severity-гээр.\n\n",
+	},
+	"top.more": {
+		"en": "  … and %d more\n",
+		"mn": "  … бас %d\n",
+	},
+	"top.col.resource":  {"en": "RESOURCE", "mn": "RESOURCE"},
+	"top.col.namespace": {"en": "NAMESPACE", "mn": "NAMESPACE"},
+	"top.col.control":   {"en": "CONTROL", "mn": "CONTROL"},
+	"top.col.findings":  {"en": "FINDINGS", "mn": "ОЛДВОР"},
+	"top.col.resources": {"en": "RESOURCES", "mn": "RESOURCE"},
+	"top.col.worst":     {"en": "WORST", "mn": "ХАМГ МУУ"},
+	"top.col.weight":    {"en": "WEIGHT", "mn": "ЖИН"},
+
 	"err.update.scanner.unknown": {
 		"en": "unknown scanner '%s' (known: %s)",
 		"mn": "'%s' scanner танигдсангүй (байгаа: %s)",
@@ -656,6 +696,7 @@ Commands:
   report    Render scan-result.json as a report (json|sarif|html); --lang also switches the report itself
   gate      Check scan-result.json against the .tatar-kuber.yaml policy and pass/fail CI (exit code)
   diff      Compare two scan-result.json files: what is new / fixed / worsened
+  top       Rank scan-result.json: which workload, and which control, to fix first
   doctor    Which scanner binaries are installed, their versions and supported modes
   verify-lab Check a scan against expected-findings.json (regression)
   update    Download, verify and update the scanner binaries
@@ -695,6 +736,7 @@ Commands:
   report    scan-result.json-оос тайлан (json|sarif|html) үүсгэнэ; --lang нь тайлангийн хэлийг ч сэлгэнэ
   gate      scan-result.json-ыг .tatar-kuber.yaml бодлоготой тулгаж CI-д pass/fail (exit code)
   diff      Хоёр scan-result.json-ыг тулгаж юу шинэ / зассан / дордсоныг харуулна
+  top       scan-result.json-ыг эрэмбэлнэ: аль ачааллыг, аль control-ыг түрүүлж засах вэ
   doctor    Scanner binary-ууд суусан эсэх, хувилбар, горимыг шалгана
   verify-lab expected-findings.json-той тулгаж regression шалгана
   update    Scanner binary-уудыг татаж, баталгаажуулж шинэчилнэ
