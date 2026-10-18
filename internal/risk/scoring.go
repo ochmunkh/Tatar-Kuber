@@ -206,14 +206,24 @@ func Band(score int) string {
 //
 // heuristic нь canonical control-ийн шинж (Registry.Control.Heuristic).
 func Confidence(scannerCount int, heuristic bool) finding.Confidence {
+	c, _ := ConfidenceOf(scannerCount, heuristic)
+	return c
+}
+
+// ConfidenceOf — зэрэг БА яагаад тэр зэрэг гарсаныг хамтад нь буцаана.
+//
+// Хоёр утга НЭГ газраас гарах нь чухал: тайлбарыг дараа нь өөр газар
+// тооцоолбол тэр хоёр зөрөх боломж нээгдэнэ — итгэлийн зэрэг нь өөрийн
+// тайлбартайгаа зөрсөн тайлан бол тайлбаргүй тайлангаас дор.
+func ConfidenceOf(scannerCount int, heuristic bool) (finding.Confidence, finding.ConfidenceReason) {
 	switch {
 	case scannerCount >= 2:
-		return finding.ConfidenceHigh
+		return finding.ConfidenceHigh, finding.ConfidenceReasonCorroborated
 	case scannerCount == 1 && !heuristic:
-		return finding.ConfidenceHigh
+		return finding.ConfidenceHigh, finding.ConfidenceReasonSingleScanner
 	case scannerCount == 1 && heuristic:
-		return finding.ConfidenceMedium
+		return finding.ConfidenceMedium, finding.ConfidenceReasonHeuristic
 	default:
-		return finding.ConfidenceLow
+		return finding.ConfidenceLow, finding.ConfidenceReasonUnattributed
 	}
 }

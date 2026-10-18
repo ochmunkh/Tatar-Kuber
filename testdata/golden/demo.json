@@ -161,6 +161,7 @@
         "trivy"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 18,
       "risk_factors": {
@@ -199,6 +200,7 @@
         "kubescape"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 12,
       "risk_factors": {
@@ -247,6 +249,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 12.6,
       "risk_factors": {
@@ -295,6 +298,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 12.6,
       "risk_factors": {
@@ -340,6 +344,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 12.6,
       "risk_factors": {
@@ -388,6 +393,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 12.6,
       "risk_factors": {
@@ -437,6 +443,7 @@
         "trivy"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 12.6,
       "risk_factors": {
@@ -482,6 +489,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 12.6,
       "risk_factors": {
@@ -530,6 +538,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 12.6,
       "risk_factors": {
@@ -578,6 +587,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 12.6,
       "risk_factors": {
@@ -623,6 +633,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 12.6,
       "risk_factors": {
@@ -668,6 +679,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 12.6,
       "risk_factors": {
@@ -722,6 +734,7 @@
         "trivy"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "corroborated",
       "blind_shot": false,
       "risk_contribution": 12.6,
       "risk_factors": {
@@ -782,6 +795,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 12.6,
       "risk_factors": {
@@ -830,6 +844,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 12.6,
       "risk_factors": {
@@ -878,6 +893,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 12.6,
       "risk_factors": {
@@ -923,6 +939,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 12.6,
       "risk_factors": {
@@ -968,6 +985,7 @@
         "trivy"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 8.4,
       "risk_factors": {
@@ -1016,6 +1034,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 8.4,
       "risk_factors": {
@@ -1064,6 +1083,7 @@
         "checkov"
       ],
       "confidence": "MEDIUM",
+      "confidence_reason": "single-scanner-heuristic",
       "blind_shot": false,
       "risk_contribution": 7,
       "risk_factors": {
@@ -1117,6 +1137,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 5.4,
       "risk_factors": {
@@ -1158,6 +1179,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 5.4,
       "risk_factors": {
@@ -1199,6 +1221,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 5.4,
       "risk_factors": {
@@ -1240,6 +1263,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 5.4,
       "risk_factors": {
@@ -1288,6 +1312,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 5.4,
       "risk_factors": {
@@ -1336,6 +1361,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 5.4,
       "risk_factors": {
@@ -1377,6 +1403,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 5.4,
       "risk_factors": {
@@ -1418,6 +1445,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 5.4,
       "risk_factors": {
@@ -1459,6 +1487,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 5.4,
       "risk_factors": {
@@ -1500,6 +1529,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 5.4,
       "risk_factors": {
@@ -1541,6 +1571,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 5.4,
       "risk_factors": {
@@ -1582,6 +1613,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 5.4,
       "risk_factors": {
@@ -1623,6 +1655,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 5.4,
       "risk_factors": {
@@ -1664,6 +1697,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 5.4,
       "risk_factors": {
@@ -1705,6 +1739,7 @@
         "trivy"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 5.4,
       "risk_factors": {
@@ -1746,6 +1781,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 5.4,
       "risk_factors": {
@@ -1799,6 +1835,7 @@
         "popeye"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "corroborated",
       "blind_shot": false,
       "risk_contribution": 5.4,
       "risk_factors": {
@@ -1851,6 +1888,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 5.4,
       "risk_factors": {
@@ -1899,6 +1937,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 5.4,
       "risk_factors": {
@@ -1940,6 +1979,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 5.4,
       "risk_factors": {
@@ -1981,6 +2021,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 5.4,
       "risk_factors": {
@@ -2023,6 +2064,7 @@
         "kubescape"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 5.4,
       "risk_factors": {
@@ -2071,6 +2113,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 5.4,
       "risk_factors": {
@@ -2112,6 +2155,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 5.4,
       "risk_factors": {
@@ -2153,6 +2197,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 5.4,
       "risk_factors": {
@@ -2194,6 +2239,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 5.4,
       "risk_factors": {
@@ -2235,6 +2281,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 5.4,
       "risk_factors": {
@@ -2284,6 +2331,7 @@
         "popeye"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 5.4,
       "risk_factors": {
@@ -2325,6 +2373,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 5.4,
       "risk_factors": {
@@ -2365,6 +2414,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 3.6,
       "risk_factors": {
@@ -2412,6 +2462,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 3.6,
       "risk_factors": {
@@ -2459,6 +2510,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 3.6,
       "risk_factors": {
@@ -2506,6 +2558,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 3.6,
       "risk_factors": {
@@ -2553,6 +2606,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 3.6,
       "risk_factors": {
@@ -2601,6 +2655,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 1.8,
       "risk_factors": {
@@ -2642,6 +2697,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 1.8,
       "risk_factors": {
@@ -2695,6 +2751,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 1.8,
       "risk_factors": {
@@ -2736,6 +2793,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 1.8,
       "risk_factors": {
@@ -2777,6 +2835,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 1.8,
       "risk_factors": {
@@ -2818,6 +2877,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 1.8,
       "risk_factors": {
@@ -2859,6 +2919,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 1.8,
       "risk_factors": {
@@ -2900,6 +2961,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 1.8,
       "risk_factors": {
@@ -2953,6 +3015,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 1.8,
       "risk_factors": {
@@ -2994,6 +3057,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 1.8,
       "risk_factors": {
@@ -3047,6 +3111,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 1.8,
       "risk_factors": {
@@ -3088,6 +3153,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 1.8,
       "risk_factors": {
@@ -3129,6 +3195,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 1.8,
       "risk_factors": {
@@ -3182,6 +3249,7 @@
         "popeye"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "corroborated",
       "blind_shot": false,
       "risk_contribution": 1.8,
       "risk_factors": {
@@ -3227,6 +3295,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 1.8,
       "risk_factors": {
@@ -3280,6 +3349,7 @@
         "popeye"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "corroborated",
       "blind_shot": false,
       "risk_contribution": 1.8,
       "risk_factors": {
@@ -3337,6 +3407,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 1.8,
       "risk_factors": {
@@ -3378,6 +3449,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 1.8,
       "risk_factors": {
@@ -3431,6 +3503,7 @@
         "checkov"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_contribution": 1.8,
       "risk_factors": {
@@ -3473,6 +3546,7 @@
         "popeye"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_factors": {
         "base_weight": 0,
@@ -3514,6 +3588,7 @@
         "popeye"
       ],
       "confidence": "HIGH",
+      "confidence_reason": "single-scanner",
       "blind_shot": false,
       "risk_factors": {
         "base_weight": 0,

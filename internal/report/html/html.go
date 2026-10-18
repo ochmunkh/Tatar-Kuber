@@ -86,7 +86,7 @@ type labels struct {
 	ScannerVersions, Schema, ResultHash, GeneratedBy, ScoringBands, References,
 	ScoreBreakdown, Formula, Penalty, HighPool, LowPool, Capped, FactorsHint,
 	AttackExposure, MayEnable, ScannerCoverage, ScannerCoverageHint, Status, Duration,
-	RawFindings, Unmapped, RollupNote string
+	RawFindings, Unmapped, RollupNote, ConfHint string
 }
 
 var labelsEN = labels{
@@ -104,6 +104,9 @@ var labelsEN = labels{
 	ScannerCoverage: "Scanner coverage", ScannerCoverageHint: "what each scanner actually contributed to this scan — a failed or empty scanner is shown, never hidden",
 	Status: "Status", Duration: "Duration", RawFindings: "Raw findings", Unmapped: "Unmapped rules",
 	RollupNote: "Pod-scoped findings rolled up to their owning controller, so one misconfiguration is counted once",
+	ConfHint: "Confidence, and why: corroborated = two or more scanners agreed · " +
+		"single-scanner = one scanner, a direct check · single-scanner-heuristic = one scanner, " +
+		"a context-dependent check. HIGH on one scanner is not the same claim as HIGH on three.",
 }
 
 var labelsMN = labels{
@@ -121,6 +124,9 @@ var labelsMN = labels{
 	ScannerCoverage: "Scanner хамрах хүрээ", ScannerCoverageHint: "scanner бүр энэ scan-д бодитоор юу өгснийг харуулна — унасан/хоосон scanner нуугдахгүй",
 	Status: "Төлөв", Duration: "Хугацаа", RawFindings: "Түүхий finding", Unmapped: "Зураглалгүй rule",
 	RollupNote: "Pod хэмжээний finding эзэмшигч controller руу зөөгдсөн — нэг зөрчил нэг удаа тоологдоно",
+	ConfHint: "Итгэлийн зэрэг ба шалтгаан: corroborated = хоёр бую түүнээс олон scanner нийлсэн · " +
+		"single-scanner = нэг scanner, шууд шалгалт · single-scanner-heuristic = нэг scanner, " +
+		"контекстээс хамаарах шалгалт. Нэг scannerдээрх HIGH нь гурав дээрхтэй ижил үнэн биш.",
 }
 
 func pickLabels(lang string) labels {
@@ -345,6 +351,7 @@ const dashboard = `<!DOCTYPE html>
   </tr>{{end}}
   </tbody>
  </table>
+ <div class="cc" style="margin:-10px 0 16px">{{.L.ConfHint}}</div>
  {{with .Metadata.Rollup}}<div class="cc" style="margin:-10px 0 16px">↳ <b>{{.Moved}}</b> — {{$.L.RollupNote}} ({{len .Pods}} pod){{end}}</div>
 {{end}}
 
@@ -368,7 +375,7 @@ const dashboard = `<!DOCTYPE html>
     <td class="ev">{{if .Evidence}}{{range .Evidence}}<div class="evrow"><span class="evs">{{.Scanner}}</span> {{if .Path}}<code>{{.Path}}</code>{{end}}{{if .Detail}}{{.Detail}}{{end}}{{if .Value}} <span class="evv">({{.Value}})</span>{{end}}</div>{{end}}{{else}}—{{end}}</td>
     <td class="fix">{{.Remediation}}</td>
     <td>{{range $i,$s := .FoundBy}}{{if $i}}<span class="sep"> • </span>{{end}}<span class="fbb">{{$s}}</span>{{end}}</td>
-    <td class="fb">{{.Confidence}}{{if .RiskContribution}}<br><span class="pen">−{{.RiskContribution}}</span>{{end}}</td>
+    <td class="fb">{{.Confidence}}{{with .ConfidenceReason}}<br><span class="cc">{{.}}</span>{{end}}{{if .RiskContribution}}<br><span class="pen">−{{.RiskContribution}}</span>{{end}}</td>
    </tr>
   {{end}}
   </tbody>

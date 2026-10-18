@@ -70,7 +70,7 @@ func Deduplicate(findings []finding.Finding, reg *canonical.Registry) []finding.
 		if c, ok := reg.Get(merged.CanonicalControl); ok {
 			heur = c.Heuristic
 		}
-		merged.Confidence = risk.Confidence(len(merged.FoundBy), heur)
+		merged.Confidence, merged.ConfidenceReason = risk.ConfidenceOf(len(merged.FoundBy), heur)
 		merged.ID = finding.StableID(merged.CanonicalControl, merged.Resource, merged.Namespace)
 
 		out = append(out, merged)

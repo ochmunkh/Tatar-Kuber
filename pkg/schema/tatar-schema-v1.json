@@ -96,6 +96,7 @@
         "remediation":       { "type": "string" },
         "found_by":          { "type": "array", "items": { "type": "string" }, "minItems": 1 },
         "confidence":        { "enum": ["HIGH","MEDIUM","LOW"] },
+        "confidence_reason": { "enum": ["corroborated", "single-scanner", "single-scanner-heuristic", "unattributed"], "description": "Яагаад яг энэ итгэлийн зэрэг гарсаныг тайлбарлах КОД (проз биш — хэлнээс хамгийн, SIEM-д шүүгдэхээр). corroborated = 2+ scanner; single-scanner = 1 scanner, шууд шалгалт; single-scanner-heuristic = 1 scanner, эвристик control" },
         "blind_shot":        { "type": "boolean" },
         "blind_shot_reason": { "type": "string" },
         "risk_contribution": { "type": "number" },

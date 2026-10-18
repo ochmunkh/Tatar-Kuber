@@ -37,6 +37,28 @@ const (
 	StatusClosed         Status = "CLOSED"
 )
 
+// ConfidenceReason — итгэлийн зэрэг яагаад ийм болсныг тайлбарлах КОД.
+//
+// ЯАГААД КОД БОЛАХ ПРОЗ БИШ: энэ утга scan-result.json руу ордог тул
+// хэлнээс хамгийн байх ёстой, мөн SIEM/SOAR тал дээр шүүгдэх боломжтой
+// байх ёстой. Хүний хэлээр буулгах нь report давхаргын ажил.
+//
+// `confidence: HIGH` гэсэн үг дангаараа тайлбаргүй: хоёр scanner ижил
+// зүйл хэлсэн учраас юу эсвэл нэг scanner шууд шалгалт хийсэн учраас юу
+// гэдэг нь аудиторын хувьд өөр зүйл.
+type ConfidenceReason string
+
+const (
+	// Хоёр ба түүнээс олон scanner ижил зүйлийг хэлсэн.
+	ConfidenceReasonCorroborated ConfidenceReason = "corroborated"
+	// Нэг scanner, гэхдээ control нь шууд шалгалт — таамаглал биш.
+	ConfidenceReasonSingleScanner ConfidenceReason = "single-scanner"
+	// Нэг scanner, control нь эвристик — контекстээс хамаарна.
+	ConfidenceReasonHeuristic ConfidenceReason = "single-scanner-heuristic"
+	// Ямар ч scanner холбогдоогүй — практик дээр тохиолдох ёсгүй.
+	ConfidenceReasonUnattributed ConfidenceReason = "unattributed"
+)
+
 // Confidence — итгэлийн зэрэг (scanner corroboration).
 type Confidence string
 
@@ -84,6 +106,7 @@ type Finding struct {
 	Remediation      string            `json:"remediation"`
 	FoundBy          []string          `json:"found_by"`
 	Confidence       Confidence        `json:"confidence"`
+	ConfidenceReason ConfidenceReason  `json:"confidence_reason,omitempty"` // яагаад яг энэ зэрэг болсоныг тайлбарлах КОД
 	BlindShot        bool              `json:"blind_shot"`
 	BlindShotReason  string            `json:"blind_shot_reason,omitempty"`
 	RiskContribution float64           `json:"risk_contribution,omitempty"`

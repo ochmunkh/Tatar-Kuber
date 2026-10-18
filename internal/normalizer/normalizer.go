@@ -49,6 +49,7 @@ func Build(rs *canonical.Resolver, scanner, ruleID string, ctx canonical.Resolve
 		rem = m.Remediation
 	}
 	ts := now()
+	conf, confReason := risk.ConfidenceOf(1, ctrl.Heuristic)
 
 	ev := m.Evidence
 	for i := range ev {
@@ -71,7 +72,8 @@ func Build(rs *canonical.Resolver, scanner, ruleID string, ctx canonical.Resolve
 		Evidence:         m.Evidence,
 		Remediation:      rem,
 		FoundBy:          []string{scanner},
-		Confidence:       risk.Confidence(1, ctrl.Heuristic),
+		Confidence:       conf,
+		ConfidenceReason: confReason,
 		BlindShot:        false,
 		Status:           finding.StatusOpen,
 		FirstSeen:        ts,
