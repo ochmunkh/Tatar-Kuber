@@ -154,9 +154,13 @@ func (s *Scanner) Normalize(raw scanner.RawResult) ([]finding.Finding, error) {
 			}
 			for _, v := range r.Vulnerabilities {
 				ctx := canonical.ResolverContext{ResourceKind: res.Kind, Namespace: res.Namespace, Severity: v.Severity, Detail: "image"}
-				rem := "Багц шинэчлэх"
+				// Adapter-ийн бичвэр нь scan-result.json руу шууд ордог тул ХЭЛЭЭС ХАМГИЙН
+				// БАЙХ ёстой: хоёр хэлт давхарга нь canonical registry — тэндээс
+				// `report --lang` сонгоно. Энд монголоор бичвэл en тайланд монгол
+				// өгүүлбэр гарч, өөрчлөх аргагүй болно.
+				rem := "Update the package"
 				if v.FixedVersion != "" {
-					rem = fmt.Sprintf("%s-г %s руу шинэчилнэ", v.PkgName, v.FixedVersion)
+					rem = fmt.Sprintf("Upgrade %s to %s", v.PkgName, v.FixedVersion)
 				}
 				pkg := v.PkgName
 				if v.InstalledVersion != "" {
@@ -179,7 +183,7 @@ func (s *Scanner) Normalize(raw scanner.RawResult) ([]finding.Finding, error) {
 				}
 				ctx := canonical.ResolverContext{ResourceKind: res.Kind, Namespace: res.Namespace, Severity: sec.Severity, Detail: detail}
 				ev := finding.Evidence{Scanner: "trivy", Detail: sec.Match}
-				meta := normalizer.Meta{Resource: resource, Namespace: res.Namespace, Title: sec.Title, Description: "Илэрсэн нууц: " + sec.Category, Evidence: []finding.Evidence{ev}, Remediation: "Нууцыг кодоос салгаж Secret store руу шилжүүлнэ", Severity: sec.Severity}
+				meta := normalizer.Meta{Resource: resource, Namespace: res.Namespace, Title: sec.Title, Description: "secret detected: " + sec.Category, Evidence: []finding.Evidence{ev}, Remediation: "Move the secret out of the manifest into a secret store", Severity: sec.Severity}
 				if f, ok := normalizer.Build(s.resolver, "trivy", "secret", ctx, meta, s.now); ok {
 					out = append(out, f)
 				}

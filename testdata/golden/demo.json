@@ -956,7 +956,7 @@
       "severity": "HIGH",
       "original_severity": "HIGH",
       "title": "Secret exposed in environment variable",
-      "description": "Илэрсэн нууц: AWS",
+      "description": "secret detected: AWS",
       "evidence": [
         {
           "scanner": "trivy",

@@ -198,7 +198,8 @@ func (s *Scanner) Normalize(raw scanner.RawResult) ([]finding.Finding, error) {
 					if pth.FixPath.Path != "" {
 						e.Path = pth.FixPath.Path
 						if pth.FixPath.Value != "" {
-							e.Value = "зөвлөмж: " + pth.FixPath.Value
+							// Evidence.Value нь scan-result.json руу ордог — хэлээс хамгийн байна.
+							e.Value = "suggested: " + pth.FixPath.Value
 						}
 					} else if pth.FailedPath != "" {
 						e.Path = pth.FailedPath
