@@ -22,6 +22,7 @@ Run:  python3 scripts/docx-to-md.py [docs/FILE.docx ...]
 Regenerate after editing a .docx; the .md is generated, not hand-maintained.
 """
 
+import io
 import re
 import sys
 import zipfile
@@ -376,7 +377,14 @@ def main(argv):
         return 1
     for d in docs:
         out = d.with_suffix(".md")
-        out.write_text(convert(d), encoding="utf-8")
+        # newline="\n" — аль ч тавцан дээр LF. Гаралт нь `.gitattributes`-д
+        # `*.md text eol=lf` гэж бүртгэгдсэн файл тул генератор тэр дүрмийг
+        # өөрөө дагах ёстой. Эс бөгөс Windows дээр write_text нь CRLF бичиж,
+        # scripts/docs.sh --check нь бүх мөрийг зөрүүтэй гэж заадаг байв — агуулга
+        # нь байт тутамдаа ижил байсан ч (git diff хоосон). CI нь Linux дээр
+        # ажилладгийн учраас энэ зөвхөн хөгжүүлэгчийн машин дээр харагддаг байсан.
+        with io.open(out, "w", encoding="utf-8", newline="\n") as fh:
+            fh.write(convert(d))
         print(f"  {d.name} -> {out.name} ({out.stat().st_size} bytes)")
     return 0
 
