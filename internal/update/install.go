@@ -75,6 +75,9 @@ func unpackStaged(artefact string, kind Archive, scanner, toolsDir string) (stag
 		_ = os.RemoveAll(staging)
 		return "", "", err
 	}
+	// #nosec G302 -- энэ бол ажиллуулах файл: x бит заавал хэрэгтэй учир
+	// gosec-ийн хүсдэг 0600 боломжгүй. 0700 нь ажиллах хамгийн чанга эрх —
+	// зөвхөн эзэмшигч уншиж, ажиллуулна.
 	if err = os.Chmod(filepath.Join(staging, rel), 0o700); err != nil {
 		_ = os.RemoveAll(staging)
 		return "", "", err
