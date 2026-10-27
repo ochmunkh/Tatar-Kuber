@@ -7,12 +7,18 @@ TATAR-Kuber is early-stage and there is lots of high-impact work available.
 
 ## Ways to contribute
 
-- **Add a new scanner adapter** (e.g. kubeaudit, kube-bench, Kubescape frameworks) — the
-  cleanest entry point, see below.
-- **Improve the canonical control registry** (`schema/canonical-controls.yaml`) — mappings,
-  new controls, better compliance references.
+The goal right now is **depth, not breadth**: take the four scanners already wired up
+(Trivy · Kubescape · Checkov · Popeye), reconcile their output as accurately as possible,
+and report from that one reconciled result. Most of the value left in this project is in
+the mapping, not in another adapter.
+
+- **Improve the canonical control registry** (`schema/canonical-controls.yaml`) — correct a
+  mapping, cover a rule that is currently unmapped, add a missing control. *The best place
+  to start.*
+- **Improve the report** — what an auditor actually hands to a client.
 - **Bug fixes / tests** — especially CLI test coverage and concurrency (parallel adapters).
 - **Docs & translations** — English/Mongolian, or a new language for the reports.
+- **A fifth scanner adapter** — welcome, with eyes open: see *Adding a scanner adapter* below.
 
 ## Dev setup
 
@@ -29,11 +35,28 @@ please keep it that way.
 ## Workflow
 
 1. **Fork** the repo and create a branch: `feat/<short-name>` or `fix/<short-name>`.
-2. Make focused changes. Keep PRs small and single-purpose.
+2. **One PR, one concern.** A large change is harder to review than it was to write, and a
+   reviewer who cannot hold it in their head will not merge it. Anything substantial —
+   roughly a few hundred lines, or anything touching how findings are produced — starts as
+   an issue, so the design is agreed before the work is done.
 3. Ensure `go vet ./...`, `gofmt`, and `go test ./...` all pass.
 4. Open a **Pull Request** describing *what* and *why*. Link any related issue.
 
 A maintainer will review. Please be patient and kind — see the Code of Conduct.
+
+### What a change has to show
+
+Three things, because this is the kind of tool that fails silently rather than loudly:
+
+1. **A mapping change cites the scanner's own rule definition.** Link it in the PR. "The
+   names look similar" is not evidence — an audit during v1.0.1/v1.0.2 found 15 of 77
+   mappings wrong, and every one of them had looked plausible.
+2. **Fixtures are real scanner output, with the version recorded.** A hand-written JSON that
+   resembles Trivy proves nothing, and a mapping is only true for a range of scanner
+   versions — rule IDs get renamed, split and retired upstream.
+3. **A change to normalization reports per-scanner contribution, not totals.** The golden
+   corpus prints that line (`trivy 5->4`); put it in the PR. Totals hide precisely the
+   failure this project exists to catch.
 
 ## The engineering documents (`.docx` **and** `.md`)
 
@@ -71,9 +94,19 @@ still tells the reader where it came from.
 
 ## Adding a scanner adapter (step by step)
 
-This is the recommended first contribution. See
-[`docs/03_Scanner-Adapter-Interface.md`](docs/03_Scanner-Adapter-Interface.md), the rendered
-copy of `03_Scanner-Adapter-Interface.docx`.
+A fifth scanner is welcome — but an adapter is a one-off PR and a mapping is a standing
+obligation. Upstream renames, splits and retires rule IDs, and someone has to notice. So
+say in the PR what the scanner adds that the current four do not: a layer nobody looks at
+(`kube-bench` checks nodes and the control plane, where all four of ours look at workloads,
+manifests and RBAC), a control in `docs/coverage.md` that nothing checks today, or
+independent corroboration of findings we already produce — overlap is not waste here,
+agreement between scanners is what `found_by` and `confidence` are built on.
+
+Then say who re-verifies the mapping when that scanner's rules move. Nobody is asked to
+promise years; the point is that the cost is named rather than discovered later.
+
+See [`docs/03_Scanner-Adapter-Interface.md`](docs/03_Scanner-Adapter-Interface.md), the
+rendered copy of `03_Scanner-Adapter-Interface.docx`.
 
 1. Create `internal/scanner/<name>/<name>.go` implementing `scanner.ScannerAdapter`
    (`Name`, `Available`, `Version`, `Supports`, `Scan`, `Normalize`).
@@ -196,8 +229,11 @@ Open an issue using the templates in `.github/ISSUE_TEMPLATE/`.
 Хувь нэмэр оруулах хүсэлд баярлалаа! 🎉 Төсөл эрт шатанд байгаа тул хийх ажил их байна.
 
 **Хувь нэмэр оруулах гол чиглэлүүд:**
-- Шинэ **scanner adapter** нэмэх (kubeaudit г.м) — хамгийн цэвэр эхлэл.
-- **canonical-controls.yaml**-ийг сайжруулах (mapping, шинэ control, compliance).
+- **canonical-controls.yaml** — буруу зураглал засах, зураглагдаагүй rule хамрах,
+  дутуу control нэмэх. *Хамгийн сайн эхлэл.*
+- **Тайлан сайжруулах** — аудиторын үйлчлүүлэгчдээ өгдөг бодит зүйл.
+- **5 дахь scanner adapter** — хүлээн авна, гэхдээ зардлыг нь мэдсэн байх:
+  adapter бол нэг удаагийн PR, зураглал бол **байнгын үүрэг**.
 - **Bug fix / тест** — ялангуяа CLI тест, concurrency (adapter-уудыг зэрэгцүүлэх).
 - **Баримт / орчуулга** — англи/монгол, эсвэл тайлангийн шинэ хэл.
 
@@ -210,6 +246,19 @@ Go 1.22+ шаардлагатай. Module path жижиг үсэгтэй (`githu
 
 **Ажлын урсгал:** fork → `feat/...` салбар → фокустай өөрчлөлт → `go test ./...` ногоон →
 Pull Request (юу, яагаад хийснийг тайлбарла). Maintainer хянана.
+
+**Нэг PR — нэг асуудал.** Зураглалын засвар, шинэ гаралтын формат, рефактор гурвыг нэг PR-т
+бүү нэгтгэ. Зураглалын өөрчлөлтийг нотлохын тулд яг аль хэсэг нь шалтгаан болсныг харах
+шаардлагатай; холилдсон PR-т энэ боломжгүй.
+
+### Өөрчлөлт юу нотлох ёстой вэ
+
+1. **Scanner-ийн rule-ийн эх тодорхойлолтыг иш тат.** `CKV_K8S_27` нь юу шалгадгийг upstream
+   дээр нь зааж өг. "Тохирч байгаа шиг байна" гэдэг нь зураглалын үндэслэл биш.
+2. **Бодит fixture, хувилбарыг нь бичсэн байх.** Гараар бичсэн JSON биш, тухайн scanner-ийн
+   бодит гаралт — аль хувилбараар гаргасныг тэмдэглэ. Rule-ууд хувилбар хооронд хөдөлдөг.
+3. **Нийт тоо биш, scanner тус бүрийн хувь нэмрийг мэдээл.** "69 → 74 боллоо" гэдэг юу ч
+   нотлохгүй. Аль scanner юу нэмсэн, юу нь давхцаж нэгдсэнийг харуул (§6, §9).
 
 **Инженерийн баримтууд (`.docx` ба `.md`):** `docs/` доторх зургаан тодорхойлолт тус бүр
 ХОЁР хувиар commit хийгддэг — бичигддэг Word файл (`05_CLI-Specification.docx`) ба түүнээс
