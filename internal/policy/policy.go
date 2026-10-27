@@ -35,6 +35,7 @@ func Default() Policy { return Policy{FailOn: "high"} }
 // Load — .tatar-kuber.yaml-ыг уншина. Файл байхгүй бол Default-ыг буцаана
 // (алдаа биш — бодлогогүй ажиллаж болно).
 func Load(path string) (Policy, error) {
+	// #nosec G304 -- бодлогын зам нь --policy туг эсвэл default .tatar-kuber.yaml.
 	data, err := os.ReadFile(path)
 	if err != nil {
 		if os.IsNotExist(err) {

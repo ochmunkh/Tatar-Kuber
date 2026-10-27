@@ -63,6 +63,8 @@ func cmdReport(args []string) int {
 
 	w := os.Stdout
 	if target != "" {
+		// #nosec G304 -- target бол хэрэглэгчийн --out туг: тайлангаа хаана
+		// бичихийг хэрэглэгч шийднэ.
 		f, err := os.Create(target)
 		if err != nil {
 			errln(err)

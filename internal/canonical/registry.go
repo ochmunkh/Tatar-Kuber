@@ -84,6 +84,8 @@ type Registry struct {
 
 // Load — canonical-controls.yaml ачаалж index байгуулна.
 func Load(path string) (*Registry, error) {
+	// #nosec G304 -- бүртгэлийн зам нь тохиргооноос ирнэ; энэ файлыг ачаалах нь
+	// Load-ийн цорын ганц үүрэг.
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("canonical registry уншиж чадсангүй: %w", err)

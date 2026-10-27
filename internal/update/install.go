@@ -51,13 +51,13 @@ func unpackStaged(artefact string, kind Archive, scanner, toolsDir string) (stag
 	if err = os.RemoveAll(staging); err != nil {
 		return "", "", err
 	}
-	if err = os.MkdirAll(staging, 0o755); err != nil {
+	if err = os.MkdirAll(staging, 0o700); err != nil {
 		return "", "", err
 	}
 
 	switch kind {
 	case ArchiveRaw:
-		err = copyFile(artefact, filepath.Join(staging, scanner), 0o755)
+		err = copyFile(artefact, filepath.Join(staging, scanner), 0o700)
 	case ArchiveTarGz:
 		err = extractTarGz(artefact, staging)
 	case ArchiveZip:
@@ -75,7 +75,7 @@ func unpackStaged(artefact string, kind Archive, scanner, toolsDir string) (stag
 		_ = os.RemoveAll(staging)
 		return "", "", err
 	}
-	if err = os.Chmod(filepath.Join(staging, rel), 0o755); err != nil {
+	if err = os.Chmod(filepath.Join(staging, rel), 0o700); err != nil {
 		_ = os.RemoveAll(staging)
 		return "", "", err
 	}
@@ -185,11 +185,11 @@ func extractTarGz(src, dest string) error {
 		}
 		switch h.Typeflag {
 		case tar.TypeDir:
-			if err := os.MkdirAll(target, 0o755); err != nil {
+			if err := os.MkdirAll(target, 0o700); err != nil {
 				return err
 			}
 		case tar.TypeReg:
-			if err := os.MkdirAll(filepath.Dir(target), 0o755); err != nil {
+			if err := os.MkdirAll(filepath.Dir(target), 0o700); err != nil {
 				return err
 			}
 			written, err := writeMember(tr, target, budget)
@@ -219,7 +219,7 @@ func extractZip(src, dest string) error {
 			return fmt.Errorf("archive member %q escapes the install directory", zf.Name)
 		}
 		if zf.FileInfo().IsDir() {
-			if err := os.MkdirAll(target, 0o755); err != nil {
+			if err := os.MkdirAll(target, 0o700); err != nil {
 				return err
 			}
 			continue
@@ -227,7 +227,7 @@ func extractZip(src, dest string) error {
 		if !zf.Mode().IsRegular() {
 			continue // as above: only regular files are unpacked
 		}
-		if err := os.MkdirAll(filepath.Dir(target), 0o755); err != nil {
+		if err := os.MkdirAll(filepath.Dir(target), 0o700); err != nil {
 			return err
 		}
 		rc, err := zf.Open()

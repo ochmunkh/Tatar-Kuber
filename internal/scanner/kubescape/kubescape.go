@@ -94,6 +94,7 @@ func readOutput(dir string) []byte {
 		if e.IsDir() || !strings.HasSuffix(e.Name(), ".json") {
 			continue
 		}
+		// #nosec G304 -- dir бол --raw-dir, e.Name() нь түүний ReadDir-ийн гаралт.
 		b, err := os.ReadFile(filepath.Join(dir, e.Name()))
 		if err == nil && len(b) > len(best) {
 			best = b

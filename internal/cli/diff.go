@@ -77,6 +77,8 @@ func cmdDiff(args []string) int {
 
 func loadScan(path string) (finding.ScanResult, int) {
 	var res finding.ScanResult
+	// #nosec G304 -- path бол хэрэглэгчийн --old/--new туг. Дурын зам уншихыг
+	// хориглох нь CLI-г утгагүй болгоно; энд хязгаарлах зөв хил байхгүй.
 	b, err := os.ReadFile(path)
 	if err != nil {
 		errln(err)

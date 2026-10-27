@@ -60,6 +60,8 @@ func loadRawDir(dir string) ([]scanner.RawResult, map[string]int, error) {
 	names := []string{"trivy", "kubescape", "checkov", "popeye"}
 	var raws []scanner.RawResult
 	for _, n := range names {
+		// #nosec G304 -- dir бол --raw-dir, n нь бүртгэгдсэн scanner-уудын
+		// хаалттай жагсаалт. Энэ гурван уншилт бүгд ижил үндэслэлтэй.
 		data, err := os.ReadFile(filepath.Join(dir, n+".json"))
 		if err != nil {
 			continue // тухайн scanner-ийн raw байхгүй бол алгасна
@@ -71,6 +73,7 @@ func loadRawDir(dir string) ([]scanner.RawResult, map[string]int, error) {
 	}
 
 	// versions.json (сонголт): scanner -> version
+	// #nosec G304 -- дээрхтэй адил: --raw-dir доторх тогтсон нэртэй файл.
 	if vb, err := os.ReadFile(filepath.Join(dir, "versions.json")); err == nil {
 		var vers map[string]string
 		if json.Unmarshal(vb, &vers) == nil {
@@ -84,6 +87,7 @@ func loadRawDir(dir string) ([]scanner.RawResult, map[string]int, error) {
 
 	// inventory.json (сонголт): объект -> тоо
 	var inv map[string]int
+	// #nosec G304 -- дээрхтэй адил: --raw-dir доторх тогтсон нэртэй файл.
 	if ib, err := os.ReadFile(filepath.Join(dir, "inventory.json")); err == nil {
 		_ = json.Unmarshal(ib, &inv)
 	}

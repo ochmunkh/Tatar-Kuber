@@ -190,13 +190,18 @@ func reportRollup(r *finding.RollupInfo) {
 }
 
 // saveRaw — raw scanner гаралтыг <dir>/<scanner>.json, хувилбаруудыг versions.json болгон бичнэ.
+//
+// Эрх: хавтас 0750, файл 0600. scan-result.json ба raw гаралт нь кластерын
+// сул талуудын жагсаалт — нийтэд уншигдах шалтгаан байхгүй, ялангуяа олон
+// хэрэглэгчтэй CI runner дээр. Өөр UID-аар уншуулах хэрэгтэй бол тэр
+// шийдвэрийг хэрэглэгч ил гаргах ёстой, default нь биш.
 func saveRaw(dir string, raws []scanner.RawResult) error {
-	if err := os.MkdirAll(dir, 0o755); err != nil {
+	if err := os.MkdirAll(dir, 0o750); err != nil {
 		return err
 	}
 	vers := map[string]string{}
 	for _, raw := range raws {
-		if err := os.WriteFile(filepath.Join(dir, raw.Scanner+".json"), raw.Data, 0o644); err != nil {
+		if err := os.WriteFile(filepath.Join(dir, raw.Scanner+".json"), raw.Data, 0o600); err != nil {
 			return err
 		}
 		if raw.Version != "" {
@@ -204,11 +209,11 @@ func saveRaw(dir string, raws []scanner.RawResult) error {
 		}
 	}
 	vb, _ := json.MarshalIndent(vers, "", "  ")
-	return os.WriteFile(filepath.Join(dir, "versions.json"), vb, 0o644)
+	return os.WriteFile(filepath.Join(dir, "versions.json"), vb, 0o600)
 }
 
 func writeResult(r interface{}, outDir string) int {
-	if err := os.MkdirAll(outDir, 0o755); err != nil {
+	if err := os.MkdirAll(outDir, 0o750); err != nil {
 		errln(err)
 		return 2
 	}
@@ -218,7 +223,7 @@ func writeResult(r interface{}, outDir string) int {
 		errln(err)
 		return 2
 	}
-	if err := os.WriteFile(path, data, 0o644); err != nil {
+	if err := os.WriteFile(path, data, 0o600); err != nil {
 		errln(err)
 		return 2
 	}

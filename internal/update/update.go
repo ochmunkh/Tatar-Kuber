@@ -208,7 +208,7 @@ func Apply(ctx context.Context, opts Options) ([]Result, error) {
 
 	// Everything verified — only now does anything leave the staging directory.
 	tools := ToolsDir(opts.Home)
-	if err := os.MkdirAll(tools, 0o755); err != nil {
+	if err := os.MkdirAll(tools, 0o700); err != nil {
 		return nil, err
 	}
 	// Re-read rather than reuse Resolve's copy: the lock is rewritten whole, so
