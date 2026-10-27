@@ -1,5 +1,0 @@
-?   	github.com/ochmunkh/tatar-kuber	[no test files]
-?   	github.com/ochmunkh/tatar-kuber/cmd/tatar-kuber	[no test files]
-ok  	github.com/ochmunkh/tatar-kuber/internal/blindshot	3.719s
-ok  	github.com/ochmunkh/tatar-kuber/internal/canonical	2.599s
-ok  	github.com/ochmunkh/tatar-kuber/internal/cli	23.137s
