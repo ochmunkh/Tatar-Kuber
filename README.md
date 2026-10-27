@@ -227,6 +227,8 @@ tatar-kuber gate        --input scan-result.json [--policy .tatar-kuber.yaml] [-
 tatar-kuber doctor      # which scanners are installed, versions, supported modes
 tatar-kuber diff        --old prev/scan-result.json --new out/scan-result.json
                         # trending: new / fixed / worsened / improved  [--fail-on-new high] [--format json]
+tatar-kuber top         --input scan-result.json [--limit 10]
+                        # what to fix first: worst workloads, and the controls that hit the most resources
 tatar-kuber verify-lab  --input scan-result.json --expected expected-findings.json
 tatar-kuber update      [--scanner trivy,popeye] [--dry-run] [--check] [--home ~/.tatar-kuber]
 tatar-kuber version
@@ -238,6 +240,12 @@ every command also accepts   [--lang en|mn]
 still accept the older `-o` spelling, so existing pipelines keep working — but `-o` meant two
 different things depending on the command, so the long names are what the docs use. Severity
 thresholds (`--fail-on`, `--fail-on-new`, `fail_on:`) are case-insensitive.
+
+**Where to start.** `tatar-kuber top` reads a finished scan and prints two tables: the
+workloads carrying the most weight (summed by severity, not just counted) and the controls
+that hit the most distinct resources. The second table is the one that usually matters — a
+single control failing across thirty workloads is one fix, not thirty. `--limit` sets the
+rows per table. It changes nothing on disk; it is a reading of `scan-result.json`.
 
 **Updating the scanners.** `tatar-kuber update` downloads each scanner, checks its SHA256
 against the pin in `~/.tatar-kuber/tools.lock.yaml`, and only then installs it. A mismatch
@@ -614,6 +622,8 @@ tatar-kuber gate        --input scan-result.json [--policy .tatar-kuber.yaml] [-
 tatar-kuber doctor      # ямар scanner суусан, хувилбар, дэмжих горим
 tatar-kuber diff        --old prev/scan-result.json --new out/scan-result.json
                         # тренд: шинэ / зассан / дордсон / сайжирсан  [--fail-on-new high] [--format json]
+tatar-kuber top         --input scan-result.json [--limit 10]
+                        # юунаас эхлэх вэ: хамгийн муу workload, хамгийн олон resource-д нөлөөлсөн control
 tatar-kuber verify-lab  --input scan-result.json --expected expected-findings.json
 tatar-kuber update      [--scanner trivy,popeye] [--dry-run] [--check] [--home ~/.tatar-kuber]
 tatar-kuber version
@@ -625,6 +635,13 @@ tatar-kuber version
 гэсэн хуучин бичиглэлээ хэвээр хүлээж авна (байгаа pipeline эвдрэхгүй) — гэхдээ `-o` нь
 командаас хамаарч хоёр өөр зүйл гэсэн утгатай байсан тул баримтад бүтэн нэрийг ашиглана.
 Severity босго (`--fail-on`, `--fail-on-new`, `fail_on:`) нь үсгийн том/жижигт үл хамаарна.
+
+**Юунаас эхлэх вэ.** `tatar-kuber top` нь дууссан scan-ийг уншаад хоёр хүснэгт хэвлэнэ:
+хамгийн их ачаа үүрсэн workload-ууд (зүгээр тоолсон биш, severity-гээр нь жигнэсэн), ба
+хамгийн олон өөр resource-д тусч байгаа control-ууд. Ихэвчлэн **хоёр дахь хүснэгт** нь
+чухал — гучин workload дээр унасан нэг control бол гучин засвар биш, НЭГ засвар.
+`--limit` нь хүснэгт тус бүрийн мөрийн тоог тогтооно. Диск дээр юу ч өөрчлөхгүй, зөвхөн
+`scan-result.json`-ийг уншина.
 
 **Scanner-уудыг шинэчлэх.** `tatar-kuber update` нь scanner бүрийг татаж, SHA256-ыг нь
 `~/.tatar-kuber/tools.lock.yaml` доторх pin-тэй тулгаж, дараа нь л суулгана. Нэг нь зөрвөл
