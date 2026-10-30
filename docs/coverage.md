@@ -22,7 +22,7 @@ issue several ways.
 | Checked by at least one scanner | **32** |
 | **Not checked** (no rule mapped) | **1** |
 | Heuristic (context-dependent, lower confidence) | 2 |
-| Registry schema / last updated | 1.0 / 2026-09-07 |
+| Registry schema / last updated | 1.0 / 2026-10-18 |
 
 | Scanner | Controls it can reach | Rule IDs mapped |
 |---|---:|---:|
