@@ -89,6 +89,40 @@ Theme: **an audit is not a one-off, and a report must not misstate how it was pr
 
 ---
 
+## v1.0.4 — Saying what it actually is 🚧 (in development)
+
+Theme: **close the gap between what the tool does and what it says about itself.**
+Every item below was a place where something working was described wrongly, and nothing
+turned red.
+
+- **`top`** — ranks a finished scan twice: workloads by summed severity, and controls by how
+  many distinct resources they hit. The second table is usually the one that matters — one
+  control failing across thirty workloads is one fix, not thirty. Read-only.
+- **`confidence_reason`** — `confidence: HIGH` collapsed 70 single-scanner findings, 4
+  corroborated ones and 1 heuristic into one word. Each finding now says which it is.
+- **Control descriptions reach the report** — 33 curated descriptions sat in the registry
+  while 70 of 75 findings printed none. Now bilingual, and scanner-written text is no longer
+  overwritten by them.
+- **Per-platform checksum pins** — one checksum per scanner was correct on linux/amd64 and a
+  mismatch everywhere else, read as a corrupt download rather than an unpinned platform.
+  Twelve pins now, each read from the release's own published checksum file.
+- **Pin drift is watched** — three of four pins went stale within twelve days and nothing
+  said so. A daily job compares each pin against upstream and keeps one issue open; a check
+  that cannot reach the API fails rather than reporting "current".
+- **Least privilege, honestly** — the suggested ClusterRole asked for Secret read access with
+  a comment claiming it would not read the values. RBAC cannot do that; `get`/`list` return
+  the whole `data:` field. The permission is gone.
+- **Windows** — `update` now refuses clearly instead of failing obscurely (the catalogue
+  carries no Windows assets), and CI builds and tests on Windows. The docs parity check,
+  which could never pass on the maintainer's own machine, now does.
+- **SBOM per release**, schema versioning policy with a frozen `required` list, English
+  adapter strings, tightened output file permissions (scan results are a list of a cluster's
+  weaknesses, not world-readable data), and the registry no longer misstates when it changed.
+- **First outside contribution** — 13 commits from [fg0x0](https://github.com/fg0x0), and
+  CONTRIBUTING now states what a change has to show.
+
+---
+
 ## Release 2 (v2.0) — Depth & the audit deliverable 🎯
 
 Theme: **make it the tool a security auditor reaches for.**
@@ -255,6 +289,41 @@ v1.0.0-ийн бодит live run-ыг аудит хийхэд 11 finding бүг
 - **Өдөр тутмын scanner хамгаалалт** — амьд ба статик workflow долоо хоног тутмын оронд өдөр
   бүр ажиллана; суулгагчийн саатал бүхэл run-ыг унагахаа болив: суулгалт бүр дахин оролдоно,
   тэгсэн ч бүтэхгүй scanner нь `unavailable` гэж гарч, үлдсэн scan үргэлжилнэ.
+
+---
+
+## v1.0.4 — Байгаа байдлаа үнэн хэлэх 🚧 (хөгжүүлэлтэд)
+
+Сэдэв: **хэрэгсэл юу хийдэг, өөрийгөө юу гэж хэлдэг хоёрын зөрүүг хаах.**
+Доорх зүйл бүр нь ажиллаж байгаа зүйлийг буруу тайлбарлаж байсан газар бөгөөд
+аль нь ч улаан болоогүй.
+
+- **`top`** — дууссан scan-ийг хоёр талаас эрэмбэлнэ: workload-ууд severity-ийн нийлбэрээр,
+  control-ууд тусч байгаа өөр resource-ийн тоогоор. Ихэвчлэн хоёр дахь хүснэгт нь чухал нь —
+  гучин workload дээр унасан нэг control бол гучин засвар биш, НЭГ засвар. Зөвхөн уншина.
+- **`confidence_reason`** — `confidence: HIGH` нь 70 ганц-scanner, 4 баталгаажсан, 1 эвристик
+  олдворыг нэг үгэнд нийлүүлж байв. Одоо олдвор бүр алинд нь хамаарахаа хэлнэ.
+- **Control-ийн тайлбар тайланд хүрдэг болов** — бүртгэлд 33 тайлбар бичээстэй байхад 75
+  олдвороос 70 нь тайлбаргүй хэвлэгддэг байв. Одоо хоёр хэлээр, бас scanner-ийн өөрийнх нь
+  бичсэн текстийг дарж бичихгүй.
+- **Платформ тус бүрийн checksum** — нэг scanner-т нэг checksum нь linux/amd64 дээр зөв,
+  бусад бүх платформ дээр зөрж, "эвдэрсэн татаж авалт" гэж уншигддаг байв. Одоо 12 pin,
+  тус бүр нь release-ийн өөрийнх нь нийтэлсэн checksum файлаас уншигдсан.
+- **Pin хоцрохыг харж байна** — 4-өөс 3 нь 12 хоногийн дотор хоцорсон атлаа хэн ч хэлээгүй.
+  Өдөр тутмын ажил upstream-тэй тулгаж нэг issue нээлттэй барина; API-д хүрч чадаагүй
+  шалгалт нь "цэгцтэй" гэж хэлэхгүй, унана.
+- **Хамгийн бага эрх, үнэнээр** — санал болгож байсан ClusterRole нь Secret унших эрх гуйж,
+  "утгыг нь уншихгүй" гэсэн тайлбартай байв. RBAC дээр энэ боломжгүй: `get`/`list` нь `data:`
+  талбарыг бүхэлд нь буцаана. Эрхийг нь хассан.
+- **Windows** — `update` нь ойлгомжгүй унахын оронд шалтгаанаа хэлж татгалздаг болов
+  (каталогт Windows-ийн файл байхгүй), CI нь Windows дээр build, тест ажиллуулна.
+  Арчилагчийн өөрийнх нь машин дээр хэзээ ч давдаггүй байсан баримтын шалгалт одоо давна.
+- **Release бүрт SBOM**, схемийн хувилбарлалтын бодлого ба царцаасан `required` жагсаалт,
+  adapter-ийн англи хэллэг, гаралтын файлын эрхийн чангалалт (scan-ийн үр дүн бол кластерын
+  сул талуудын жагсаалт, нийтэд уншуулах өгөгдөл биш), мөн бүртгэл сүүлд хэзээ өөрчлөгдсөнөө
+  худал хэлэхээ болив.
+- **Эхний гадны хувь нэмэр** — [fg0x0](https://github.com/fg0x0)-оос 13 commit, мөн
+  CONTRIBUTING нь өөрчлөлт юу нотлох ёстойг тодорхой бичив.
 
 ---
 
