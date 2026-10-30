@@ -1,0 +1,75 @@
+# Пиннэсэн scanner хувилбар upstream-ээс хоцорч байгаа эсэхийг өдөр бүр шалгана.
+#
+# Яагаад: tools.lock.yaml нь scanner бүрийн ЯГ нэг release-ийг нэрлэдэг, гэтэл
+# тэр нэрийг юу ч харж байгаагүй. Pin бичигдсэнээс хойш 12 хоногийн дотор
+# 4-өөс 3 нь хоцорсон бөгөөд хэн ч хэлээгүй. Хуучирсан pin бол аюулгүй байдлын
+# хяналт биш, зүгээр нэг огнооны тэмдэг.
+#
+# Энэ workflow ЮУ Ч ӨӨРЧЛӨХГҮЙ. Pin-ийг хөдөлгөх нь хувилбарын засвар биш:
+# шинэ release-ийн өөрийнх нь нийтэлсэн checksum файлаас утгыг нь дахин уншиж,
+# scanner-ийн rule ID-ууд бүртгэлд бичсэн утгаараа хэвээр байгааг дахин батлах
+# ёстой (CONTRIBUTING: "зураглал бол байнгын үүрэг").
+name: Scanner pin drift
+
+on:
+  schedule:
+    - cron: "37 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compare pins against upstream
+        id: drift
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set +e
+          python3 scripts/check-scanner-drift.py | tee drift.txt
+          code=${PIPESTATUS[0]}
+          set -e
+          # 2 = шалгаж чадсангүй. Үүнийг "бүх зүйл цэгцтэй" гэж уншиж
+          # БОЛОХГҮЙ тул ажиллалтыг унагана.
+          if [ "$code" = "2" ]; then
+            echo "::error::drift шалгалт хариу өгч чадсангүй — доорх алдааг үз"
+            exit 1
+          fi
+          echo "stale=$([ "$code" = "1" ] && echo yes || echo no)" >> "$GITHUB_OUTPUT"
+
+      - name: Open or update the drift issue
+        if: steps.drift.outputs.stale == 'yes'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          title="Scanner pins are behind upstream"
+          body=$(printf '%s\n\n```\n%s\n```\n\n_%s_\n' \
+            "Өдөр тутмын шалгалт пиннэсэн release-үүдийг upstream-тэй тулгав." \
+            "$(cat drift.txt)" \
+            "Автоматаар шинэчлэгдэнэ. Бүх pin цэгцрэхэд энэ issue автоматаар хаагдана.")
+          num=$(gh issue list --state open --search "$title in:title" --json number,title \
+                  --jq ".[] | select(.title == \"$title\") | .number" | head -1)
+          if [ -n "$num" ]; then
+            gh issue edit "$num" --body "$body"
+            echo "updated #$num"
+          else
+            gh issue create --title "$title" --body "$body"
+          fi
+
+      - name: Close the drift issue when every pin is current
+        if: steps.drift.outputs.stale == 'no'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          title="Scanner pins are behind upstream"
+          num=$(gh issue list --state open --search "$title in:title" --json number,title \
+                  --jq ".[] | select(.title == \"$title\") | .number" | head -1)
+          if [ -n "$num" ]; then
+            gh issue close "$num" --comment "Бүх pin upstream-тэй тэнцлээ."
+          fi

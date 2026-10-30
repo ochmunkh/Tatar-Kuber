@@ -78,6 +78,15 @@ func TestDefaultLock_EveryPinIsWellFormed(t *testing.T) {
 		// MISMATCH everywhere else, which read as a corrupt download rather
 		// than as an unpinned platform.
 		tool, _ := lookup(name)
+		// The catalogue says which release to fetch; the lock says what that
+		// release's artefacts hash to. If they name different versions, the
+		// download is verified against another release's checksum and fails
+		// as "corrupt" — fail-closed, but the message blames the mirror
+		// instead of the person who bumped one file and not the other.
+		if e.Version != tool.Version {
+			t.Errorf("%s: tools.lock.yaml pins %q but the catalogue fetches %q — "+
+				"bump both, and re-read the checksums from the new release", name, e.Version, tool.Version)
+		}
 		if len(e.SHA256.ByPlatform) == 0 && strings.TrimSpace(e.SHA256.Legacy) == "" {
 			unpinned = append(unpinned, name)
 			continue
