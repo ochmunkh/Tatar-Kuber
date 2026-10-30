@@ -4,23 +4,23 @@ Work that was started but cannot be finished here, with what it is waiting on.
 
 ## `tatar-kuber update` — three of four scanners are pinned
 
-**Resolved 2026-09-30.** The command installs. `tools.lock.yaml` at the repo
-root ships pins for trivy, kubescape and popeye, each obtained the only way a
-pin is worth anything:
+**Resolved 2026-09-30; pins widened to four platforms 2026-10-18.** The command
+installs. `tools.lock.yaml` at the repo root ships pins for trivy, kubescape and
+popeye — twelve checksums in all, one per scanner per platform
+(linux/darwin x amd64/arm64).
 
-1. the latest stable release was read from the project's GitHub releases API
-2. the linux/amd64 artefact was downloaded
-3. its SHA256 was computed locally
-4. that value was compared against the checksum file the project itself
-   publishes on the same release
+Every value was **read out of the checksum file the project itself publishes on
+the release**. None was computed from a local download. That distinction is the
+whole point: a hash taken from a file you already have proves only that it did
+not change on its way to you, which is not what a pin is for. `tools.lock.yaml`
+records the same rule in its own header, and the two files must keep saying it.
 
-All three matched. Step 4 is the one that counts — a checksum computed from a
-download you already have proves only that the file did not change in transit.
-
-Verified end to end against the live release: `tatar-kuber update --scanner
-popeye` downloaded 21 MB from GitHub, the SHA256 matched the pin, the binary
-installed and runs, and `tools.lock.yaml` recorded `installed: "0.22.1"`
-separately from the pin.
+The first round (2026-09-30) also downloaded the linux/amd64 artefact and
+checked the computed hash against the published one, end to end: `tatar-kuber
+update --scanner popeye` pulled 21 MB from GitHub, the SHA256 matched, the
+binary installed and ran, and `tools.lock.yaml` recorded `installed: "0.22.1"`
+separately from the pin. That was a verification of the mechanism, not the
+source of any value in the file.
 
 The catalogue's URL shapes were stale and were refreshed at the same time:
 kubescape v4 renamed **every** asset (the v3 `kubescape-ubuntu-latest` names do
@@ -67,8 +67,28 @@ pinned public key per scanner. Note kubescape already ships
 `checksums.sha256.sig` and `checksums.sha256.pem` next to its release, so it is
 the one that could be verified first.
 
-### Pins are per-platform
+### Pins are per-platform — and all four are now pinned
 
-The shipped pins are for **linux/amd64**. `update` on another platform resolves
-a different asset, whose checksum is not in the file, and refuses until someone
-pins it the same way.
+A release publishes a **different artefact per platform**, so one checksum pins
+exactly one of them. Until 2026-10-18 this file carried a single value per
+scanner: correct on linux/amd64, and a mismatch everywhere else — which `update`
+reported as a corrupt download rather than as an unpinned platform. The lock
+file is now keyed by platform and carries all four for each of the three
+pinnable scanners.
+
+`update` still refuses, by design, any scanner with no pin for the platform it
+is running on. Windows is that case for all four: the catalogue has no Windows
+assets, and `update` says so plainly instead of failing obscurely.
+
+### Pinned versions drift
+
+The pins name specific releases (trivy 0.74.0, kubescape 4.0.15, popeye 0.22.1,
+checkov 3.3.20 as of 2026-10-18). Upstream moves; nothing in CI notices yet, so
+the pins go stale silently. A daily job that compares each pin against the
+project's latest release and opens an issue is the obvious fix and is not
+written.
+
+Checked by hand on 2026-10-30, twelve days after the pins were written: trivy
+0.74.0 -> 0.76.1, kubescape 4.0.15 -> 4.0.17, checkov 3.3.20 -> 3.4.0. Only
+popeye was still current. Three of four drifted inside two weeks and nothing
+said so.
