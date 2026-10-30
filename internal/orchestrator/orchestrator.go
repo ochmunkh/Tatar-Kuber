@@ -29,7 +29,7 @@ import (
 // ГАРААР шинэчилнэ, эс бөгөөс `tatar-kuber version` шинэ хувилбар хэлэх атлаа
 // тайлан бүр хуучин хувилбараар өөрийгөө танилцуулна — аудитын артефактад
 // гарал үүслийн алдаа. Хоёрын зөрүүг TestVersionsAgree барина.
-const Version = "1.0.3"
+const Version = "1.0.4"
 
 // Pipeline — scanner-агностик цөм.
 type Pipeline struct {
