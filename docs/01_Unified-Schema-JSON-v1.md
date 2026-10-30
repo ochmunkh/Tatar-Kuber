@@ -83,6 +83,7 @@ Finding бол TATAR-Kuber-ийн атомын нэгж. Дараах хүснэ
 | remediation | string | Тийм | Засах алхам, ж: Set securityContext.privileged=false |
 | found_by | string\[\] | Тийм | Илрүүлсэн scanner-ууд, ж: \[trivy, kubescape\] |
 | confidence | enum | Тийм | HIGH \\| MEDIUM \\| LOW — хэдэн scanner баталгаажуулснаас (§scoring) |
+| confidence_reason | enum | Үгүй | corroborated \\| single-scanner \\| single-scanner-heuristic \\| unattributed — confidence ЯАГААД тийм гарсныг хэлнэ. Сонголттой: хуучин уншигч үүнийг хайхрахгүй өнгөрч болно. |
 | blind_shot | bool | Тийм | Контекстээр downgrade хийсэн эсэх. Нуухгүй, зөвхөн тэмдэглэнэ. |
 | blind_shot_reason | string | Үгүй | Шалтгаан, ж: Known Kubernetes networking component |
 | risk_contribution | number | Үгүй | Энэ finding cluster оноонд оруулсан penalty (§scoring). |
@@ -139,6 +140,7 @@ flowchart LR
   "remediation": "securityContext.privileged=false болгоно уу.",
   "found_by": ["trivy", "kubescape", "checkov"],
   "confidence": "HIGH",
+  "confidence_reason": "corroborated",
   "blind_shot": false,
   "blind_shot_reason": null,
   "risk_contribution": 18.0,
@@ -180,6 +182,7 @@ flowchart LR
     "status":    { "enum": ["OPEN","ACKNOWLEDGED","MITIGATION_PLANNED",
                             "FIXED","VERIFIED","CLOSED"] },
     "confidence":{ "enum": ["HIGH","MEDIUM","LOW"] },
+    "confidence_reason":{ "enum": ["corroborated","single-scanner","single-scanner-heuristic","unattributed"] },
     "found_by":  { "type": "array", "items": { "type": "string" }, "minItems": 1 },
     "blind_shot":{ "type": "boolean" }
   }
@@ -217,4 +220,7 @@ status, owner, first_seen, last_seen талбарууд MVP-д бүрэн аши
 • (v1.3) Мөн энэ нь diff-ийн горим зөрүүгийн шалгалтыг сохолж байсан: амьд scan ба дахин тоглуулсан ingest хоёул remote тул тэдний хооронд анхааруулга хэзээ ч хөөрөхгүй байв. Одоо offline болсноор ялгагдана. Тэмдэглэл: raw гаралт нь анх local эсвэл remote горимоор цуглуулагдсаныг ingest давхаргаас мэдэх боломжгүй тул таамаглахгүй — offline гэдэг нь "бид scanner ажиллуулаагүй, урьд цуглуулсныг уншсан" гэсэн ҮНЭН мэдэгдэл.
 • (v1.3) metadata.tatar_version нь release хэрэгслийн ldflags хүрдэггүй const-оос ирдэг (goreleaser зөвхөн cli.Version-ыг оруулдаг). Тиймээс `tatar-kuber version` нэг хувилбар хэлж, тайлан бүр болон SARIF-ийн driver.version өөр хувилбар бичих боломжтой байв. Хоёрын зөрүүг одоо TestVersionsAgree барина.
 • (v1.3) metadata.lang нь report --lang-аар гаралтын үед сэлгэгдэж болно. Файлыг дарж бичихгүй тул metadata.result_hash хүчинтэй хэвээр — нэг scan-result.json-оос хоёр хэл дээрх тайлан гарна.
+• ШИНЭ ТАЛБАР (v1.4): confidence_reason. confidence нь нэг үгээр хариулдаг байсан — жишээ корпус дээр 75 олдвор БҮГД "HIGH". Гэтэл бодит байдал нь: 70 нь ганц scanner хэлсэн, 4 нь хоёр scanner бие даан баталсан, 1 нь эвристик. Хоёр scanner-ийн тохирол ба нэг scanner-ийн таамаг нэг үгэнд нийлж байсан. Утгууд: corroborated (2+ scanner), single-scanner (1 scanner, deterministic шалгалт), single-scanner-heuristic (1 scanner, контекст шаарддаг эвристик), unattributed (found_by хоосон).
+• (v1.4) confidence_reason нь required-д ОРООГҮЙ бөгөөд хэзээ ч орохгүй: сонголттой талбар нэмэх нь хуучин уншигчийг эвдэхгүй, required жагсаалтыг өсгөх нь эвднэ. Энэ ялгааг pkg/schema/compat_test.go барина, pkg/schema/VERSIONING.md тайлбарлана.
+• (v1.4) confidence өөрөө ХЭВЭЭР үлдэнэ. confidence_reason нь түүнийг солихгүй, тайлбарлана — ижил confidence-тай хоёр олдворыг ялгах боломж олгоно.
 ```

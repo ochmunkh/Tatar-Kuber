@@ -26,6 +26,7 @@ TATAR-Kuber-ийн command-line интерфэйсийн эцсийн тодор
 | tatar-kuber gate | scan-result.json-ыг .tatar-kuber.yaml бодлоготой тулгаж CI-д pass/fail (exit code) |
 | tatar-kuber doctor | Scanner binary суусан эсэх, хувилбар, дэмждэг горимыг шалгана |
 | tatar-kuber verify-lab | expected-findings.json-той тулгаж regression шалгана |
+| tatar-kuber top | Дууссан scan-аас юунаас эхлэхийг эрэмблэнэ: хамгийн их ачаа үүрсэн workload (severity-гээр жигнэсэн) ба хамгийн олон өөр resource-д тусч байгаа control. --limit нь хүснэгт тус бүрийн мөрийн тоо (default 10). Диск дээр юу ч бичихгүй. |
 
 ## 3. tatar-kuber scan
 
@@ -196,3 +197,7 @@ Scan бүр дараах үе шатыг лог болгож бичнэ: START S
 - (v1.6) Итгэх боломжгүй baseline (cluster_mismatch, mode_mismatch, rollup_mismatch, schema_mismatch) үед baseline ХЭРЭГСЭХГҮЙ, бүх олдвор тооцогдоно — аюулгүй байдлын gate эргэлзээтэй үедээ хаалттай талдаа унана. Шалтгааныг stderr-т нэрлэнэ.
 - (v1.6) Suppression-ий бүртгэл (хугацаа дууссан / юунд ч тохироогүй дүрэм) нь БҮТЭН олдворын жагсаалт дээр тооцогдсон хэвээр. Эс бөгөөс baseline-д байсан finding-ийг хаадаг дүрэм бүр "ямар ч олдворт тохироогүй" гэж худал анхааруулагдах байв.
 - (v1.6) Тест: TestCLI_GateBaseline — baseline-гүй (exit 1), өөрчлөлтгүй baseline (exit 0), шинэ CRITICAL (exit 1), дордсон олдвор (exit 1), cluster зөрсөн baseline (exit 1, хэрэгсэхгүй), байхгүй файл (exit 2).
+- ШИНЭ КОМАНД (v1.7): tatar-kuber top --input scan-result.json \[--limit N\] \[--lang mn\|en\]. Хоёр хүснэгт хэвлэнэ: (1) workload-ууд, severity-ийн зэрэглэлийн нийлбэрээр эрэмбэлсэн (тэнцвэл олдворын тоо, дараа нь нэр); (2) control-ууд, тусч байгаа ӨӨР resource-ийн тоогоор эрэмбэлсэн (тэнцвэл severity). Хоёр дахь хүснэгт нь ихэвчлэн чухал нь: гучин workload дээр унасан нэг control бол гучин засвар биш, НЭГ засвар.
+- (v1.7) Эрэмбэлэлтийн ДҮРЭМ нь гаралтын хэсэг — тайлбаргүй эрэмбэ нь тайлбаргүй оноотой адил муу. Тиймээс эрэмбийн үндэслэл баримтад бичигдэв, флагийн тайлбарт давтагдана.
+- (v1.7) top нь зөвхөн УНШИНА: scan-result.json-д гар хүрэхгүй, шинэ файл үүсгэхгүй. Exit code: 0 — OK (олдворгүй scan ч мөн 0, алдаа биш); 2 — оролт уншигдахгүй/эвдэрсэн, эсвэл танигдахгүй флаг. --input нь default-тай (scan-result.json) тул 'дутуу' гэсэн тохиолдол байхгүй — exit 3 энэ командад гарахгүй.
+- (v1.7) Тест: internal/cli/top_test.go — TestTop_RanksResourcesBySeverityWeightNotCount, TestTop_ControlsCountDistinctResources, TestTop_EmptyScanIsNotAnError, TestTop_MissingInputIsExit2, TestTop_LimitSaysHowManyWereHidden.
