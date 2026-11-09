@@ -146,6 +146,13 @@ issue several ways.
 				fmt.Fprintf(&b, "- **%s** — %s\n", c.ID, c.Title.Get("en"))
 			}
 		}
+		// Цоорхойг нэрлэх нь шударга, гэхдээ хаасан гэсэн үг биш. Энэ баримт
+		// хаах замаа өөрөө заадаг байх ёстой — эс бөгөөс "шалгагддаггүй 1" нь
+		// хэрэглэгчийн хувьд ямар ч үйлдэлгүй мэдэгдэл хэвээр үлдэнэ.
+		b.WriteString("\nA control here is not a bug; it is a gap this project refuses to hide. " +
+			"To close one, `tatar-kuber attest` records a human's signed decision — with a reason, " +
+			"a name and a mandatory expiry — and merges it into the result. When that expiry lapses " +
+			"the control counts as unchecked again and `gate` says so.\n")
 		b.WriteString("\n")
 	}
 

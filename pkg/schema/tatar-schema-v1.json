@@ -4,124 +4,560 @@
   "title": "TATAR-Kuber Scan Result",
   "description": "scan-result.json — TATAR-Kuber-ийн солилцооны формат (Unified Schema v1). report / gate / diff / verify-lab бүгд ҮҮНИЙГ уншдаг, adopter нь baseline болгож commit хийдэг тул энэ бол гэрээ. pkg/schema/schema_test.go нь Go бүтэцтэй зөрөхөд унана.",
   "type": "object",
-  "required": ["schema_version", "metadata", "summary", "findings"],
+  "required": [
+    "schema_version",
+    "metadata",
+    "summary",
+    "findings"
+  ],
   "properties": {
-    "schema_version": { "type": "string", "description": "Схемийн хувилбар (ж: tatar-v1)" },
-    "metadata":        { "$ref": "#/$defs/metadata" },
-    "summary":         { "$ref": "#/$defs/summary" },
-    "findings":        { "type": "array", "items": { "$ref": "#/$defs/finding" } }
+    "schema_version": {
+      "type": "string",
+      "description": "Схемийн хувилбар (ж: tatar-v1)"
+    },
+    "metadata": {
+      "$ref": "#/$defs/metadata"
+    },
+    "summary": {
+      "$ref": "#/$defs/summary"
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/finding"
+      }
+    },
+    "attestations": {
+      "type": "array",
+      "description": "Гараар баталсан хариултууд. Scanner-ийн олдвор БИШ тул findings-д орохгүй; result_hash нь зөвхөн findings-ээс тооцогддог тул эдгээрийг нэмэх нь түүнийг хөдөлгөхгүй.",
+      "items": {
+        "$ref": "#/$defs/attestation"
+      }
+    }
   },
   "$defs": {
     "metadata": {
       "type": "object",
-      "required": ["scan_id","cluster_name","scan_mode","tatar_version","scanner_versions","started_at","finished_at","result_hash"],
+      "required": [
+        "scan_id",
+        "cluster_name",
+        "scan_mode",
+        "tatar_version",
+        "scanner_versions",
+        "started_at",
+        "finished_at",
+        "result_hash"
+      ],
       "properties": {
-        "scan_id":          { "type": "string" },
-        "cluster_name":     { "type": "string" },
-        "scan_mode":        { "enum": ["local","remote","offline"], "description": "local (-f манифест) | remote (амьд cluster) | offline (--raw-dir ingest)" },
-        "lang":             { "type": "string", "description": "тайлангийн хэл: en | mn" },
-        "tatar_version":    { "type": "string" },
-        "scanner_versions": { "type": "object", "additionalProperties": { "type": "string" } },
-        "scanner_runs":     { "type": "array", "description": "scanner бүрийн бодит үр дүн — '0 finding' нь 'цэвэр' үү, 'scanner ажиллаагүй' юу гэдгийг ялгана", "items": {
+        "scan_id": {
+          "type": "string"
+        },
+        "cluster_name": {
+          "type": "string"
+        },
+        "scan_mode": {
+          "enum": [
+            "local",
+            "remote",
+            "offline"
+          ],
+          "description": "local (-f манифест) | remote (амьд cluster) | offline (--raw-dir ingest)"
+        },
+        "lang": {
+          "type": "string",
+          "description": "тайлангийн хэл: en | mn"
+        },
+        "tatar_version": {
+          "type": "string"
+        },
+        "scanner_versions": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "scanner_runs": {
+          "type": "array",
+          "description": "scanner бүрийн бодит үр дүн — '0 finding' нь 'цэвэр' үү, 'scanner ажиллаагүй' юу гэдгийг ялгана",
+          "items": {
             "type": "object",
-            "required": ["scanner","status","findings"],
+            "required": [
+              "scanner",
+              "status",
+              "findings"
+            ],
             "properties": {
-              "scanner":        { "type": "string" },
-              "status":         { "enum": ["ok","unavailable","unsupported","error","timeout","parse_error","ingested"] },
-              "version":        { "type": "string" },
-              "duration_ms":    { "type": "integer" },
-              "error":          { "type": "string" },
-              "raw_bytes":      { "type": "integer" },
-              "findings":       { "type": "integer", "description": "normalize хийгдсэн (dedup-ээс ӨМНӨХ) тоо" },
-              "unmapped_rules": { "type": "array", "items": { "type": "string" } },
-              "unmapped_count": { "type": "integer" }
+              "scanner": {
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "ok",
+                  "unavailable",
+                  "unsupported",
+                  "error",
+                  "timeout",
+                  "parse_error",
+                  "ingested"
+                ]
+              },
+              "version": {
+                "type": "string"
+              },
+              "duration_ms": {
+                "type": "integer"
+              },
+              "error": {
+                "type": "string"
+              },
+              "raw_bytes": {
+                "type": "integer"
+              },
+              "findings": {
+                "type": "integer",
+                "description": "normalize хийгдсэн (dedup-ээс ӨМНӨХ) тоо"
+              },
+              "unmapped_rules": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "unmapped_count": {
+                "type": "integer"
+              }
             }
-        }},
-        "rollup":           { "type": "object", "description": "Pod -> эзэмшигч controller зөөлт (тоо буурсан нь 'зассан' гэсэн үг биш)", "properties": {
-            "moved": { "type": "integer" },
-            "pods":  { "type": "array", "items": { "type": "string" } }
-        }},
-        "started_at":       { "type": "string", "format": "date-time" },
-        "finished_at":      { "type": "string", "format": "date-time" },
-        "result_hash":      { "type": "string", "description": "Агуулгын hash — тайлан дахин үүсгэхэд хүчинтэй хэвээр байх ёстой" },
-        "inventory":        { "type": "object", "additionalProperties": { "type": "integer" } }
+          }
+        },
+        "rollup": {
+          "type": "object",
+          "description": "Pod -> эзэмшигч controller зөөлт (тоо буурсан нь 'зассан' гэсэн үг биш)",
+          "properties": {
+            "moved": {
+              "type": "integer"
+            },
+            "pods": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "started_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "finished_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "result_hash": {
+          "type": "string",
+          "description": "Агуулгын hash — тайлан дахин үүсгэхэд хүчинтэй хэвээр байх ёстой"
+        },
+        "inventory": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer"
+          }
+        }
       }
     },
     "summary": {
       "type": "object",
-      "required": ["counts","blind_shot","risk_score","risk_band","total_findings"],
+      "required": [
+        "counts",
+        "blind_shot",
+        "risk_score",
+        "risk_band",
+        "total_findings"
+      ],
       "properties": {
-        "counts":         { "type": "object", "additionalProperties": { "type": "integer" } },
-        "blind_shot":     { "type": "integer" },
-        "risk_score":     { "type": "integer" },
-        "risk_band":      { "type": "string" },
-        "total_findings": { "type": "integer" },
-        "risk_breakdown": { "type": "object", "description": "Оноо хэрхэн гарсны бүрэн тайлбар (explainable score)", "properties": {
-            "total_penalty":      { "type": "number" },
-            "high_penalty":       { "type": "number" },
-            "low_penalty_raw":    { "type": "number" },
-            "low_penalty_capped": { "type": "number" },
-            "low_pool_cap":       { "type": "number" },
-            "scale":              { "type": "number" },
-            "formula":            { "type": "string" },
-            "top_contributors":   { "type": "array", "items": {
+        "counts": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer"
+          }
+        },
+        "blind_shot": {
+          "type": "integer"
+        },
+        "risk_score": {
+          "type": "integer"
+        },
+        "risk_band": {
+          "type": "string"
+        },
+        "total_findings": {
+          "type": "integer"
+        },
+        "risk_breakdown": {
+          "type": "object",
+          "description": "Оноо хэрхэн гарсны бүрэн тайлбар (explainable score)",
+          "properties": {
+            "total_penalty": {
+              "type": "number"
+            },
+            "high_penalty": {
+              "type": "number"
+            },
+            "low_penalty_raw": {
+              "type": "number"
+            },
+            "low_penalty_capped": {
+              "type": "number"
+            },
+            "low_pool_cap": {
+              "type": "number"
+            },
+            "scale": {
+              "type": "number"
+            },
+            "formula": {
+              "type": "string"
+            },
+            "top_contributors": {
+              "type": "array",
+              "items": {
                 "type": "object",
                 "properties": {
-                  "id":                { "type": "string" },
-                  "canonical_control": { "type": "string" },
-                  "resource":          { "type": "string" },
-                  "severity":          { "enum": ["CRITICAL","HIGH","MEDIUM","LOW","INFO"] },
-                  "contribution":      { "type": "number" },
-                  "share":             { "type": "number" }
+                  "id": {
+                    "type": "string"
+                  },
+                  "canonical_control": {
+                    "type": "string"
+                  },
+                  "resource": {
+                    "type": "string"
+                  },
+                  "severity": {
+                    "enum": [
+                      "CRITICAL",
+                      "HIGH",
+                      "MEDIUM",
+                      "LOW",
+                      "INFO"
+                    ]
+                  },
+                  "contribution": {
+                    "type": "number"
+                  },
+                  "share": {
+                    "type": "number"
+                  }
                 }
-            }}
-        }}
+              }
+            }
+          }
+        },
+        "attested": {
+          "type": "object",
+          "description": "Гараар баталсан control-уудын хураангуй. Хугацаа дууссаныг ТУСАД нь тоолно: 'N батлагдсан' гэдэг нь хугацаа дууссаныг оруулбал худал мэдэгдэл болно.",
+          "properties": {
+            "compliant": {
+              "type": "integer"
+            },
+            "non_compliant": {
+              "type": "integer"
+            },
+            "not_applicable": {
+              "type": "integer"
+            },
+            "expired": {
+              "type": "integer"
+            }
+          }
+        }
       }
     },
     "finding": {
       "title": "TATAR-Kuber Finding",
       "type": "object",
-      "required": ["id","canonical_control","resource","type","category","severity","title","description","remediation","found_by","confidence","blind_shot","status","first_seen","last_seen"],
+      "required": [
+        "id",
+        "canonical_control",
+        "resource",
+        "type",
+        "category",
+        "severity",
+        "title",
+        "description",
+        "remediation",
+        "found_by",
+        "confidence",
+        "blind_shot",
+        "status",
+        "first_seen",
+        "last_seen"
+      ],
       "properties": {
-        "id":                { "type": "string", "pattern": "^TK-[0-9a-f]{12}$", "description": "Тогтвортой content-hash ID: TK- + SHA256(canonical_control|resource|namespace)-ийн эхний 12 hex (48 бит)" },
-        "canonical_control": { "type": "string", "pattern": "^TATAR-[A-Z]+-[0-9]{3}$" },
-        "resource":          { "type": "string" },
-        "namespace":         { "type": "string" },
-        "type":              { "enum": ["misconfiguration","vulnerability","secret","rbac","network","hygiene"] },
-        "category":          { "type": "string" },
-        "severity":          { "enum": ["CRITICAL","HIGH","MEDIUM","LOW","INFO"] },
-        "original_severity": { "enum": ["CRITICAL","HIGH","MEDIUM","LOW","INFO"] },
-        "title":             { "type": "string" },
-        "description":       { "type": "string" },
-        "remediation":       { "type": "string" },
-        "found_by":          { "type": "array", "items": { "type": "string" }, "minItems": 1 },
-        "confidence":        { "enum": ["HIGH","MEDIUM","LOW"] },
-        "confidence_reason": { "enum": ["corroborated", "single-scanner", "single-scanner-heuristic", "unattributed"], "description": "Яагаад яг энэ итгэлийн зэрэг гарсаныг тайлбарлах КОД (проз биш — хэлнээс хамгийн, SIEM-д шүүгдэхээр). corroborated = 2+ scanner; single-scanner = 1 scanner, шууд шалгалт; single-scanner-heuristic = 1 scanner, эвристик control" },
-        "blind_shot":        { "type": "boolean" },
-        "blind_shot_reason": { "type": "string" },
-        "risk_contribution": { "type": "number" },
-        "status":            { "enum": ["OPEN","ACKNOWLEDGED","MITIGATION_PLANNED","FIXED","VERIFIED","CLOSED"] },
-        "owner":             { "type": "string" },
-        "first_seen":        { "type": "string", "format": "date-time" },
-        "last_seen":         { "type": "string", "format": "date-time" },
-        "references":        { "type": "array", "items": { "type": "string" } },
-        "raw_refs":          { "type": "array", "items": {
-            "type": "object",
-            "required": ["scanner","rule_id"],
-            "properties": { "scanner": {"type":"string"}, "rule_id": {"type":"string"} }
-        }},
-        "evidence":          { "type": "array", "items": {
-            "type": "object",
-            "properties": { "scanner": {"type":"string"}, "path": {"type":"string"}, "value": {"type":"string"}, "detail": {"type":"string"} }
-        }},
-        "risk_factors":      { "type": "object",
-            "properties": { "base_weight": {"type":"number"}, "asset_context": {"type":"number"}, "exposure": {"type":"number"}, "confidence": {"type":"number"}, "contribution": {"type":"number"} }
+        "id": {
+          "type": "string",
+          "pattern": "^TK-[0-9a-f]{12}$",
+          "description": "Тогтвортой content-hash ID: TK- + SHA256(canonical_control|resource|namespace)-ийн эхний 12 hex (48 бит)"
         },
-        "attack":            { "type": "array", "description": "MITRE ATT&CK techniques this weakness MAY ENABLE (exposure, not detection)", "items": {
+        "canonical_control": {
+          "type": "string",
+          "pattern": "^TATAR-[A-Z]+-[0-9]{3}$"
+        },
+        "resource": {
+          "type": "string"
+        },
+        "namespace": {
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "misconfiguration",
+            "vulnerability",
+            "secret",
+            "rbac",
+            "network",
+            "hygiene"
+          ]
+        },
+        "category": {
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "CRITICAL",
+            "HIGH",
+            "MEDIUM",
+            "LOW",
+            "INFO"
+          ]
+        },
+        "original_severity": {
+          "enum": [
+            "CRITICAL",
+            "HIGH",
+            "MEDIUM",
+            "LOW",
+            "INFO"
+          ]
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "remediation": {
+          "type": "string"
+        },
+        "found_by": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "confidence": {
+          "enum": [
+            "HIGH",
+            "MEDIUM",
+            "LOW"
+          ]
+        },
+        "confidence_reason": {
+          "enum": [
+            "corroborated",
+            "single-scanner",
+            "single-scanner-heuristic",
+            "unattributed"
+          ],
+          "description": "Яагаад яг энэ итгэлийн зэрэг гарсаныг тайлбарлах КОД (проз биш — хэлнээс хамгийн, SIEM-д шүүгдэхээр). corroborated = 2+ scanner; single-scanner = 1 scanner, шууд шалгалт; single-scanner-heuristic = 1 scanner, эвристик control"
+        },
+        "blind_shot": {
+          "type": "boolean"
+        },
+        "blind_shot_reason": {
+          "type": "string"
+        },
+        "risk_contribution": {
+          "type": "number"
+        },
+        "status": {
+          "enum": [
+            "OPEN",
+            "ACKNOWLEDGED",
+            "MITIGATION_PLANNED",
+            "FIXED",
+            "VERIFIED",
+            "CLOSED"
+          ]
+        },
+        "owner": {
+          "type": "string"
+        },
+        "first_seen": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "last_seen": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "references": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "raw_refs": {
+          "type": "array",
+          "items": {
             "type": "object",
-            "required": ["technique","tactic"],
-            "properties": { "technique": {"type":"string"}, "name": {"type":"string"}, "tactic": {"type":"string"} }
-        }}
+            "required": [
+              "scanner",
+              "rule_id"
+            ],
+            "properties": {
+              "scanner": {
+                "type": "string"
+              },
+              "rule_id": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "scanner": {
+                "type": "string"
+              },
+              "path": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              },
+              "detail": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "risk_factors": {
+          "type": "object",
+          "properties": {
+            "base_weight": {
+              "type": "number"
+            },
+            "asset_context": {
+              "type": "number"
+            },
+            "exposure": {
+              "type": "number"
+            },
+            "confidence": {
+              "type": "number"
+            },
+            "contribution": {
+              "type": "number"
+            }
+          }
+        },
+        "attack": {
+          "type": "array",
+          "description": "MITRE ATT&CK techniques this weakness MAY ENABLE (exposure, not detection)",
+          "items": {
+            "type": "object",
+            "required": [
+              "technique",
+              "tactic"
+            ],
+            "properties": {
+              "technique": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "tactic": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "attestation": {
+      "type": "object",
+      "description": "Автоматаар шалгагдах боломжгүй control-д хүний өгсөн хариулт. Хугацаа ЗААВАЛ: хугацаагүй баталгаа нь хугацаагүй suppression-тай ижил согог.",
+      "required": [
+        "control",
+        "decision",
+        "rationale",
+        "attested_by",
+        "attested_at",
+        "expires"
+      ],
+      "properties": {
+        "control": {
+          "type": "string",
+          "pattern": "^TATAR-[A-Z]+-[0-9]{3}$"
+        },
+        "decision": {
+          "enum": [
+            "compliant",
+            "non-compliant",
+            "not-applicable"
+          ],
+          "description": "non-compliant нь gate-ийг унагаана."
+        },
+        "scope": {
+          "type": "string"
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "attested_by": {
+          "type": "string",
+          "minLength": 1
+        },
+        "attested_at": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "expires": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "title": {
+          "type": "string",
+          "description": "canonical бүртгэлээс apply үед бөглөгдөнө"
+        },
+        "severity": {
+          "enum": [
+            "CRITICAL",
+            "HIGH",
+            "MEDIUM",
+            "LOW",
+            "INFO"
+          ],
+          "description": "canonical бүртгэлээс apply үед бөглөгдөнө — attestation файлаар солих боломжгүй"
+        },
+        "status": {
+          "enum": [
+            "active",
+            "expired"
+          ],
+          "description": "apply хийх мөчид тооцогдоно"
+        }
       }
     }
   }

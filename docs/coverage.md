@@ -37,6 +37,8 @@ These controls exist in the registry but no scanner rule maps to them. They are 
 
 - **TATAR-NET-004** — Ingress without TLS
 
+A control here is not a bug; it is a gap this project refuses to hide. To close one, `tatar-kuber attest` records a human's signed decision — with a reason, a name and a mandatory expiry — and merges it into the result. When that expiry lapses the control counts as unchecked again and `gate` says so.
+
 ## Matrix
 
 Each cell is the number of scanner rule IDs mapped to that control.

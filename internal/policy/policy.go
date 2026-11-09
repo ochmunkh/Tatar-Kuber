@@ -143,6 +143,12 @@ type Result struct {
 	MinScore      int
 	ScoreViolated bool
 
+	// Гараар баталсан давхарга. Эдгээр нь Violations-оос ТУСАД нь байна:
+	// аудитын тайланд "scanner олсон" ба "хүн баталсан" хоёр ялгарч байх
+	// ёстой, тоо нь нийлсэн ч.
+	AttestViolations []finding.Attestation // active + non-compliant, босго давсан
+	AttestExpired    []finding.Attestation // хугацаа дууссан — ДАХИН шалгагдаагүй болсон
+
 	// Reasons — gate унасан шалтгаануудын ТОГТМОЛ КОД (бичвэр биш).
 	// CLI нь `--lang`-аар сонгогдсон хэл дээр хэвлэдэг тул шалтгааны бичвэр
 	// нэг л газар — CLI-ийн мессежийн каталогт — амьдрах ёстой. Кодод хэрэгтэй
@@ -152,8 +158,9 @@ type Result struct {
 
 // Result.Reasons-д гарах кодууд.
 const (
-	ReasonThreshold = "threshold" // босго давсан олдвор бий
-	ReasonMinScore  = "min_score" // cluster score шаардсанаас доогуур
+	ReasonThreshold   = "threshold"   // босго давсан олдвор бий
+	ReasonMinScore    = "min_score"   // cluster score шаардсанаас доогуур
+	ReasonAttestation = "attestation" // хүн зөрчил байгааг баталсан (non-compliant)
 )
 
 // Evaluate — scan үр дүнг бодлоготой тулгаж pass/fail шийднэ.
@@ -207,6 +214,38 @@ func (p Policy) Evaluate(res finding.ScanResult, now time.Time) Result {
 		out.Passed = false
 		out.Reasons = append(out.Reasons, ReasonThreshold)
 	}
+	// ── Гараар баталсан давхарга ─────────────────────────────────────────
+	//
+	// Хоёр зүйлийг ЧИМЭЭГҮЙ өнгөрөөж болохгүй:
+	//
+	//  1. non-compliant — хүн зөрчил байгааг баталсан. Scanner үүнийг олж
+	//     чадахгүй (тийм учраас л attestation хэрэгтэй), гэтэл хүн баталсан
+	//     зөрчил нь scanner-ийн олсон зөрчлөөс дутуу бодит биш. Босго давбал
+	//     gate унана.
+	//  2. expired — хугацаа дууссан attestation бол "хаагдсан цоорхой" биш,
+	//     ДАХИН НЭЭГДСЭН цоорхой. Хугацаа дууссан suppression дахин
+	//     идэвхжихтэй яг ижил зарчим: нэг удаа батлаад үүрд мартах боломж
+	//     байж болохгүй.
+	for _, a := range res.Attestations {
+		if a.Status == finding.AttestExpired {
+			out.AttestExpired = append(out.AttestExpired, a)
+			continue
+		}
+		if a.Decision != finding.AttestNonCompliant {
+			continue
+		}
+		// Severity нь бүртгэлээс ирдэг. Хэрэв ямар нэг шалтгаанаар хоосон бол
+		// босгоос доогуур гэж ҮЗЭХГҮЙ: мэдэгдэхгүй severity-г "аюулгүй" гэж
+		// уншуулах нь энэ хэрэгслийн эсэргүүцэх зан (§6).
+		if a.Severity == "" || finding.Rank(a.Severity) >= out.Threshold {
+			out.AttestViolations = append(out.AttestViolations, a)
+		}
+	}
+	if len(out.AttestViolations) > 0 {
+		out.Passed = false
+		out.Reasons = append(out.Reasons, ReasonAttestation)
+	}
+
 	if p.MinScore > 0 && res.Summary.RiskScore < p.MinScore {
 		out.Passed = false
 		out.ScoreViolated = true

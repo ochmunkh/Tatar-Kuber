@@ -464,6 +464,152 @@ var catalog = map[string]canonical.I18n{
 		"en": "cluster score %d < required %d",
 		"mn": "cluster score %d < шаардлагатай %d",
 	},
+	"gate.reason.attestation": {
+		"en": "%d attested control(s) are non-compliant",
+		"mn": "гараар баталсан %d control зөрчилтэй",
+	},
+
+	// ── attest ─────────────────────────────────────────────────────────────
+	//
+	// Хугацаа дууссан attestation нь "хаагдсан цоорхой" биш, ДАХИН НЭЭГДСЭН
+	// цоорхой. Scanner түүнийг шалгадаггүй тул өөр хэн ч хэлэхгүй — бичвэр нь
+	// тэр утгыг шууд хэлэх ёстой.
+	"gate.attest.expired": {
+		"en": "attestation for '%s' expired (%s, by %s) — that control is UNCHECKED again",
+		"mn": "'%s'-ийн баталгаа хугацаа дууссан (%s, %s) — тэр control ДАХИН шалгагдаагүй боллоо",
+	},
+	"gate.attest.violations": {
+		"en": "Attested non-compliant (%d):\n",
+		"mn": "Гараар баталсан зөрчил (%d):\n",
+	},
+	"attest.subcommand.missing": {
+		"en": "attest needs a subcommand: create | apply",
+		"mn": "attest-д дэд команд хэрэгтэй: create | apply",
+	},
+	"attest.subcommand.unknown": {
+		"en": "unknown attest subcommand '%s' (create | apply)",
+		"mn": "attest-ийн '%s' дэд команд танигдахгүй (create | apply)",
+	},
+	"attest.created": {
+		"en": "wrote %s — %d control(s) to attest",
+		"mn": "%s бичигдлээ — баталгаажуулах %d control",
+	},
+	"attest.nogaps": {
+		"en": "every control is checked by at least one scanner; nothing is waiting on a human. Use --all to attest checked controls too.",
+		"mn": "control бүр дор хаяж нэг scanner-ээр шалгагддаг; хүнээс хүлээж буй зүйл алга. Шалгагддаг control-уудыг бас батлах бол --all.",
+	},
+	"attest.invalid": {
+		"en": "%d problem(s) — nothing was applied. A half-applied attestation leaves nobody able to say which control is covered.",
+		"mn": "%d асуудал — юу ч хэрэглэгдсэнгүй. Хагас хэрэгжсэн баталгаа нь аль control хамгаалагдсаныг хэн ч хэлж чадахгүй төлөв үүсгэнэ.",
+	},
+	"attest.expired": {
+		"en": "'%s' expired on %s — recorded as expired, which counts as UNCHECKED",
+		"mn": "'%s' нь %s-нд хугацаа дууссан — шалгагдаагүйд тооцогдоно",
+	},
+	"attest.applied": {
+		"en": "attestations applied — compliant=%d  non-compliant=%d  not-applicable=%d  expired=%d",
+		"mn": "баталгаа нэгдлээ — хангасан=%d  зөрчилтэй=%d  хамаарахгүй=%d  хугацаа дууссан=%d",
+	},
+	"attest.noncompliant.note": {
+		"en": "%d non-compliant attestation(s) will fail the gate at or above their severity — that is the point of recording them.",
+		"mn": "зөрчилтэй гэж баталсан %d control нь severity-ийнхээ түвшинд gate-ийг унагаана — тэдгээрийг бүртгэх учир нь яг энэ.",
+	},
+	"attest.template.header": {
+		"en": `The controls below are checked by NO scanner. They are listed by name in
+docs/coverage.md as a DECLARED gap — declaring it is honest, but it is not
+closed. This file is how it gets closed: a human checks what a scanner cannot,
+writes down why, and signs it.
+
+RULES (all enforced by 'attest apply'):
+  decision     compliant | non-compliant | not-applicable — REQUIRED.
+               non-compliant FAILS THE GATE. That is deliberate: if a person
+               has confirmed a control is broken, the result must show it.
+  rationale    why — REQUIRED. An attestation without a reason is not evidence.
+  attested_by  who — REQUIRED. An unsigned attestation is not evidence.
+  expires      REQUIRED. When it lapses the control becomes UNCHECKED again and
+               the gate says so. An attestation with no expiry gets written once
+               and reads as true forever — that is exactly what this prevents.
+  evidence     links to supporting proof (optional, worth the most in an audit)
+  scope        note narrowing where this applies (optional)
+
+severity is NOT written here: the canonical registry is its only source. It is
+shown in the comments below for information only.`,
+		"mn": `Доорх control-уудыг ЯМАР Ч scanner шалгадаггүй. Тэдгээр нь docs/coverage.md-д
+нэрээрээ ил бичигдсэн ЗАРЛАГДСАН цоорхой — ил зарласан нь шударга, гэхдээ
+хаагдсан гэсэн үг биш. Энэ файл бол түүнийг хаах зам: scanner чадахгүй зүйлийг
+хүн шалгаж, үндэслэлээ бичиж, нэрээ бүртгүүлнэ.
+
+ДҮРЭМ (бүгд 'attest apply' дээр шалгагдана):
+  decision     compliant | non-compliant | not-applicable — ЗААВАЛ.
+               non-compliant нь GATE-ИЙГ УНАГААНА. Энэ нь санамсаргүй биш:
+               хүн зөрчил байгааг баталсан бол үр дүн түүнийг харуулах ёстой.
+  rationale    яагаад — ЗААВАЛ. Үндэслэлгүй баталгаа бол баталгаа биш.
+  attested_by  хэн — ЗААВАЛ. Гарын үсэггүй баталгаа бол баталгаа биш.
+  expires      ЗААВАЛ. Хугацаа дуусмагц control нь ДАХИН шалгагдаагүй болж,
+               gate түүнийг хэлнэ. Хугацаагүй баталгаа нэг удаа бичигдээд үүрд
+               үнэн мэт уншигдана — яг тэрнээс сэргийлж байна.
+  evidence     нотлох баримтын холбоос (сонголт, аудитад хамгийн үнэтэй)
+  scope        хаана хамаарахыг нарийсгах тэмдэглэл (сонголт)
+
+severity-г ЭНД бичихгүй: canonical бүртгэл бол түүний цорын ганц эх сурвалж.
+Доорх сэтгэгдэлд зөвхөн мэдээлэл болгон харуулав.`,
+	},
+	"attest.template.generated": {
+		"en": "Generated: %s  ·  suggested expires: %s (one year)",
+		"mn": "Үүсгэсэн: %s  ·  санал болгох expires: %s (нэг жил)",
+	},
+	"attest.template.decision": {
+		"en": "compliant | non-compliant | not-applicable",
+		"mn": "compliant | non-compliant | not-applicable",
+	},
+	"attest.template.rationale": {
+		"en": "why — tie it to the proof",
+		"mn": "яагаад — нотлох баримттай холбож бич",
+	},
+	"attest.template.by": {
+		"en": "who",
+		"mn": "хэн",
+	},
+	"attest.template.expires": {
+		"en": "YYYY-MM-DD",
+		"mn": "YYYY-MM-DD",
+	},
+	"attest.template.evidence": {
+		"en": "links to proof",
+		"mn": "нотлох баримтын холбоос",
+	},
+	"attest.template.scope": {
+		"en": "e.g. the prod namespace only",
+		"mn": "ж: зөвхөн prod namespace",
+	},
+	"attest.template.nogaps": {
+		"en": "No unchecked control — there is no gap to close. (attest create --all for every control.)",
+		"mn": "Шалгагддаггүй control алга — хаах цоорхой байхгүй. (Бүгдийг авах бол: attest create --all)",
+	},
+	"attest.template.severity": {
+		"en": "severity",
+		"mn": "severity",
+	},
+	"flag.attest.out": {
+		"en": "where to write the attestation template",
+		"mn": "баталгааны загварыг хаана бичих вэ",
+	},
+	"flag.attest.all": {
+		"en": "include every active control, not only the ones no scanner checks",
+		"mn": "зөвхөн шалгагддаггүйг биш, идэвхтэй бүх control-ыг оруулна",
+	},
+	"flag.attest.cluster": {
+		"en": "cluster name to record in the template",
+		"mn": "загварт бичих кластерын нэр",
+	},
+	"flag.attest.file": {
+		"en": "the filled-in attestations.yaml to apply",
+		"mn": "хэрэглэх attestations.yaml (бөглөсөн)",
+	},
+	"flag.attest.outdir": {
+		"en": "directory for the merged scan-result.json (default: next to --input)",
+		"mn": "нэгтгэсэн scan-result.json-ийг бичих хавтас (default: --input-ийн хажууд)",
+	},
 	"gate.baseline.warn": {
 		"en": "baseline — %s",
 		"mn": "baseline — %s",
@@ -697,6 +843,7 @@ Commands:
   gate      Check scan-result.json against the .tatar-kuber.yaml policy and pass/fail CI (exit code)
   diff      Compare two scan-result.json files: what is new / fixed / worsened
   top       Rank scan-result.json: which workload, and which control, to fix first
+  attest    create | apply — record a human decision for controls no scanner checks
   doctor    Which scanner binaries are installed, their versions and supported modes
   verify-lab Check a scan against expected-findings.json (regression)
   update    Download, verify and update the scanner binaries
@@ -737,6 +884,7 @@ Commands:
   gate      scan-result.json-ыг .tatar-kuber.yaml бодлоготой тулгаж CI-д pass/fail (exit code)
   diff      Хоёр scan-result.json-ыг тулгаж юу шинэ / зассан / дордсоныг харуулна
   top       scan-result.json-ыг эрэмбэлнэ: аль ачааллыг, аль control-ыг түрүүлж засах вэ
+  attest    create | apply — scanner шалгадаггүй control-д хүний шийдвэрийг бүртгэнэ
   doctor    Scanner binary-ууд суусан эсэх, хувилбар, горимыг шалгана
   verify-lab expected-findings.json-той тулгаж regression шалгана
   update    Scanner binary-уудыг татаж, баталгаажуулж шинэчилнэ

@@ -7,7 +7,7 @@
 ![Output](https://img.shields.io/badge/output-JSON%20%C2%B7%20SARIF%20%C2%B7%20HTML-1F6F54)
 [![CI](https://github.com/ochmunkh/Tatar-Kuber/actions/workflows/ci.yml/badge.svg)](https://github.com/ochmunkh/Tatar-Kuber/actions/workflows/ci.yml)
 [![Real cluster](https://github.com/ochmunkh/Tatar-Kuber/actions/workflows/real-cluster.yml/badge.svg)](https://github.com/ochmunkh/Tatar-Kuber/actions/workflows/real-cluster.yml)
-![Tests](https://img.shields.io/badge/tests-19%20packages%20green-brightgreen)
+![Tests](https://img.shields.io/badge/tests-20%20packages%20green-brightgreen)
 ![Release](https://img.shields.io/badge/release-v1.0.3-brightgreen)
 
 **Kubernetes security posture assessment framework — one command, four scanners, one standard report.**
@@ -212,7 +212,7 @@ sources → scanners (parallel) → normalize → canonical + dedup → blind-sh
 
 ```bash
 go build ./...
-go test ./...          # 19 packages, all green
+go test ./...          # 20 packages, all green
 ./scripts/build.sh 1.0.3
 ```
 
@@ -229,6 +229,9 @@ tatar-kuber diff        --old prev/scan-result.json --new out/scan-result.json
                         # trending: new / fixed / worsened / improved  [--fail-on-new high] [--format json]
 tatar-kuber top         --input scan-result.json [--limit 10]
                         # what to fix first: worst workloads, and the controls that hit the most resources
+tatar-kuber attest create --out attestations.yaml [--all] [--cluster NAME]
+tatar-kuber attest apply  --input scan-result.json --attestations attestations.yaml [--out-dir DIR]
+                        # a human's signed answer for controls no scanner checks
 tatar-kuber verify-lab  --input scan-result.json --expected expected-findings.json
 tatar-kuber update      [--scanner trivy,popeye] [--dry-run] [--check] [--home ~/.tatar-kuber]
 tatar-kuber version
@@ -246,6 +249,25 @@ workloads carrying the most weight (summed by severity, not just counted) and th
 that hit the most distinct resources. The second table is the one that usually matters — a
 single control failing across thirty workloads is one fix, not thirty. `--limit` sets the
 rows per table. It changes nothing on disk; it is a reading of `scan-result.json`.
+
+**Closing a declared gap.** `docs/coverage.md` names every control no scanner checks — today
+that is one, `TATAR-NET-004`. Naming it is honest, but it is still a gap. `attest` is how it
+gets closed: `attest create` writes a template for exactly those controls, a human fills in a
+decision, a reason, their name and an **expiry**, and `attest apply` merges it into the result.
+
+Four things make it an audit record rather than a checkbox:
+
+- **An expiry is mandatory.** When it lapses the control counts as unchecked again and `gate`
+  says so by name. An attestation with no expiry gets written once and reads as true forever.
+- **`non-compliant` fails the gate** at or above the control's severity. If a person has
+  confirmed a control is broken, the result has to show it — otherwise attestation is a way to
+  write things down and never act on them.
+- **It is not a finding.** Attestations live in their own `attestations[]` block, never in
+  `findings`, so `found_by` never claims a scanner saw something it did not — and because
+  `metadata.result_hash` covers only the findings, a human's answer cannot quietly alter the
+  scanners' evidence.
+- **Severity comes from the registry**, not from the file. Letting the attestation set its own
+  severity would be a silent way around the gate.
 
 **Updating the scanners.** `tatar-kuber update` downloads each scanner, checks its SHA256
 against the pin in `~/.tatar-kuber/tools.lock.yaml`, and only then installs it. A mismatch
@@ -624,6 +646,9 @@ tatar-kuber diff        --old prev/scan-result.json --new out/scan-result.json
                         # тренд: шинэ / зассан / дордсон / сайжирсан  [--fail-on-new high] [--format json]
 tatar-kuber top         --input scan-result.json [--limit 10]
                         # юунаас эхлэх вэ: хамгийн муу workload, хамгийн олон resource-д нөлөөлсөн control
+tatar-kuber attest create --out attestations.yaml [--all] [--cluster НЭР]
+tatar-kuber attest apply  --input scan-result.json --attestations attestations.yaml [--out-dir DIR]
+                        # scanner шалгадаггүй control-д хүний гарын үсэгтэй хариулт
 tatar-kuber verify-lab  --input scan-result.json --expected expected-findings.json
 tatar-kuber update      [--scanner trivy,popeye] [--dry-run] [--check] [--home ~/.tatar-kuber]
 tatar-kuber version
@@ -642,6 +667,25 @@ Severity босго (`--fail-on`, `--fail-on-new`, `fail_on:`) нь үсгийн
 чухал — гучин workload дээр унасан нэг control бол гучин засвар биш, НЭГ засвар.
 `--limit` нь хүснэгт тус бүрийн мөрийн тоог тогтооно. Диск дээр юу ч өөрчлөхгүй, зөвхөн
 `scan-result.json`-ийг уншина.
+
+**Зарлагдсан цоорхойг хаах.** `docs/coverage.md` нь ямар ч scanner шалгадаггүй control бүрийг
+нэрээр нь бичдэг — өнөөдөр нэг, `TATAR-NET-004`. Нэрлэсэн нь шударга, гэвч цоорхой хэвээр.
+`attest` бол түүнийг хаах зам: `attest create` нь яг тэр control-уудын загвар гаргана, хүн
+шийдвэр, үндэслэл, нэрээ, мөн **хугацаа** бичнэ, `attest apply` нь үр дүнд нэгтгэнэ.
+
+Үүнийг галочка биш, аудитын бүртгэл болгож байгаа дөрвөн зүйл:
+
+- **Хугацаа заавал.** Дуусмагц control нь дахин шалгагдаагүйд тооцогдож, `gate` түүнийг
+  нэрээр нь хэлнэ. Хугацаагүй баталгаа нэг удаа бичигдээд үүрд үнэн мэт уншигдана.
+- **`non-compliant` нь gate-ийг унагаана** — control-ийн severity-ийн түвшинд. Хүн зөрчил
+  байгааг баталсан бол үр дүн түүнийг харуулах ёстой; эс бөгөөс баталгаажуулалт бол бичээд
+  мартах арга болно.
+- **Энэ нь олдвор БИШ.** Attestation нь тусдаа `attestations[]` дотор амьдарна, `findings`-д
+  хэзээ ч орохгүй — тиймээс `found_by` нь scanner хараагүй зүйлээ харсан гэж хэлэхгүй, мөн
+  `metadata.result_hash` нь зөвхөн олдворыг хамардаг тул хүний хариулт scanner-ийн нотолгоог
+  чимээгүй өөрчилж чадахгүй.
+- **Severity нь бүртгэлээс** ирнэ, файлаас биш. Attestation-д өөрийн severity тавих боломж
+  өгөх нь gate-ийг тойрох чимээгүй зам болно.
 
 **Scanner-уудыг шинэчлэх.** `tatar-kuber update` нь scanner бүрийг татаж, SHA256-ыг нь
 `~/.tatar-kuber/tools.lock.yaml` доторх pin-тэй тулгаж, дараа нь л суулгана. Нэг нь зөрвөл
@@ -768,7 +812,7 @@ docker run --rm -v "$PWD:/work" -w /work ghcr.io/ochmunkh/tatar-kuber:latest sca
 
 ```bash
 go build ./...
-go test ./...          # 19 багц, бүгд ногоон
+go test ./...          # 20 багц, бүгд ногоон
 ./scripts/build.sh 1.0.3
 ```
 

@@ -35,6 +35,17 @@ var requiredV1 = map[string][]string{
 	"finding": {"id", "canonical_control", "resource", "type", "category", "severity",
 		"title", "description", "remediation", "found_by", "confidence", "blind_shot",
 		"status", "first_seen", "last_seen"},
+
+	// attestation (v1.0.4-д нэмэгдсэн) — ШИНЭ объектын төрөл, шинэ шаардлага
+	// БИШ. `attestations` нь root дээр СОНГОЛТТОЙ property: хуучин баримтад
+	// огт байхгүй, хуучин уншигч үл тоомсорлоно. Тиймээс энэ нь урагшаа
+	// нийцтэй байдлыг эвдэхгүй.
+	//
+	// Харин ЭНЭ жагсаалт дотор нь хатуу байх нь зориуд: хугацаа (expires),
+	// үндэслэл (rationale), гарын үсэг (attested_by) гурвыг сонголттой болговол
+	// attestation нь баталгаа байхаа болино. Эдгээрийг ХАСАХ нь механизмыг
+	// утгагүй болгох тул энэ тест түүнийг ч барина.
+	"attestation": {"control", "decision", "rationale", "attested_by", "attested_at", "expires"},
 }
 
 func TestSchema_RequiredFieldsAreFrozen(t *testing.T) {

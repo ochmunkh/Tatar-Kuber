@@ -169,6 +169,77 @@ type ScanResult struct {
 	Metadata      Metadata  `json:"metadata"`
 	Summary       Summary   `json:"summary"`
 	Findings      []Finding `json:"findings"`
+
+	// Attestations — ГАРААР баталсан хариултууд. Scanner-ийн олдвор БИШ тул
+	// findings дотор ОРОХГҮЙ: тэнд оруулбал found_by худал болж, dedup-ийн
+	// "хоёр scanner санал нийлсэн" гэсэн утга алдагдана. Энэ бол тусдаа,
+	// хүний давхарга — хэн, хэзээ, ямар үндэслэлээр гэдэг нь бүртгэгдсэн.
+	//
+	// result_hash нь ЗӨВХӨН findings-ээс тооцогддог тул attestation нэмэх нь
+	// түүнийг хөдөлгөхгүй. Энэ нь санамсаргүй биш: гараар бичсэн хариулт
+	// scanner-ийн нотолгоог чимээгүй өөрчилж чадахгүй байх ёстой.
+	Attestations []Attestation `json:"attestations,omitempty"`
+}
+
+// AttestDecision — гараар баталсан шийдвэр.
+type AttestDecision string
+
+const (
+	// Хяналт хангагдсан — хүн шалгаж, баталж байна.
+	AttestCompliant AttestDecision = "compliant"
+	// Хяналт хангагдаагүй — хүн зөрчлийг баталж байна. gate унагаана.
+	AttestNonCompliant AttestDecision = "non-compliant"
+	// Энэ орчинд хамаарахгүй (ж: Ingress огт ашигладаггүй кластер).
+	AttestNotApplicable AttestDecision = "not-applicable"
+)
+
+// AttestStatus — apply хийх мөчид тооцогдсон төлөв.
+type AttestStatus string
+
+const (
+	AttestActive  AttestStatus = "active"
+	AttestExpired AttestStatus = "expired"
+)
+
+// Attestation — автоматаар шалгагдах боломжгүй control-д хүний өгсөн хариулт.
+//
+// ЯАГААД ХЭРЭГТЭЙ: docs/coverage.md нь ямар ч scanner шалгадаггүй control-ыг
+// нэрээр нь ил гаргадаг. Тэр жагсаалт бол ЗАРЛАГДСАН цоорхой — хаагдсан биш.
+// Attestation бол түүнийг хаах цорын ганц зам: scanner чадахгүй зүйлийг хүн
+// шалгаж, гарын үсгээ зурж, тэр хариулт нь үр дүнд нэгдэж ордог.
+//
+// ХУГАЦАА ЗААВАЛ: Expires хоосон байж болохгүй. Хугацаагүй attestation нь
+// хугацаагүй suppression-тай яг ижил согог — нэг л удаа бичигдээд үүрд үнэн
+// мэт уншигдана. Хугацаа дуусмагц энэ нь АЛГА болсонтой адил: control дахин
+// шалгагдаагүй болж, gate түүнийг хэлнэ.
+//
+// Severity, Title хоёрыг ЭНД бичдэггүй — apply хийх үед canonical бүртгэлээс
+// авна. Бүртгэл бол severity-ийн цорын ганц эх сурвалж; attestation файлаар
+// severity солих боломж нээвэл тэр нь gate-ийг тойрох чимээгүй зам болно.
+type Attestation struct {
+	Control    string         `yaml:"control" json:"control"`
+	Decision   AttestDecision `yaml:"decision" json:"decision"`
+	Scope      string         `yaml:"scope,omitempty" json:"scope,omitempty"`
+	Rationale  string         `yaml:"rationale" json:"rationale"`
+	Evidence   []string       `yaml:"evidence,omitempty" json:"evidence,omitempty"`
+	AttestedBy string         `yaml:"attested_by" json:"attested_by"`
+	AttestedAt string         `yaml:"attested_at" json:"attested_at"`
+	Expires    string         `yaml:"expires" json:"expires"`
+
+	// Бүртгэлээс apply үед бөглөгдөнө (YAML-д бичигддэггүй).
+	Title    string       `yaml:"-" json:"title,omitempty"`
+	Severity Severity     `yaml:"-" json:"severity,omitempty"`
+	Status   AttestStatus `yaml:"-" json:"status,omitempty"`
+}
+
+// AttestSummary — attestation-ийн хураангуй. Хугацаа дууссаныг ТУСАД нь
+// тоолно: "10 control батлагдсан" гэдэг нь 3 нь хугацаа дууссан байхад
+// худал мэдэгдэл болно.
+type AttestSummary struct {
+	Compliant     int `json:"compliant"`
+	NonCompliant  int `json:"non_compliant"`
+	NotApplicable int `json:"not_applicable"`
+	Expired       int `json:"expired"`
 }
 
 type Metadata struct {
@@ -217,6 +288,7 @@ type Summary struct {
 	RiskBand      string           `json:"risk_band"`
 	TotalFindings int              `json:"total_findings"`
 	RiskBreakdown *RiskBreakdown   `json:"risk_breakdown,omitempty"` // оноо хэрхэн гарсны тайлбар
+	Attested      *AttestSummary   `json:"attested,omitempty"`       // гараар баталсан control-уудын хураангуй
 }
 
 // Rank — severity-ийн эрэмбийн тоо (CRITICAL=5 … INFO=1, тодорхойгүй=0).

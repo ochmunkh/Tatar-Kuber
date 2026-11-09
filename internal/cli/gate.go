@@ -134,6 +134,27 @@ func cmdGate(args []string) int {
 		fmt.Println()
 	}
 
+	// Хугацаа дууссан attestation бол "хаагдсан цоорхой" биш, ДАХИН НЭЭГДСЭН
+	// цоорхой — scanner түүнийг шалгадаггүй тул өөр хэн ч хэлэхгүй.
+	for _, a := range r.AttestExpired {
+		warnln(msg("gate.attest.expired", a.Control, a.Expires, a.AttestedBy))
+	}
+	if len(r.AttestViolations) > 0 {
+		fmt.Print(msg("gate.attest.violations", len(r.AttestViolations)))
+		for _, a := range r.AttestViolations {
+			sev := string(a.Severity)
+			if sev == "" {
+				sev = "?"
+			}
+			scope := ""
+			if a.Scope != "" {
+				scope = "  " + a.Scope
+			}
+			fmt.Printf("  [%s] %s%s  (%s — %s)\n", sev, a.Control, scope, a.AttestedBy, a.Rationale)
+		}
+		fmt.Println()
+	}
+
 	if r.Passed {
 		fmt.Println(msg("gate.passed"))
 		return 0
@@ -156,6 +177,8 @@ func joinReasons(r policy.Result) string {
 			out += msg("gate.reason.threshold", len(r.Violations), r.FailOn)
 		case policy.ReasonMinScore:
 			out += msg("gate.reason.minscore", r.Score, r.MinScore)
+		case policy.ReasonAttestation:
+			out += msg("gate.reason.attestation", len(r.AttestViolations))
 		default:
 			out += code
 		}

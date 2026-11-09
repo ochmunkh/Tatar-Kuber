@@ -27,6 +27,7 @@ TATAR-Kuber-ийн command-line интерфэйсийн эцсийн тодор
 | tatar-kuber doctor | Scanner binary суусан эсэх, хувилбар, дэмждэг горимыг шалгана |
 | tatar-kuber verify-lab | expected-findings.json-той тулгаж regression шалгана |
 | tatar-kuber top | Дууссан scan-аас юунаас эхлэхийг эрэмблэнэ: хамгийн их ачаа үүрсэн workload (severity-гээр жигнэсэн) ба хамгийн олон өөр resource-д тусч байгаа control. --limit нь хүснэгт тус бүрийн мөрийн тоо (default 10). Диск дээр юу ч бичихгүй. |
+| tatar-kuber attest | create \\| apply — ЯМАР Ч scanner шалгадаггүй control-д хүний гарын үсэгтэй хариултыг бүртгэж, scan үр дүнд нэгтгэнэ. Хугацаа заавал; non-compliant нь gate-ийг унагаана; findings-д гар хүрэхгүй тул result_hash хүчинтэй хэвээр. |
 
 ## 3. tatar-kuber scan
 
@@ -201,3 +202,11 @@ Scan бүр дараах үе шатыг лог болгож бичнэ: START S
 - (v1.7) Эрэмбэлэлтийн ДҮРЭМ нь гаралтын хэсэг — тайлбаргүй эрэмбэ нь тайлбаргүй оноотой адил муу. Тиймээс эрэмбийн үндэслэл баримтад бичигдэв, флагийн тайлбарт давтагдана.
 - (v1.7) top нь зөвхөн УНШИНА: scan-result.json-д гар хүрэхгүй, шинэ файл үүсгэхгүй. Exit code: 0 — OK (олдворгүй scan ч мөн 0, алдаа биш); 2 — оролт уншигдахгүй/эвдэрсэн, эсвэл танигдахгүй флаг. --input нь default-тай (scan-result.json) тул 'дутуу' гэсэн тохиолдол байхгүй — exit 3 энэ командад гарахгүй.
 - (v1.7) Тест: internal/cli/top_test.go — TestTop_RanksResourcesBySeverityWeightNotCount, TestTop_ControlsCountDistinctResources, TestTop_EmptyScanIsNotAnError, TestTop_MissingInputIsExit2, TestTop_LimitSaysHowManyWereHidden.
+- ШИНЭ КОМАНД (v1.8): tatar-kuber attest create \[--out attestations.yaml\] \[--all\] \[--cluster НЭР\] \[--registry PATH\] \[--lang mn\|en\]. docs/coverage.md-д нэрлэгдсэн ШАЛГАГДДАГГҮЙ control-уудын (default) бөглөөгүй загвар YAML гаргана. --all нь идэвхтэй бүх control-ыг оруулна (ISO маягийн бүрэн баталгаажуулалтад). Загвар нь ЗОРИУД бөглөөгүй: урьдчилан 'compliant' гэж бичсэн загвар нь хүнийг уншилгүй баталдаг болгоно.
+- ШИНЭ КОМАНД (v1.8): tatar-kuber attest apply --input scan-result.json --attestations attestations.yaml \[--out-dir DIR\] \[--registry PATH\] \[--lang mn\|en\]. Файлыг бүртгэлтэй тулгаж шалгаад үр дүнд нэгтгэнэ. Шалгалт ХАТУУ: нэг ч алдаа байвал ЮУ Ч хэрэглэгдэхгүй — хагас хэрэгжсэн баталгаажуулалт нь аль control хамгаалагдсаныг хэн ч хэлж чадахгүй төлөв үүсгэнэ.
+- (v1.8) Заавал талбарууд: control (бүртгэлд БАЙГАА байх), decision (compliant \| non-compliant \| not-applicable), rationale, attested_by, attested_at, expires. Хугацаа ЗААВАЛ байх нь зарчмын шийдвэр: хугацаагүй attestation нь хугацаагүй suppression-тай ижил согог (§8).
+- (v1.8) severity-г attestation файлд БИЧДЭГГҮЙ — apply үед canonical бүртгэлээс бөглөгдөнө. Бүртгэл бол severity-ийн цорын ганц эх сурвалж; файлаар солих боломж нээвэл тэр нь gate-ийг тойрох чимээгүй зам болно.
+- (v1.8) gate нь хоёр шинэ зүйл хэлнэ: (а) active + non-compliant attestation нь control-ийн severity босго давбал gate УНАНА (шалтгааны код: attestation); (б) хугацаа дууссан attestation бүрт анхааруулга — тэр control ДАХИН шалгагдаагүй боллоо гэдгийг нэрээр нь хэлнэ. Scanner түүнийг шалгадаггүй тул өөр хэн ч хэлэхгүй.
+- (v1.8) attest apply нь findings-д ГАР ХҮРЭХГҮЙ: attestation нь тусдаа attestations\[\] болж орно. metadata.result_hash нь зөвхөн findings-ээс тооцогддог тул хүчинтэй хэвээр — гараар бичсэн хариулт scanner-ийн нотолгоог чимээгүй өөрчилж чадахгүй байх ёстой.
+- (v1.8) Exit code: 0 — OK; 2 — оролт/attestation файл уншигдахгүй, эсвэл шалгалтанд унасан; 3 — дэд команд дутуу эсвэл танигдахгүй.
+- (v1.8) Тест: internal/attest (13 тест — заавал хугацаа, танигдахгүй control, давхардал, үндэслэл/гарын үсэг, хугацааны хил, бүртгэлээс severity, findings хөндөгдөөгүй, эрэмбэ), internal/policy/attest_test.go (5 тест — gate-ийн зан), internal/cli/attest_test.go (6 тест). Мутациар шалгасан: заавал хугацааны шалгалт болон 'severity мэдэгдэхгүй бол аюулгүй биш' гэсэн дүрмийг эвдэхэд тест шууд унана.

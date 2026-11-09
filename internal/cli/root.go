@@ -47,6 +47,8 @@ func Execute() int {
 		return cmdDiff(cmdArgs)
 	case "top":
 		return cmdTop(cmdArgs)
+	case "attest":
+		return cmdAttest(cmdArgs)
 	case "verify-lab":
 		return cmdVerifyLab(cmdArgs)
 	case "update":
