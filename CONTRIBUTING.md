@@ -25,7 +25,7 @@ the mapping, not in another adapter.
 ```bash
 git clone https://github.com/ochmunkh/Tatar-Kuber && cd Tatar-Kuber
 go build ./...
-go test ./...          # 20 packages, must stay green
+go test ./...          # 21 packages, must stay green
 python3 scripts/validate_registry.py   # canonical registry sanity
 ```
 
@@ -177,7 +177,7 @@ release tooling. `TestVersionsAgree` catches the two that matter; the rest are m
 Then:
 
 ```bash
-go test ./...                      # 20 packages, including the golden corpus
+go test ./...                      # 21 packages, including the golden corpus
 git tag -a vX.Y.Z -m "..." && git push origin vX.Y.Z
 ```
 

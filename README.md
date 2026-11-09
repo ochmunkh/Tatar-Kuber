@@ -7,7 +7,7 @@
 ![Output](https://img.shields.io/badge/output-JSON%20%C2%B7%20SARIF%20%C2%B7%20HTML-1F6F54)
 [![CI](https://github.com/ochmunkh/Tatar-Kuber/actions/workflows/ci.yml/badge.svg)](https://github.com/ochmunkh/Tatar-Kuber/actions/workflows/ci.yml)
 [![Real cluster](https://github.com/ochmunkh/Tatar-Kuber/actions/workflows/real-cluster.yml/badge.svg)](https://github.com/ochmunkh/Tatar-Kuber/actions/workflows/real-cluster.yml)
-![Tests](https://img.shields.io/badge/tests-20%20packages%20green-brightgreen)
+![Tests](https://img.shields.io/badge/tests-21%20packages%20green-brightgreen)
 ![Release](https://img.shields.io/badge/release-v1.0.3-brightgreen)
 
 **Kubernetes security posture assessment framework — one command, four scanners, one standard report.**
@@ -212,7 +212,7 @@ sources → scanners (parallel) → normalize → canonical + dedup → blind-sh
 
 ```bash
 go build ./...
-go test ./...          # 20 packages, all green
+go test ./...          # 21 packages, all green
 ./scripts/build.sh 1.0.3
 ```
 
@@ -221,7 +221,8 @@ go test ./...          # 20 packages, all green
 ```
 tatar-kuber scan        --kubeconfig | --context | -f | --raw-dir  [--out-dir DIR] [--namespace ns1,ns2] [--no-raw] [--no-rollup]
                         # live scan keeps raw scanner output in <out>/raw/ (evidence; re-ingestable via --raw-dir)
-tatar-kuber report      --input scan-result.json --format json | sarif | html  [--out FILE] [--fail-on high]
+tatar-kuber report      --input scan-result.json --format json | sarif | html | audit | pdf  [--out FILE] [--fail-on high]
+                        # audit = print-ready bilingual audit report; pdf = the same, converted on this machine
 tatar-kuber gate        --input scan-result.json [--policy .tatar-kuber.yaml] [--fail-on high] [--min-score N]
                         # --baseline prev/scan-result.json : fail only on NEW and WORSENED
 tatar-kuber doctor      # which scanners are installed, versions, supported modes
@@ -268,6 +269,19 @@ Four things make it an audit record rather than a checkbox:
   scanners' evidence.
 - **Severity comes from the registry**, not from the file. Letting the attestation set its own
   severity would be a silent way around the gate.
+
+**The audit deliverable.** `report --format html` is a dashboard — filters, collapsible
+sections, meant for a screen. What an auditor hands a client is a different document, so it is
+a different format: `--format audit` renders a paged, self-contained, bilingual report with the
+scope, the method, **what did not run**, the score and how it was derived, the manually attested
+controls, and the findings grouped by canonical control with their remediation.
+
+`--format pdf` produces the same document as a PDF. TATAR-Kuber does not write PDF itself: it
+converts with a headless browser or `wkhtmltopdf` already on the machine. That is a deliberate
+trade — a Go PDF library would double the dependency count and bring font embedding for
+Cyrillic with it. **If no converter is found the command refuses and says so**, naming what it
+looked for and pointing at `--format audit` plus the browser's own Print → Save as PDF. It does
+not emit an empty file and call it done.
 
 **Updating the scanners.** `tatar-kuber update` downloads each scanner, checks its SHA256
 against the pin in `~/.tatar-kuber/tools.lock.yaml`, and only then installs it. A mismatch
@@ -638,7 +652,8 @@ scanner тус бүрийн явцын мөр, gate-ийн шийдвэр. `--la
 ```
 tatar-kuber scan        --kubeconfig | --context | -f | --raw-dir  [--out-dir DIR] [--namespace ns1,ns2] [--no-raw] [--no-rollup]
                         # live scan нь scanner-уудын түүхий гаралтыг <out>/raw/-д хадгална (нотолгоо; --raw-dir-ээр дахин боловсруулна)
-tatar-kuber report      --input scan-result.json --format json | sarif | html  [--out FILE] [--fail-on high]
+tatar-kuber report      --input scan-result.json --format json | sarif | html | audit | pdf  [--out FILE] [--fail-on high]
+                        # audit = хуудаслалтад бэлэн хоёр хэлт аудитын тайлан; pdf = түүнийг энэ машин дээр хөрвүүлсэн нь
 tatar-kuber gate        --input scan-result.json [--policy .tatar-kuber.yaml] [--fail-on high] [--min-score N]
                         # --baseline prev/scan-result.json : зөвхөн шинэ ба дордсон finding дээр fail болно
 tatar-kuber doctor      # ямар scanner суусан, хувилбар, дэмжих горим
@@ -686,6 +701,19 @@ Severity босго (`--fail-on`, `--fail-on-new`, `fail_on:`) нь үсгийн
   чимээгүй өөрчилж чадахгүй.
 - **Severity нь бүртгэлээс** ирнэ, файлаас биш. Attestation-д өөрийн severity тавих боломж
   өгөх нь gate-ийг тойрох чимээгүй зам болно.
+
+**Аудитын deliverable.** `report --format html` бол ДЭЛГЭЦИЙН самбар — шүүлтүүр, задардаг
+хэсэгтэй. Аудиторын үйлчлүүлэгчдээ өгдөг зүйл бол өөр баримт, тиймээс өөр формат:
+`--format audit` нь хуудаслагдсан, бие даасан, хоёр хэлт тайлан гаргана — хамрах хүрээ, арга
+зүй, **юу ажиллаагүй**, оноо ба түүний гарал, гараар баталсан хяналтууд, мөн canonical
+хяналтаар бүлэглэсэн олдворууд засах арга хэмжээтэйгээ.
+
+`--format pdf` нь яг тэр баримтыг PDF болгоно. TATAR-Kuber нь PDF-ийг өөрөө бичдэггүй:
+машин дээр БАЙГАА headless хөтөч эсвэл `wkhtmltopdf`-ээр хөрвүүлнэ. Энэ бол ухамсартай
+сонголт — Go-гийн PDF сан нэмбэл гадаад хамаарал хоёр дахин нэмэгдэж, кирилл үсэгт шрифт
+шигтгэх асуудал дагалдана. **Хөрвүүлэгч олдохгүй бол команд ИЛ ТАТГАЛЗАНА**: юу хайснаа
+нэрлээд, `--format audit` болон хөтчийн Print → Save as PDF-ийг зааж өгнө. Хоосон файл
+гаргаад "болов" гэж хэлэхгүй.
 
 **Scanner-уудыг шинэчлэх.** `tatar-kuber update` нь scanner бүрийг татаж, SHA256-ыг нь
 `~/.tatar-kuber/tools.lock.yaml` доторх pin-тэй тулгаж, дараа нь л суулгана. Нэг нь зөрвөл
@@ -812,7 +840,7 @@ docker run --rm -v "$PWD:/work" -w /work ghcr.io/ochmunkh/tatar-kuber:latest sca
 
 ```bash
 go build ./...
-go test ./...          # 20 багц, бүгд ногоон
+go test ./...          # 21 багц, бүгд ногоон
 ./scripts/build.sh 1.0.3
 ```
 

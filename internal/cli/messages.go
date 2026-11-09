@@ -261,12 +261,12 @@ var catalog = map[string]canonical.I18n{
 	},
 
 	"flag.report.format": {
-		"en": "format: json|sarif|html (long name: --format)",
-		"mn": "формат: json|sarif|html (бүтэн нэр: --format)",
+		"en": "format: json|sarif|html|audit|pdf (long name: --format)",
+		"mn": "формат: json|sarif|html|audit|pdf (бүтэн нэр: --format)",
 	},
 	"flag.report.format.long": {
-		"en": "format: json|sarif|html (long name of -o)",
-		"mn": "формат: json|sarif|html (-o-ийн бүтэн нэр)",
+		"en": "format: json|sarif|html|audit|pdf (long name of -o)",
+		"mn": "формат: json|sarif|html|audit|pdf (-o-ийн бүтэн нэр)",
 	},
 	"flag.report.out": {
 		"en": "output file (default: stdout; report.html for html)",
@@ -590,6 +590,18 @@ severity-г ЭНД бичихгүй: canonical бүртгэл бол түүни�
 		"en": "severity",
 		"mn": "severity",
 	},
+	"report.pdf.noconverter": {
+		"en": "no HTML-to-PDF converter found. TATAR-Kuber does not write PDF itself: it renders a print-ready audit report and converts it with a converter already on this machine (looked for: %s).\n  Either install one, or run `report --format audit` and use your browser's Print \u2192 Save as PDF \u2014 the HTML is the same document.",
+		"mn": "HTML-ээс PDF рүү хөрвүүлэгч олдсонгүй. TATAR-Kuber нь PDF-ийг өөрөө бичдэггүй: хуудаслалтад бэлэн аудитын тайлан гаргаад, энэ компьютер дээр БАЙГАА хөрвүүлэгчээр хөрвүүлдэг (хайсан: %s).\n  Аль нэгийг нь суулгах, эсвэл `report --format audit` ажиллуулаад хөтчийнхөө Print \u2192 Save as PDF-ийг ашиглана уу \u2014 HTML нь яг ижил баримт.",
+	},
+	"report.pdf.failed": {
+		"en": "the %s converter failed",
+		"mn": "%s хөрвүүлэгч амжилтгүй боллоо",
+	},
+	"report.pdf.wrote": {
+		"en": "audit PDF written: %s (converted with %s)",
+		"mn": "аудитын PDF бичигдлээ: %s (%s-ээр хөрвүүлэв)",
+	},
 	"flag.attest.out": {
 		"en": "where to write the attestation template",
 		"mn": "баталгааны загварыг хаана бичих вэ",
@@ -839,7 +851,7 @@ Usage:
 
 Commands:
   scan      Scan a cluster/manifest, or ingest collected raw output, into scan-result.json
-  report    Render scan-result.json as a report (json|sarif|html); --lang also switches the report itself
+  report    Render scan-result.json as a report (json|sarif|html|audit|pdf); --lang also switches the report itself
   gate      Check scan-result.json against the .tatar-kuber.yaml policy and pass/fail CI (exit code)
   diff      Compare two scan-result.json files: what is new / fixed / worsened
   top       Rank scan-result.json: which workload, and which control, to fix first
@@ -880,7 +892,7 @@ const usageMN = `TATAR-Kuber — Kubernetes security posture assessment framewor
 
 Commands:
   scan      Cluster/manifest шалгах эсвэл цуглуулсан raw-г нэгтгэж scan-result.json үүсгэнэ
-  report    scan-result.json-оос тайлан (json|sarif|html) үүсгэнэ; --lang нь тайлангийн хэлийг ч сэлгэнэ
+  report    scan-result.json-оос тайлан (json|sarif|html|audit|pdf) үүсгэнэ; --lang нь тайлангийн хэлийг ч сэлгэнэ
   gate      scan-result.json-ыг .tatar-kuber.yaml бодлоготой тулгаж CI-д pass/fail (exit code)
   diff      Хоёр scan-result.json-ыг тулгаж юу шинэ / зассан / дордсоныг харуулна
   top       scan-result.json-ыг эрэмбэлнэ: аль ачааллыг, аль control-ыг түрүүлж засах вэ

@@ -9,6 +9,7 @@ import (
 	"github.com/ochmunkh/tatar-kuber/internal/canonical"
 	"github.com/ochmunkh/tatar-kuber/internal/finding"
 	"github.com/ochmunkh/tatar-kuber/internal/orchestrator"
+	auditrep "github.com/ochmunkh/tatar-kuber/internal/report/audit"
 	htmlrep "github.com/ochmunkh/tatar-kuber/internal/report/html"
 	jsonrep "github.com/ochmunkh/tatar-kuber/internal/report/json"
 	sarifrep "github.com/ochmunkh/tatar-kuber/internal/report/sarif"
@@ -56,9 +57,29 @@ func cmdReport(args []string) int {
 		}
 	}
 
+	// PDF нь урсгал руу бичигддэггүй: хөрвүүлэгч файл шаардана. Тиймээс
+	// --out-гүй үед өөрөө нэр сонгоно.
 	target := *out
-	if target == "" && *format == "html" {
+	switch {
+	case target == "" && *format == "html":
 		target = "report.html"
+	case target == "" && *format == "audit":
+		target = "audit.html"
+	case target == "" && *format == "pdf":
+		target = "audit.pdf"
+	}
+
+	// PDF-ийн зам тусдаа: эхлээд хөрвүүлэгч БАЙГАА эсэхийг шалгана, дараа нь л
+	// ямар нэг зүйл үүсгэнэ. Тайланг бичээд сүүлд нь "хөрвүүлэгч алга" гэж
+	// хэлэх нь хагас үр дүн үлдээнэ.
+	// Хэл: --lang тодорхой өгөгдсөн үед л дарна. Эс бөгөөс тайлан нь scan-д
+	// сонгосон хэлээрээ үлдэнэ (v1.0.3-ийн гэрээ).
+	reportLang := ""
+	if explicitLang {
+		reportLang = uiLang
+	}
+	if *format == "pdf" {
+		return renderAuditPDF(res, target, reportLang, *failOn)
 	}
 
 	w := os.Stdout
@@ -81,6 +102,8 @@ func cmdReport(args []string) int {
 		err = sarifrep.Render(w, res)
 	case "html":
 		err = htmlrep.Render(w, res)
+	case "audit":
+		err = auditrep.Render(w, res, reportLang)
 	default:
 		fmt.Fprintln(os.Stderr, msg("report.format.unknown"), *format)
 		return 3
@@ -134,6 +157,17 @@ func relang(res *finding.ScanResult, lang, registryPath string) int {
 
 	orchestrator.ApplyLang(res.Findings, reg, lang)
 	res.Metadata.Lang = lang
+
+	// Attestation-ийн гарчиг нь apply хийх үеийн хэлээр шингэсэн байдаг.
+	// Түүнийг ч сэлгэнэ — эс бөгөөс монгол тайлан дунд англи гарчигтай мөр
+	// үлдэж, "нэг scan, хоёр хэл" гэсэн гэрээ хагас биелнэ. Хүний бичсэн
+	// талбаруудад (rationale, scope) ГАР ХҮРЭХГҮЙ: тэдгээр нь орчуулга биш,
+	// гэрчлэл — бичигдсэн хэлээрээ үлдэх ёстой.
+	for i := range res.Attestations {
+		if c, ok := reg.Get(res.Attestations[i].Control); ok {
+			res.Attestations[i].Title = c.Title.Get(lang)
+		}
+	}
 
 	// Зөвлөмж нь finding-ийн remediation-оос үүсдэг тул дээрх дуудлагаар
 	// сэлгэгдэнэ. Гэхдээ registry-д байхгүй control-ийн гарчиг scanner-ийн эх
