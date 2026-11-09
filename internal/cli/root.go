@@ -8,7 +8,7 @@ import (
 )
 
 // Version — build-time-д тохируулагдана (-ldflags).
-var Version = "1.0.4-dev"
+var Version = "1.0.5-dev"
 
 // Execute — entrypoint.
 func Execute() int {

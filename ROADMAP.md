@@ -89,12 +89,23 @@ Theme: **an audit is not a one-off, and a report must not misstate how it was pr
 
 ---
 
-## v1.0.4 — Saying what it actually is 🚧 (in development)
+## v1.0.4 — Saying what it actually is ✅ (shipped)
 
 Theme: **close the gap between what the tool does and what it says about itself.**
 Every item below was a place where something working was described wrongly, and nothing
 turned red.
 
+- **`attest` — the declared gap can now be closed.** Controls no scanner checks get a human's
+  signed decision: a reason, a name, and a **mandatory expiry**. `non-compliant` fails the gate
+  at the control's severity; an expired attestation counts as unchecked again and `gate` says so
+  by name. Attestations live in their own block, never in `findings`, so `found_by` never claims
+  a scanner saw something it did not — and `result_hash`, which covers only the findings, stays
+  valid.
+- **The audit deliverable** — `report --format audit` renders a paged, self-contained, bilingual
+  report (scope, method, what did not run, the score and its derivation, attested controls,
+  findings by control); `--format pdf` converts the same document with a browser or
+  `wkhtmltopdf` already on the machine, and **refuses clearly** when none is present rather than
+  writing an empty file.
 - **`top`** — ranks a finished scan twice: workloads by summed severity, and controls by how
   many distinct resources they hit. The second table is usually the one that matters — one
   control failing across thirty workloads is one fix, not thirty. Read-only.
@@ -292,12 +303,23 @@ v1.0.0-ийн бодит live run-ыг аудит хийхэд 11 finding бүг
 
 ---
 
-## v1.0.4 — Байгаа байдлаа үнэн хэлэх 🚧 (хөгжүүлэлтэд)
+## v1.0.4 — Байгаа байдлаа үнэн хэлэх ✅ (гарсан)
 
 Сэдэв: **хэрэгсэл юу хийдэг, өөрийгөө юу гэж хэлдэг хоёрын зөрүүг хаах.**
 Доорх зүйл бүр нь ажиллаж байгаа зүйлийг буруу тайлбарлаж байсан газар бөгөөд
 аль нь ч улаан болоогүй.
 
+- **`attest` — зарлагдсан цоорхойг одоо хаах боломжтой.** Ямар ч scanner шалгадаггүй
+  хяналтуудад хүний гарын үсэгтэй шийдвэр: үндэслэл, нэр, мөн **заавал хугацаа**.
+  `non-compliant` нь хяналтын severity-ийн түвшинд gate-ийг унагаана; хугацаа дууссан баталгаа
+  нь дахин шалгагдаагүйд тооцогдож, `gate` нэрээр нь хэлнэ. Attestation нь тусдаа блокт
+  амьдарна, `findings`-д хэзээ ч орохгүй — тиймээс `found_by` нь scanner хараагүй зүйлээ харсан
+  гэж хэлэхгүй, мөн зөвхөн олдворыг хамардаг `result_hash` хүчинтэй хэвээр.
+- **Аудитын deliverable** — `report --format audit` нь хуудаслагдсан, бие даасан, хоёр хэлт
+  тайлан гаргана (хамрах хүрээ, арга зүй, юу ажиллаагүй, оноо ба түүний гарал, баталсан
+  хяналтууд, хяналтаар бүлэглэсэн олдворууд); `--format pdf` нь яг тэр баримтыг машин дээр
+  байгаа хөтөч эсвэл `wkhtmltopdf`-ээр хөрвүүлнэ, хөрвүүлэгч байхгүй бол хоосон файл гаргахын
+  оронд **ил татгалзана**.
 - **`top`** — дууссан scan-ийг хоёр талаас эрэмбэлнэ: workload-ууд severity-ийн нийлбэрээр,
   control-ууд тусч байгаа өөр resource-ийн тоогоор. Ихэвчлэн хоёр дахь хүснэгт нь чухал нь —
   гучин workload дээр унасан нэг control бол гучин засвар биш, НЭГ засвар. Зөвхөн уншина.
