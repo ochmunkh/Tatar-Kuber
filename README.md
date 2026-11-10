@@ -462,13 +462,19 @@ A security tool should hold itself to the standard it enforces:
 - **Patched toolchain** — release binaries are built with a current, patched Go stdlib
   (pinned via `toolchain` in `go.mod`), so the report renderer stays clear of `html/template` CVEs.
 - **Minimal supply chain** — one direct dependency (`gopkg.in/yaml.v3`) plus the standard library.
+- **Pinned release pipeline** — every third-party GitHub Action runs at a **commit SHA**, not a
+  movable tag. A tag can be repointed by whoever owns the action, and `checksums.txt` and the
+  SBOM are produced by those same steps — so a compromised one would ship a backdoored binary
+  *with a matching checksum*. `.github/dependabot.yml` raises updates weekly as pull requests,
+  so the pins stay reviewed rather than frozen.
 - **Safe by construction** — read-only cluster access (`get`/`list`/`watch`, granted by the
   reviewable [`deploy/least-privilege-clusterrole.yaml`](deploy/least-privilege-clusterrole.yaml)
-  — Secret *metadata* only, never secret values), no shell invocation
-  (scanners run via `exec` with fixed args, no `sh -c`), and reports render through `html/template`
-  auto-escaping.
-- **Handle output as sensitive** — a report can contain secret matches, CVEs and cluster detail;
-  treat `scan-result.json` and HTML/SARIF reports as confidential.
+  — Secrets are **not** in that role at all: RBAC has no "metadata only" for a Secret, and
+  `get`/`list` return the whole `data:` field), no shell invocation (scanners run via `exec`
+  with fixed args, no `sh -c`), and reports render through `html/template` auto-escaping.
+- **Output is written owner-only** — `scan-result.json`, the raw scanner output and every report
+  (`html`, `audit`, `sarif`, `json`, `pdf`) are created with mode `0600`. A report is a list of a
+  cluster's weaknesses in readable form; treat it as confidential wherever it travels.
 
 Found a vulnerability? Use GitHub's **Security → Report a vulnerability** (private disclosure).
 
@@ -901,13 +907,20 @@ dashboard): [**Замын зураг**](ROADMAP.md)-г үз.
 - **Patched toolchain** — release бинарууд зассан Go stdlib-ээр build хийгддэг (`go.mod`-ийн
   `toolchain`-аар бэхлэсэн) тул тайлан рендерлэгч `html/template` CVE-үүдээс цэвэр.
 - **Минимал supply chain** — ганц шууд хамаарал (`gopkg.in/yaml.v3`) + stdlib.
+- **Пиннэсэн release зам** — гуравдагч этгээдийн GitHub Action бүр **commit SHA**-гаар
+  ажиллана, хөдөлгөөнт tag-аар биш. Tag-ийг action-ы эзэмшигч өөр commit руу зөөж чадна, бас
+  `checksums.txt` ба SBOM-ыг ЯГ ТЭР алхмууд үүсгэдэг — тиймээс эвдэрсэн нэг нь backdoor-той
+  binary-г *таарсан checksum-тай нь* нийтэлнэ. `.github/dependabot.yml` долоо хоног тутам
+  шинэчлэлтийг PR болгон ирүүлдэг тул пин нь хөлдөхгүй, хянагдсан хэвээр үлдэнэ.
 - **Бүтцээрээ аюулгүй** — read-only cluster хандалт (`get`/`list`/`watch`; хянагдах
   [`deploy/least-privilege-clusterrole.yaml`](deploy/least-privilege-clusterrole.yaml)-аар
-  олгогдоно — Secret-ийн ЗӨВХӨН metadata, утгыг хэзээ ч уншихгүй), shell дуудлагагүй
+  олгогдоно — Secret тэр эрхэнд **огт байхгүй**: RBAC дээр Secret-д "зөвхөн metadata" гэсэн
+  эрх байдаггүй, `get`/`list` нь `data:` талбарыг бүхэлд нь буцаана), shell дуудлагагүй
   (scanner-ууд тогтмол аргументтэй `exec`-ээр, `sh -c` байхгүй), тайлан `html/template`
   auto-escape-аар рендерлэгддэг.
-- **Гаралтыг нууц гэж үз** — тайлан нь secret, CVE, cluster мэдээлэл агуулж болзошгүй тул
-  `scan-result.json` болон HTML/SARIF тайланг нууц мэдээлэл гэж хандах.
+- **Гаралт зөвхөн эзэмшигчид уншигдахаар бичигдэнэ** — `scan-result.json`, scanner-ийн түүхий
+  гаралт, мөн тайлан бүр (`html`, `audit`, `sarif`, `json`, `pdf`) `0600` эрхтэй үүснэ. Тайлан
+  бол кластерын сул талуудын хүн уншихуйц жагсаалт — хаашаа ч явсан нууц мэдээлэл гэж хандана.
 
 Эмзэг байдал олсон уу? GitHub-ын **Security → Report a vulnerability** (хаалттай мэдээлэл).
 

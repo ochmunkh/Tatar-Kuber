@@ -44,6 +44,21 @@ please keep it that way.
 
 A maintainer will review. Please be patient and kind — see the Code of Conduct.
 
+### If you add a GitHub Action
+
+Pin it to a **commit SHA**, with the human-readable version in a comment beside it:
+
+```yaml
+uses: owner/action@3a1b2c…  # v2.5.1
+```
+
+A tag is a pointer its owner can move. This repository's release job produces the binaries,
+`checksums.txt` and the SBOM in the same steps, so a repointed tag there would ship a backdoored
+build together with a checksum that matches it. `actions/*` and `github/codeql-action` stay on
+major tags: compromising GitHub's own namespace is a different class of event.
+
+Dependabot raises updates weekly, so a pin is a reviewed version rather than a frozen one.
+
 ### What a change has to show
 
 Three things, because this is the kind of tool that fails silently rather than loudly:
@@ -250,6 +265,21 @@ Pull Request (юу, яагаад хийснийг тайлбарла). Maintaine
 **Нэг PR — нэг асуудал.** Зураглалын засвар, шинэ гаралтын формат, рефактор гурвыг нэг PR-т
 бүү нэгтгэ. Зураглалын өөрчлөлтийг нотлохын тулд яг аль хэсэг нь шалтгаан болсныг харах
 шаардлагатай; холилдсон PR-т энэ боломжгүй.
+
+### GitHub Action нэмэх бол
+
+**Commit SHA**-гаар пиннэ, хажууд нь хүний уншиж болох хувилбарыг сэтгэгдэлд бич:
+
+```yaml
+uses: owner/action@3a1b2c…  # v2.5.1
+```
+
+Tag бол эзэмшигч нь зөөж чадах заагч. Энэ repo-гийн release ажил нь binary, `checksums.txt`,
+SBOM гурвыг нэг алхмууд дотор үүсгэдэг тул тэнд tag зөөгдвөл backdoor-той build нь түүнд
+ТААРСАН checksum-тай хамт нийтлэгдэнэ. `actions/*` ба `github/codeql-action` нь major tag-аар
+үлдэнэ: GitHub-ийн өөрийнх нь нэрийн талбарыг эзэмдэх нь өөр ангиллын халдлага.
+
+Dependabot долоо хоног тутам шинэчлэлтийг ирүүлдэг тул пин нь хөлдсөн биш, хянагдсан хувилбар.
 
 ### Өөрчлөлт юу нотлох ёстой вэ
 

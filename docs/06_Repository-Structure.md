@@ -185,3 +185,7 @@ tools:
 - (v1.3) testdata/golden/demo.json ШИНЭ: бүтэн pipeline-ийн хөлдөөсөн үр дүн. Зураглал ЧИМЭЭГҮЙ эвдрэхийг PR дээр барина (нийт тоо хөдлөхгүй байхад scanner тус бүрийн хувь нэмэр хөдөлдөг тохиолдол).
 - (v1.3) docs/coverage.md ба docs/releases/ ШИНЭ. Хоёулаа тестээр/workflow-оор эх сурвалжтайгаа тулгагддаг: TestCoverageDoc ба release-notes.yml.
 - (v1.3) Тест: 17 пакет (internal/diff нэмэгдэв). Workflow 7: ci · real-cluster · static-scan · release · release-notes · pages · security-gate.
+- (v1.4) .github/ дотор шинэ файлууд: dependabot.yml (action ба Go модулийн шинэчлэлтийг долоо хоног тутам PR болгон ирүүлнэ) ба scanner-drift.yml (пиннэсэн хувилбар хоцрох, kubescape-ийн дүрмийн утга өөрчлөгдөхийг өдөр бүр шалгана).
+- (v1.4) scripts/ дотор шинэ: check-scanner-drift.py (pin vs upstream, босготой), check-kubescape-rules.py (зураглагдсан C-id-уудыг нийтлэгдсэн regolibrary-тай тулгана), check-trivy-rules.py (пиннэсэн trivy-ийн гаргасан rule ID-ууд бүртгэлээр шийдэгдэж, заавал хүрэх control-ууд хүрсэн эсэх).
+- (v1.4) internal/attest/ — гараар батлах давхарга (types, Validate, Apply, Template). internal/report/audit/ — хуудаслагдсан хоёр хэлт аудитын тайлан. Хоёулаа цөмөөс хамаарна, цөм тэднээс хамаарахгүй.
+- (v1.4) ГУРАВДАГЧ ЭТГЭЭДИЙН ACTION БҮР commit SHA-гаар пиннэгдсэн. Tag бол хөдөлгөөнт заагч; release-ийн checksums.txt ба SBOM-ыг яг тэр алхмууд үүсгэдэг тул эвдэрсэн action нь backdoor-той binary-г ТААРСАН checksum-тай нь нийтэлж чадна. actions/\* ба github/codeql-action нь GitHub-ийн өөрийнх тул major tag-аар үлдсэн.

@@ -134,6 +134,32 @@ turned red.
 
 ---
 
+## v1.0.5 — Doing to ourselves what we demand of others 🚧 (in development)
+
+Theme: **every rule this tool enforces on a cluster, applied to the tool's own pipeline.**
+
+- **The declared gap can be closed** — `attest` records a human's signed decision for controls
+  no scanner checks: a reason, a name, and a **mandatory expiry**. `non-compliant` fails the
+  gate; an expired attestation counts as unchecked again and `gate` names it. Attestations never
+  enter `findings`, so `found_by` cannot claim a scanner saw something it did not.
+- **The audit deliverable** — `report --format audit` renders a paged, self-contained, bilingual
+  report; `--format pdf` converts it with a browser or `wkhtmltopdf` already on the machine and
+  **refuses clearly** when none is present rather than writing an empty file.
+- **The regression net moved to the side it guards** — the Lab corpus now runs inside this
+  repository's CI on every push, and the run asserts every scanner contributed something, which
+  the count-based `verify-lab` cannot see.
+- **The pin is now what CI exercises** — the daily workflows install *latest* on purpose; a
+  second job installs from `tools.lock.yaml` with `tatar-kuber update` and checks the pinned
+  trivy's rule IDs still resolve. That job found, on its first run, that `update` installed
+  scanners `doctor` could not see.
+- **Upstream is watched where it actually moves** — pin drift raises only on a minor/major gap
+  or a pin older than 90 days, and kubescape's rule *meanings* are compared daily against the
+  published library, because kubescape downloads its rules and they change with no version bump.
+- **Release integrity** — third-party Actions pinned to commit SHAs with Dependabot keeping them
+  reviewed; report files written `0600`, not just `scan-result.json`.
+
+---
+
 ## Release 2 (v2.0) — Depth & the audit deliverable 🎯
 
 Theme: **make it the tool a security auditor reaches for.**
@@ -346,6 +372,35 @@ v1.0.0-ийн бодит live run-ыг аудит хийхэд 11 finding бүг
   худал хэлэхээ болив.
 - **Эхний гадны хувь нэмэр** — [fg0x0](https://github.com/fg0x0)-оос 13 commit, мөн
   CONTRIBUTING нь өөрчлөлт юу нотлох ёстойг тодорхой бичив.
+
+---
+
+## v1.0.5 — Бусдаас шаарддагаа өөртөө хэрэглэх 🚧 (хөгжүүлэлтэд)
+
+Сэдэв: **кластерт тавьдаг шаардлага бүрээ хэрэгслийн өөрийнх нь зам дээр хэрэгжүүлэх.**
+
+- **Зарлагдсан цоорхойг хаах боломжтой боллоо** — `attest` нь scanner шалгадаггүй хяналтад
+  хүний гарын үсэгтэй шийдвэрийг бүртгэнэ: үндэслэл, нэр, мөн **заавал хугацаа**.
+  `non-compliant` нь gate-ийг унагаана; хугацаа дууссан баталгаа дахин шалгагдаагүйд
+  тооцогдож, `gate` нэрээр нь хэлнэ. Attestation нь `findings`-д хэзээ ч орохгүй тул
+  `found_by` нь scanner хараагүй зүйлээ харсан гэж хэлэхгүй.
+- **Аудитын deliverable** — `report --format audit` нь хуудаслагдсан, бие даасан, хоёр хэлт
+  тайлан гаргана; `--format pdf` нь машин дээр байгаа хөтөч эсвэл `wkhtmltopdf`-ээр хөрвүүлж,
+  хөрвүүлэгч байхгүй бол хоосон файл гаргахын оронд **ил татгалзана**.
+- **Регрессийн тор барих ёстой талдаа шилжив** — Lab корпус одоо энэ repo-гийн CI дотор push
+  бүр дээр ажиллаж, scanner бүр хувь нэмэр оруулсан эсэхийг шаардана — тоонд тулгуурласан
+  `verify-lab` үүнийг хардаггүй.
+- **Pin нь одоо CI-ийн шалгадаг зүйл боллоо** — өдөр тутмын workflow-ууд latest-ийг зориуд
+  суулгадаг; хоёр дахь job нь `tools.lock.yaml`-аас `tatar-kuber update`-ээр суулгаж,
+  пиннэсэн trivy-ийн rule ID-ууд зурагдсан хэвээр эсэхийг шалгана. Тэр job эхний
+  ажиллалтаараа `update` суулгасан scanner-ийг `doctor` олдоггүйг илрүүлэв.
+- **Upstream-ийг бодитоор хөдөлдөг газарт нь харж байна** — pin хоцролт нь зөвхөн minor/major
+  зөрүү эсвэл 90 хоногоос хуучирсан үед дохио өгнө; kubescape-ийн дүрмийн УТГА нь нийтлэгдсэн
+  сантай өдөр бүр тулгагдана, учир нь kubescape дүрмээ татдаг бөгөөд тэдгээр нь хувилбар
+  солигдолгүйгээр өөрчлөгддөг.
+- **Release-ийн бүрэн бүтэн байдал** — гуравдагч этгээдийн Action-ууд commit SHA-гаар
+  пиннэгдэж, Dependabot тэднийг хянагдсан хэвээр барина; тайлангийн файл `0600`-аар
+  бичигдэнэ, зөвхөн `scan-result.json` биш.
 
 ---
 
