@@ -27,21 +27,26 @@ kubescape v4 renamed **every** asset (the v3 `kubescape-ubuntu-latest` names do
 not exist on any v4 release) and checkov moved the version out of its filenames.
 Both would have 404'd.
 
-### Partly blocked: kubescape's rules were not re-verified here
+### kubescape's rules move without a version — now watched
 
-kubescape's pin moved 4.0.15 -> 4.0.17 on the same day, but its rule meanings
-were **not** checked the way trivy's were: kubescape downloads its policy
-library at scan time and verifies it through Sigstore's TUF root, which this
-environment cannot reach.
+kubescape does not embed its rules: it downloads the policy library at scan
+time. So pinning the binary pins nothing about the meanings, and the rule set
+can change **with no version bump at all**. The pin moved 4.0.15 -> 4.0.17 on
+2026-11-10 without running the binary here (its library fetch verifies through
+Sigstore's TUF root, which this environment cannot reach) — which matters less
+than it sounds, precisely because the version does not carry the rules.
 
-That limitation cuts both ways and is worth stating. Because the rules are
-downloaded rather than embedded, a kubescape **version** bump does not move the
-rule set — so this pin change carries little mapping risk. The flip side is that
-the rule set can change *without any version bump at all*, which is the drift
-`TestKubescapeMappingsMatchUpstreamMeaning` exists to catch, and that test
-compares against meanings recorded by hand rather than against the live library.
-Re-reading the published regolibrary and diffing it against those recorded
-meanings would make the test self-checking; it is not written.
+What does matter is now checked daily. `scripts/check-kubescape-rules.py` reads
+the published control library, and compares every mapped `C-id` against the
+meaning recorded in `TestKubescapeMappingsMatchUpstreamMeaning`. The Go test
+still proves the registry agrees with what a human wrote down — it never touches
+the network, and that rule is worth keeping — while the daily job proves that
+what the human wrote down still agrees with upstream.
+
+It found two on its first run: `C-0210` had grown "in your pod definitions", and
+`C-0262` had gone from "Anonymous access enabled" to "Anonymous user has
+RoleBinding". Both keep their meaning, so no mapping changed; the recorded names
+were brought level. Nobody would have noticed either one.
 
 ### Still blocked: checkov has nothing to verify against
 

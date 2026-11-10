@@ -20,7 +20,7 @@
 # Тиймээс зөвхөн утга учиртай үед л дохио өгнө: minor/major хоцорсон
 # (trivy 0.74 -> 0.76 дээр rule ID өөрчлөгдсөн — яг энэ ангилал), эсвэл pin
 # нь 90 хоногоос хуучирсан. Өглөө гарсан patch нь мэдээлэл, дохио биш.
-name: Scanner pin drift
+name: Upstream watch (pins · rule meanings)
 
 on:
   schedule:
@@ -84,3 +84,54 @@ jobs:
           if [ -n "$num" ]; then
             gh issue close "$num" --comment "Хянах шаардлагатай зүйл үлдсэнгүй: pin бүр эсвэл хамгийн сүүлийнх, эсвэл зөвхөн саяхны patch-аас хоцорч байна."
           fi
+
+  # kubescape нь дүрмээ ТАТДАГ — binary дотор шигтгээгүй. Тиймээс түүний rule-ийн
+  # утга ХУВИЛБАР СОЛИГДОЛГҮЙГЭЭР ч өөрчлөгдөж болно: pin нь binary-г барина,
+  # дүрмийг барихгүй. Go тест нь сүлжээнд хүрдэггүй (тэр дүрэм нь зөв) тул
+  # бүртгэл нь ГАРААР бичсэн утгатай таарч байгааг л шалгана. Upstream-тай
+  # таарч байгааг зөвхөн энэ ажил шалгана.
+  #
+  # Эхлүүлэнгүүт хоёр нэр зөрсөн нь илэрсэн (C-0210, C-0262) — утга нь хэвээр
+  # байсан тул зураглал өөрчлөгдөөгүй, гэхдээ хэн ч хэлэхгүй байсан гэдэг нь
+  # яг энэ шалгалтын шалтгаан.
+  kubescape-rules:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compare mapped kubescape controls against the published library
+        id: rules
+        run: |
+          set +e
+          python3 scripts/check-kubescape-rules.py | tee rules.txt
+          code=${PIPESTATUS[0]}
+          set -e
+          if [ "$code" = "2" ]; then
+            echo "::error::шалгалт хариу өгч чадсангүй — доорх алдааг үз"
+            exit 1
+          fi
+          echo "moved=$([ "$code" = "1" ] && echo yes || echo no)" >> "$GITHUB_OUTPUT"
+
+      - name: Open or update the rule-drift issue
+        if: steps.rules.outputs.moved == 'yes'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          title="kubescape rule meanings have moved"
+          body=$(printf '%s\n\n```\n%s\n```\n\n_%s_\n' \
+            "Зураглагдсан control нь upstream дээр алга болсон эсвэл нэр нь өөрчлөгдсөн байна. Утга нь хэвээр бол internal/canonical/mapping_test.go доторх нэрийг тэнцүүлнэ; утга нь өөрчлөгдсөн бол ЗУРАГЛАЛЫГ дахин шийднэ." \
+            "$(cat rules.txt)" \
+            "Автоматаар шинэчлэгдэнэ, цэгцрэхэд автоматаар хаагдана.")
+          num=$(gh issue list --state open --search "$title in:title" --json number,title \
+                  --jq ".[] | select(.title == \"$title\") | .number" | head -1)
+          if [ -n "$num" ]; then gh issue edit "$num" --body "$body"; else gh issue create --title "$title" --body "$body"; fi
+
+      - name: Close it when every mapped control still matches
+        if: steps.rules.outputs.moved == 'no'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          title="kubescape rule meanings have moved"
+          num=$(gh issue list --state open --search "$title in:title" --json number,title \
+                  --jq ".[] | select(.title == \"$title\") | .number" | head -1)
+          if [ -n "$num" ]; then gh issue close "$num" --comment "Зураглагдсан control бүр upstream дээр бичигдсэн утгаараа хэвээр."; fi

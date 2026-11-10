@@ -303,6 +303,17 @@ func TestTrivyMappingsMatchUpstreamMeaning(t *testing.T) {
 //
 // Утгуудыг бодит kubescape 4.0 гаралт (results[].controls[].name) ба upstream-ийн
 // control каталог (hub.armosec.io/docs/controls)-аас батлав.
+// Энэ хүснэгтийн утгууд нь upstream-ийн control НЭР. kubescape нь дүрмээ
+// ТАТДАГ (binary дотор шигтгээгүй) тул эдгээр нь хувилбар солигдолгүйгээр ч
+// өөрчлөгдөж болно — энэ тест зөвхөн бүртгэл нь ЭНД бичсэнтэй таарч байгааг
+// шалгана, upstream-тай таарч байгааг БИШ. Тэрийг өдөр тутмын
+// scripts/check-kubescape-rules.py хийнэ (тест сүлжээнд хүрдэггүй).
+//
+// 2026-11-10: тэр шалгалтыг эхлүүлэнгүүт хоёр нэр зөрсөн нь илрэв —
+// C-0210 ("...in your pod definitions" гэж уртассан) ба C-0262
+// ("Anonymous access enabled" -> "Anonymous user has RoleBinding").
+// Хоёулангийнх нь УТГА хэвээр тул зураглал өөрчлөгдөөгүй, зөвхөн энд бичсэн
+// нэрийг upstream-тай тэнцүүлэв.
 func TestKubescapeMappingsMatchUpstreamMeaning(t *testing.T) {
 	reg, err := Load(regPath)
 	if err != nil {
@@ -335,11 +346,11 @@ func TestKubescapeMappingsMatchUpstreamMeaning(t *testing.T) {
 		{"C-0186", `Minimize access to secrets`, "TATAR-RBAC-003"},
 		{"C-0187", `Minimize wildcard use in Roles and ClusterRoles`, "TATAR-RBAC-002"},
 		{"C-0188", `Minimize access to create pods`, "TATAR-RBAC-003"},
-		{"C-0210", `Ensure that the seccomp profile is set to docker/default`, "TATAR-CON-011"},
+		{"C-0210", `Ensure that the seccomp profile is set to docker/default in your pod definitions`, "TATAR-CON-011"},
 		{"C-0211", `Apply Security Context to Your Pods and Containers`, "TATAR-CON-008"},
 		{"C-0256", `External facing`, "TATAR-NET-003"},
 		{"C-0260", `Missing network policy`, "TATAR-NET-001"},
-		{"C-0262", `Anonymous access enabled`, "TATAR-RBAC-004"},
+		{"C-0262", `Anonymous user has RoleBinding`, "TATAR-RBAC-004"},
 		{"C-0267", `Workload with cluster takeover roles`, "TATAR-RBAC-001"},
 		{"C-0270", `Ensure CPU limits are set`, "TATAR-CON-010"},
 		{"C-0271", `Ensure memory limits are set`, "TATAR-CON-010"},
