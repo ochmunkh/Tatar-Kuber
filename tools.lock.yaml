@@ -13,7 +13,8 @@
 #   cosign     "unverified" — signature checking is not implemented yet, so
 #              this file never says "verified".
 #
-# PROVENANCE — how each checksum below was obtained, on 2026-10-18:
+# PROVENANCE — how each checksum below was obtained (trivy, kubescape: 2026-11-10;
+# popeye: 2026-10-18):
 #
 #   1. the release's own published checksum file was downloaded:
 #        trivy      trivy_0.74.0_checksums.txt
@@ -30,6 +31,14 @@
 # one value per scanner — correct on linux/amd64, and a MISMATCH everywhere
 # else, which read as a corrupt download rather than as an unpinned platform.
 #
+# MOVING A PIN IS NOT A VERSION EDIT. trivy embeds its misconfiguration rules in
+# the binary, so a release can change the rule IDs themselves: 0.76.1 emits
+# `KSV-0001` where 0.74.0 emitted `AVD-KSV0001`, and leaves AVDID empty. That
+# shape change is absorbed (NormalizeRuleID strips AVD-, drops hyphens and
+# collapses leading zeros — the fix that came out of the v1.0.0 incident), and
+# all 17 rules this corpus triggers still resolve to the same controls. That was
+# checked by hand against the Lab corpus before this pin moved.
+#
 # checkov is deliberately unpinned: bridgecrewio publishes no checksum file, no
 # signature and no build attestation for its release archives, so there is
 # nothing to check against. `update` refuses it rather than installing a binary
@@ -37,20 +46,20 @@
 
 tools:
   trivy:
-    version: "0.74.0"
+    version: "0.76.1"
     sha256:
-      darwin/amd64: "472816f6888dda689d075c30254d4210b4d1035acf365aa72332f584c2f60485"
-      darwin/arm64: "1caada5e0e2091909357c7525d3aa76f4b660b13821bc143b190c7483e31cc11"
-      linux/amd64:  "2ae6fe3ee734b7fdf11335663e18c75ea12dccc76062f09f164a3b0f8be4371a"
-      linux/arm64:  "b94ce1976bbf3c15b514b605ee88be7c6d94a29be2302847ff01cb794d47aad5"
+      darwin/amd64: "7aa762eacd582052d053b62dcf972a1ab058abe39a57ccae234ed8894945b6b7"
+      darwin/arm64: "11a9b6cd2752011b54f01ea4bd0dbfa9f0c41dc6538d5a3f9d23955f471bf4e5"
+      linux/amd64:  "c7cbe3137fb8a48a17574bede3dd6beb16742d1e9772929940fc90082c39d9c0"
+      linux/arm64:  "e174dff2a6dba5e3ae41f8d0537a6324405bd08132497340304c6b20e0f16a1f"
     cosign:  "unverified"
   kubescape:
-    version: "4.0.15"
+    version: "4.0.17"
     sha256:
-      darwin/amd64: "8675e08968f55c1acb11a3ce16ef43f277fdfca491fc9ec7173c173d2a59f9d5"
-      darwin/arm64: "53d0204518d34b30ef47d29a06f37630e67b06543722978cadcc17fb759211e8"
-      linux/amd64:  "011569dbcde85afc96cf63262e4f967166b6680fd70a623e9065334b6767b244"
-      linux/arm64:  "eb1ab035ead666df9ceb263d2c8fd7ae5302eaa3c9544ec64144c36c91e3d455"
+      darwin/amd64: "1b5f1b5afa9cf21d685c1e5d79f6690aca04ecc033ed5205c3a3959b506ec90b"
+      darwin/arm64: "c3eb2c7d0e7acc5f185caff31eb5491b73597826178c01f405dd56c5302e595c"
+      linux/amd64:  "d070dd27faf7282ce8af4e30263385a51fe4ee3ba59f46d57f6f30c0b3ccb342"
+      linux/arm64:  "2e7a48c7a0577c9d4ec81e8cdf0149fbb67f2e2b649165f77a1da9bb72f30fa7"
     cosign:  "unverified"
   popeye:
     version: "0.22.1"
@@ -61,6 +70,6 @@ tools:
       linux/arm64:  "5188b0b521966113580f0fef7769173af6303061dee10df247536f9bb55fe988"
     cosign:  "unverified"
   checkov:
-    version: "3.3.20"
+    version: "3.4.0"
     sha256:  ""
     cosign:  "unverified"

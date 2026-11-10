@@ -61,7 +61,7 @@ type tool struct {
 var catalogue = []tool{
 	{
 		Name:    "trivy",
-		Version: "0.74.0",
+		Version: "0.76.1",
 		Assets: map[string]asset{
 			"linux/amd64":  {URL: "https://github.com/aquasecurity/trivy/releases/download/v{v}/trivy_{v}_Linux-64bit.tar.gz", Archive: ArchiveTarGz},
 			"linux/arm64":  {URL: "https://github.com/aquasecurity/trivy/releases/download/v{v}/trivy_{v}_Linux-ARM64.tar.gz", Archive: ArchiveTarGz},
@@ -73,7 +73,7 @@ var catalogue = []tool{
 		Name: "kubescape",
 		// v4 renamed every asset: the v3 names (kubescape-ubuntu-latest,
 		// kubescape-arm64-macos-latest) no longer exist on any release.
-		Version: "4.0.15",
+		Version: "4.0.17",
 		Assets: map[string]asset{
 			"linux/amd64":  {URL: "https://github.com/kubescape/kubescape/releases/download/v{v}/kubescape_{v}_linux_amd64", Archive: ArchiveRaw},
 			"linux/arm64":  {URL: "https://github.com/kubescape/kubescape/releases/download/v{v}/kubescape_{v}_linux_arm64", Archive: ArchiveRaw},
@@ -84,7 +84,7 @@ var catalogue = []tool{
 	{
 		Name: "checkov",
 		// The version is in the TAG only; the asset filenames carry none.
-		Version: "3.3.20",
+		Version: "3.4.0",
 		Assets: map[string]asset{
 			"linux/amd64":  {URL: "https://github.com/bridgecrewio/checkov/releases/download/{v}/checkov_linux_X86_64.zip", Archive: ArchiveZip},
 			"linux/arm64":  {URL: "https://github.com/bridgecrewio/checkov/releases/download/{v}/checkov_linux_arm64.zip", Archive: ArchiveZip},

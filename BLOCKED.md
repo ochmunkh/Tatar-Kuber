@@ -27,6 +27,22 @@ kubescape v4 renamed **every** asset (the v3 `kubescape-ubuntu-latest` names do
 not exist on any v4 release) and checkov moved the version out of its filenames.
 Both would have 404'd.
 
+### Partly blocked: kubescape's rules were not re-verified here
+
+kubescape's pin moved 4.0.15 -> 4.0.17 on the same day, but its rule meanings
+were **not** checked the way trivy's were: kubescape downloads its policy
+library at scan time and verifies it through Sigstore's TUF root, which this
+environment cannot reach.
+
+That limitation cuts both ways and is worth stating. Because the rules are
+downloaded rather than embedded, a kubescape **version** bump does not move the
+rule set — so this pin change carries little mapping risk. The flip side is that
+the rule set can change *without any version bump at all*, which is the drift
+`TestKubescapeMappingsMatchUpstreamMeaning` exists to catch, and that test
+compares against meanings recorded by hand rather than against the live library.
+Re-reading the published regolibrary and diffing it against those recorded
+meanings would make the test self-checking; it is not written.
+
 ### Still blocked: checkov has nothing to verify against
 
 `bridgecrewio/checkov` publishes **no checksum file, no signature and no build
@@ -82,16 +98,41 @@ assets, and `update` says so plainly instead of failing obscurely.
 
 ### Pinned versions drift
 
-The pins name specific releases (trivy 0.74.0, kubescape 4.0.15, popeye 0.22.1,
-checkov 3.3.20 as of 2026-10-18). Upstream moves; nothing in CI notices yet, so
-the pins go stale silently. A daily job that compares each pin against the
-project's latest release and opens an issue is the obvious fix and is not
-written.
+**Watched since 2026-10-30** (`.github/workflows/scanner-drift.yml`), **pins moved
+2026-11-10.** The job compares each pin against upstream daily and keeps one
+issue open. A check that cannot reach the API fails rather than reporting
+"current".
 
-Checked by hand on 2026-10-30, twelve days after the pins were written: trivy
-0.74.0 -> 0.76.1, kubescape 4.0.15 -> 4.0.17, checkov 3.3.20 -> 3.4.0. Only
-popeye was still current. Three of four drifted inside two weeks and nothing
-said so.
+Moving a pin is not a version edit, and trivy proved why. Its misconfiguration
+rules are **embedded in the binary**, so a release can change the rule IDs
+themselves: 0.76.1 emits `KSV-0001` where 0.74.0 emitted `AVD-KSV0001`, and
+leaves `AVDID` empty entirely. Before the pin moved, trivy 0.76.1 was downloaded
+(checksum verified against the published file), run against the Lab's `broken/`
+manifests, and every rule ID it produced was resolved through the registry by
+hand: 17 of 21 map, each to the control its title describes, and the four that
+do not (`KSV-0020/0021` UID/GID bounds, `KSV-0044/0046` RBAC wildcards) are
+reported as `unmapped_rules` rather than lost. The shape change is absorbed by
+`NormalizeRuleID` — the fix that came out of the v1.0.0 incident, doing exactly
+the job it was written for.
+
+Two things this exercise exposed, both still open:
+
+**The pin is not what CI exercises.** `real-cluster.yml` and `static-scan.yml`
+install the scanners with each project's own `install.sh` or `pip`, which fetch
+**latest** — not the pinned release. So the daily runs prove the mappings
+survive against whatever shipped today, while `tools.lock.yaml` governs only
+what a *user* gets from `tatar-kuber update`. Those are two different versions
+and nothing says so. Making CI install from the lock would close the gap, at the
+cost of no longer learning about upstream breakage the day it lands; running
+both is the honest answer and is not written.
+
+**"Behind upstream" is permanently true for fast-moving projects.** Within the
+half hour it took to verify and move the pins on 2026-11-10, trivy released
+0.76.2, kubescape 4.0.20 and checkov 3.4.3. A pin is a *reviewed* version, not
+the newest one, so an issue that says "behind" will never close — and a
+permanently open issue is the same failure as a Security tab with twenty alerts
+nobody reads. The check needs a threshold with a stated reason (behind by a
+minor version, or older than N days) instead of plain inequality.
 
 ## `verify-lab` counts, it does not attribute
 
