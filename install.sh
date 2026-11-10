@@ -49,15 +49,37 @@ trap 'rm -rf "$tmp"' EXIT
 
 dlo "$base/$archive" "$tmp/$archive" || die "татаж чадсангүй: $base/$archive"
 
-# --- checksum шалгах (боломжтой бол) ---
-if dlo "$base/checksums.txt" "$tmp/checksums.txt" 2>/dev/null; then
+# --- checksum шалгах ---
+# Шалгаж чадахгүй тохиолдолд "баталгаажлаа" гэж ХЭЛЭХГҮЙ. Суулгагч өөрөө
+# худал тайлагнавал доорх бүх хамгаалалт утгагүй болно. Тиймээс гурван
+# шалтгаан бүрийг нэрлэж зогсоно:
+#   * checksums.txt татагдсангүй
+#   * sha256sum ч, shasum ч байхгүй
+#   * checksums.txt дотор энэ архивын мөр алга
+# Санаатайгаар алгасахыг хүсвэл ALLOW_UNVERIFIED=1 гэж ИЛ зөвшөөрнө.
+cannot_verify() {
+  if [ "${ALLOW_UNVERIFIED:-0}" = "1" ]; then
+    echo "АНХААР: checksum шалгаагүй ($1). ALLOW_UNVERIFIED=1 тул үргэлжилж байна." >&2
+  else
+    die "checksum шалгаж чадсангүй: $1
+  Шалгалтгүйгээр суулгахыг хүсвэл ALLOW_UNVERIFIED=1 гэж тодорхой зааж өгнө үү."
+  fi
+}
+
+if ! dlo "$base/checksums.txt" "$tmp/checksums.txt" 2>/dev/null; then
+  cannot_verify "$base/checksums.txt татагдсангүй"
+elif ! have sha256sum && ! have shasum; then
+  cannot_verify "sha256sum ч, shasum ч олдсонгүй"
+else
   ( cd "$tmp"
+    line="$(grep " $archive\$" checksums.txt || true)"
+    [ -n "$line" ] || die "checksums.txt дотор $archive-ийн мөр алга"
     if have sha256sum; then
-      grep " $archive\$" checksums.txt | sha256sum -c - >/dev/null 2>&1 || die "checksum таарсангүй"
-    elif have shasum; then
-      grep " $archive\$" checksums.txt | shasum -a 256 -c - >/dev/null 2>&1 || die "checksum таарсангүй"
+      printf '%s\n' "$line" | sha256sum -c - >/dev/null 2>&1 || die "checksum таарсангүй"
+    else
+      printf '%s\n' "$line" | shasum -a 256 -c - >/dev/null 2>&1 || die "checksum таарсангүй"
     fi
-  )
+  ) || exit 1
   echo "checksum баталгаажлаа"
 fi
 

@@ -8,7 +8,7 @@
 [![CI](https://github.com/ochmunkh/Tatar-Kuber/actions/workflows/ci.yml/badge.svg)](https://github.com/ochmunkh/Tatar-Kuber/actions/workflows/ci.yml)
 [![Real cluster](https://github.com/ochmunkh/Tatar-Kuber/actions/workflows/real-cluster.yml/badge.svg)](https://github.com/ochmunkh/Tatar-Kuber/actions/workflows/real-cluster.yml)
 ![Tests](https://img.shields.io/badge/tests-21%20packages%20green-brightgreen)
-![Release](https://img.shields.io/badge/release-v1.0.3-brightgreen)
+![Release](https://img.shields.io/badge/release-v1.0.5-brightgreen)
 
 **Kubernetes security posture assessment framework — one command, four scanners, one standard report.**
 
@@ -213,7 +213,7 @@ sources → scanners (parallel) → normalize → canonical + dedup → blind-sh
 ```bash
 go build ./...
 go test ./...          # 21 packages, all green
-./scripts/build.sh 1.0.3
+./scripts/build.sh 1.0.5
 ```
 
 ## CLI
@@ -325,9 +325,17 @@ needed. Every rule in it grants only `get` / `list` / `watch`: there is no `crea
 `update`, `patch` or `delete` verb anywhere in the file, which is the whole of the
 **Read-Only First** promise in a form you can diff.
 
-Secrets are the one place worth stating plainly: the ClusterRole does grant read access to
-`secrets` because RBAC and mount analysis need to know which secrets exist and what mounts
-them — but TATAR-Kuber reads **metadata only** and never the secret *values*.
+Secrets are the one place worth stating plainly: **the ClusterRole does not grant access to
+`secrets` at all.**
+
+It used to, with a comment promising that only metadata would be read. That promise cannot be
+kept: RBAC has no "metadata only" permission for a Secret, and `get` / `list` return the whole
+`data:` field. The role asked for a capability it then pledged not to use — which is a pledge,
+not a control. It was removed in v1.0.4.
+
+Nothing is lost by removing it. Which secret is mounted where is written in the pod spec
+(`volumes.secret`, `envFrom.secretRef`), which this role already reads, and the RBAC analysis
+works from `Role` / `RoleBinding` objects rather than from Secrets themselves.
 
 ### Exit codes
 
@@ -436,7 +444,7 @@ GitHub's release page is a copy, and CI diffs the two daily.
 
 ## Status
 
-**v1.0.3** — Live Mode B (parallel adapters) · explainable risk · CI/CD gatekeeper
+**v1.0.5** — `attest` · bilingual audit report / PDF · pinned release pipeline
 (policy + GitHub Action + SARIF) · goreleaser + brew/curl/Docker · scanner coverage report ·
 Pod → controller rollup · **scan trending (`diff`)** · **`report --lang` — one scan, either
 language** · **honest `scan_mode`**.
@@ -762,9 +770,17 @@ ServiceAccount, мөн тэдгээрийг холбох ClusterRoleBinding-ыг
 `create`, `update`, `patch`, `delete` verb байхгүй — **Read-Only First** гэсэн зарчим
 бүхэлдээ diff хийж шалгах боломжтой хэлбэрт байна.
 
-Secret-ийн талаар ил хэлэх нь зүйтэй: RBAC ба mount шинжилгээнд ямар secret байгаа, түүнийг
-хэн mount хийж байгааг мэдэх шаардлагатай тул ClusterRole нь `secrets` уншихыг зөвшөөрдөг —
-харин TATAR-Kuber нь ЗӨВХӨН metadata уншина, secret-ийн УТГЫГ хэзээ ч уншихгүй.
+Secret-ийн талаар ил хэлэх нь зүйтэй: **ClusterRole нь `secrets`-д огт эрх олгодоггүй.**
+
+Өмнө нь олгодог байсан бөгөөд тайлбартаа "зөвхөн metadata уншина" гэж амладаг байв. Тэр
+амлалтыг биелүүлэх боломжгүй: RBAC дээр Secret-д "зөвхөн metadata" гэсэн эрх байдаггүй,
+`get` / `list` нь `data:` талбарыг бүхэлд нь буцаана. Өөрөөр хэлбэл эрхийг нь авчхаад
+"ашиглахгүй" гэж амлаж байсан хэрэг — тэр нь амлалт, хяналт биш. v1.0.4-д хассан.
+
+Хасснаар алдагдах зүйл алга. Аль secret хаана mount хийгдсэн, env руу орсон нь pod-ийн
+тодорхойлолтод (`volumes.secret`, `envFrom.secretRef`) бичигдсэн байдаг бөгөөд энэ эрх түүнийг
+аль хэдийн уншдаг; RBAC-ийн шинжилгээ нь Secret объект дээр биш, `Role` / `RoleBinding`
+дээр тулгуурладаг.
 
 ### Exit code
 
@@ -847,7 +863,7 @@ docker run --rm -v "$PWD:/work" -w /work ghcr.io/ochmunkh/tatar-kuber:latest sca
 ```bash
 go build ./...
 go test ./...          # 21 багц, бүгд ногоон
-./scripts/build.sh 1.0.3
+./scripts/build.sh 1.0.5
 ```
 
 ### Баримт бичиг
@@ -881,7 +897,7 @@ release хуудас нь ХУУЛБАР бөгөөд CI хоёрын зөрүү
 
 ### Төлөв
 
-**v1.0.3** — Live Mode B (parallel adapters) · тайлбарлагдах эрсдэл · CI/CD gatekeeper
+**v1.0.5** — `attest` · хоёр хэлт аудитын тайлан / PDF · пиннэсэн release зам
 (бодлого + GitHub Action + SARIF) · goreleaser + brew/curl/Docker · scanner хамрах хүрээний тайлан ·
 Pod → controller rollup · **тренд (`diff`)** · **`report --lang` — нэг scan, аль ч хэл** ·
 **үнэн `scan_mode`**.
