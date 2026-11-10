@@ -51,7 +51,7 @@ jobs:
         with:
           fetch-depth: 0 # changelog-д бүх түүх хэрэгтэй
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v7
         with:
           go-version: "stable" # patched stdlib (html/template XSS засварууд)
           cache: true
