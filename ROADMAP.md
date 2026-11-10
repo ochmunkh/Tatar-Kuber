@@ -134,7 +134,7 @@ turned red.
 
 ---
 
-## v1.0.5 — Doing to ourselves what we demand of others 🚧 (in development)
+## v1.0.5 — Doing to ourselves what we demand of others ✅ (shipped)
 
 Theme: **every rule this tool enforces on a cluster, applied to the tool's own pipeline.**
 
@@ -375,7 +375,7 @@ v1.0.0-ийн бодит live run-ыг аудит хийхэд 11 finding бүг
 
 ---
 
-## v1.0.5 — Бусдаас шаарддагаа өөртөө хэрэглэх 🚧 (хөгжүүлэлтэд)
+## v1.0.5 — Бусдаас шаарддагаа өөртөө хэрэглэх ✅ (гарсан)
 
 Сэдэв: **кластерт тавьдаг шаардлага бүрээ хэрэгслийн өөрийнх нь зам дээр хэрэгжүүлэх.**
 
