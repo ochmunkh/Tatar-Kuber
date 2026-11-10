@@ -13,6 +13,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io/fs"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -31,18 +32,75 @@ func ToolsDir() string {
 }
 
 // Resolve — binary-г PATH эсвэл ToolsDir-ээс хайж бүтэн замыг буцаана.
+//
+// ToolsDir доторх БАЙРЛАЛ нь хоёр хэлбэртэй байж болно:
+//
+//	<tools>/<name>            — гараар тавьсан нэг файл
+//	<tools>/<name>/<...>      — `tatar-kuber update`-ийн задалсан архив
+//
+// Хоёр дахийг нь мэдэхгүй байсан нь бодит согог байв: `update` амжилттай
+// суулгаад `doctor` нь "суугаагүй" гэж хэлдэг байсан — хоёулаа "ажиллаж"
+// байгаа мөртлөө хоорондоо зөрчилдөж, улаан болдоггүй. CI нь scanner-уудаа
+// install.sh-ээр /usr/local/bin руу суулгадаг байсан тул энэ зам огт
+// шалгагддаггүй байсан (2026-11-10-нд пиннэсэн scanner-ийг CI-д анх
+// ажиллуулахад илрэв).
 func Resolve(name string) (string, bool) {
 	if p, err := exec.LookPath(name); err == nil {
 		return p, true
 	}
-	cand := filepath.Join(ToolsDir(), name)
-	if runtime.GOOS == "windows" && !strings.HasSuffix(cand, ".exe") {
-		cand += ".exe"
+	base := filepath.Join(ToolsDir(), name)
+	for _, cand := range []string{base, filepath.Join(base, name)} {
+		if p, ok := executableAt(cand); ok {
+			return p, true
+		}
 	}
-	if fi, err := os.Stat(cand); err == nil && !fi.IsDir() {
-		return cand, true
+	// Архив нь binary-г гүнд нь савласан байж болно (findBinary нь суулгах
+	// үед нэрээр нь хайдаг — энд ч мөн адил).
+	if p, ok := walkFor(base, name); ok {
+		return p, true
 	}
 	return "", false
+}
+
+// executableAt — зам нь (Windows дээр .exe дагавартай нь) бодит файл эсэх.
+func executableAt(path string) (string, bool) {
+	cands := []string{path}
+	if runtime.GOOS == "windows" && !strings.HasSuffix(path, ".exe") {
+		cands = []string{path + ".exe", path}
+	}
+	for _, c := range cands {
+		if fi, err := os.Stat(c); err == nil && fi.Mode().IsRegular() {
+			return c, true
+		}
+	}
+	return "", false
+}
+
+// walkFor — root доороос <name> (эсвэл <name>.exe) нэртэй файлыг хайна.
+// Хамгийн гүехэн нь ялна: багц нь хэрэгслийн нэртэй сан агуулж байвал дээд
+// түвшний ажиллуулах файл үлдэнэ. Энэ нь internal/update.findBinary-ийн
+// дүрэмтэй санаатайгаар ижил.
+func walkFor(root, name string) (string, bool) {
+	want := map[string]bool{name: true}
+	if runtime.GOOS == "windows" {
+		want[name+".exe"] = true
+	}
+	best, bestDepth := "", -1
+	_ = filepath.WalkDir(root, func(path string, d fs.DirEntry, err error) error {
+		if err != nil || d.IsDir() || !want[d.Name()] || !d.Type().IsRegular() {
+			return nil //nolint:nilerr // алдаатай мөчир нь "олдсонгүй", зогсоох шалтгаан биш
+		}
+		rel, rerr := filepath.Rel(root, path)
+		if rerr != nil {
+			return nil
+		}
+		dep := strings.Count(rel, string(filepath.Separator))
+		if bestDepth < 0 || dep < bestDepth {
+			best, bestDepth = path, dep
+		}
+		return nil
+	})
+	return best, best != ""
 }
 
 // Available — binary олдвол (true, nil). Олдохгүй бол (false, nil) —

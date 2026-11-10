@@ -156,13 +156,33 @@ jobs:
           mkdir -p "$HOME/.tatar-kuber"
           cp tools.lock.yaml "$HOME/.tatar-kuber/tools.lock.yaml"
           ./tatar-kuber update --scanner trivy
-          echo "$HOME/.tatar-kuber/tools" >> "$GITHUB_PATH"
+
+      # `update` суулгасан зүйлийг `doctor` ОЛОХ ЁСТОЙ. Энэ нь тодорхой биш
+      # байсан: update нь архивыг <tools>/<name>/ дотор задалдаг атлаа
+      # toolexec.Resolve нь <tools>/<name>-ийг ФАЙЛ гэж хайдаг байсан тул
+      # update "суулгалаа" гэж хэлээд doctor "суугаагүй" гэж хэлдэг байв —
+      # хоёулаа ногоон. CI нь scanner-уудаа install.sh-ээр PATH руу
+      # суулгадаг байсан тул энэ зам огт шалгагддаггүй байсан. Энэ алхам
+      # тэр зөрүүг дахин үүсэхээс сэргийлнэ.
+      - name: "`doctor` must see what `update` installed"
+        run: |
+          ./tatar-kuber doctor | tee doctor.txt
+          if grep -qiE '^[[:space:]]*trivy.*(not installed|суугаагүй)' doctor.txt; then
+            echo "::error::update суулгасан атлаа doctor олсонгүй — Resolve-ийн байрлалын зөрүү"
+            exit 1
+          fi
 
       - name: Which version did the pin actually give us
         run: |
-          trivy --version | head -2
+          TRIVY="$(find "$HOME/.tatar-kuber/tools/trivy" -type f -name trivy | head -1)"
+          if [ -z "$TRIVY" ]; then
+            echo "::error::update дууссан атлаа trivy-ийн binary олдсонгүй"
+            find "$HOME/.tatar-kuber" -maxdepth 4 | head -40
+            exit 1
+          fi
+          echo "TRIVY=$TRIVY" >> "$GITHUB_ENV"
           PINNED="$(grep -A1 '^  trivy:' tools.lock.yaml | grep version | tr -d ' "' | cut -d: -f2)"
-          GOT="$(trivy --version | head -1 | awk '{print $2}')"
+          GOT="$("$TRIVY" --version | head -1 | awk '{print $2}')"
           echo "pinned=$PINNED installed=$GOT"
           if [ "$PINNED" != "$GOT" ]; then
             echo "::error::update нь $PINNED-ийг суулгах ёстой атлаа $GOT суув"
@@ -176,7 +196,7 @@ jobs:
       # байгааг шалгана.
       - name: The pinned trivy's rule IDs still resolve
         run: |
-          trivy config --quiet --format json --output trivy-vuln.json examples/vulnerable/
+          "$TRIVY" config --quiet --format json --output trivy-vuln.json examples/vulnerable/
           python3 scripts/check-trivy-rules.py trivy-vuln.json
 
       - name: Upload evidence

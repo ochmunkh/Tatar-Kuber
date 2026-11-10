@@ -173,3 +173,24 @@ and belongs in that repository.
 Until then the floor lives in `.github/workflows/ci.yml`. It deliberately does
 not record exact per-scanner numbers — that would be a second copy of
 `expected-findings.json`, and the two would drift.
+
+## `update` installed scanners that `doctor` could not see
+
+**Found and fixed 2026-11-10, by the job above on its first run.**
+
+`tatar-kuber update` unpacks an archive into `~/.tatar-kuber/tools/<name>/` and
+leaves the binary inside that directory. `toolexec.Resolve` looked for
+`~/.tatar-kuber/tools/<name>` as a **file** and rejected a directory. So every
+scanner installed by `update` was invisible to `doctor` and to every live scan:
+one command said "installed", the next said "not installed", and neither turned
+red.
+
+It survived because nothing exercised that path. CI installed its scanners with
+each project's own `install.sh`, straight onto `PATH`, so `Resolve` always found
+them the easy way; the lock-driven install had never run anywhere.
+
+`Resolve` now checks the file, then `<tools>/<name>/<name>`, then walks the
+directory for the executable by name — the same shallowest-match rule
+`internal/update.findBinary` uses when it installs. Three tests build the exact
+layout `update` produces; reverting `Resolve` fails two of them. The CI job also
+asserts at the integration level that `doctor` sees what `update` just put down.
