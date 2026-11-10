@@ -90,7 +90,7 @@ jobs:
 
       # Статик аюулгүй байдлын шинжилгээ (SAST). CI-г унагахгүй — үр дүнг Code Scanning-д мэдээлнэ.
       - name: gosec (SAST)
-        uses: securego/gosec@c9453023c4e81ebdb6dde29e22d9cd5e2285fb16 # v2.22.8 (v2.22.8) # pin — аюулгүй байдлын хэрэгсэл @master-аас татагдах ёсгүй
+        uses: securego/gosec@5eb1d104ef85ff2c905c877eb600e8c1dee33a22 # v2.22.8 (v2.22.8) # pin — аюулгүй байдлын хэрэгсэл @master-аас татагдах ёсгүй
         with:
           args: "-no-fail -fmt sarif -out gosec.sarif ./..."
 
