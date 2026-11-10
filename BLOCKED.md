@@ -126,13 +126,18 @@ and nothing says so. Making CI install from the lock would close the gap, at the
 cost of no longer learning about upstream breakage the day it lands; running
 both is the honest answer and is not written.
 
-**"Behind upstream" is permanently true for fast-moving projects.** Within the
-half hour it took to verify and move the pins on 2026-11-10, trivy released
-0.76.2, kubescape 4.0.20 and checkov 3.4.3. A pin is a *reviewed* version, not
-the newest one, so an issue that says "behind" will never close — and a
-permanently open issue is the same failure as a Security tab with twenty alerts
-nobody reads. The check needs a threshold with a stated reason (behind by a
-minor version, or older than N days) instead of plain inequality.
+**"Behind upstream" is permanently true for fast-moving projects.** *(Fixed the
+same day.)* Within the half hour it took to verify and move the pins on
+2026-11-10, trivy released 0.76.2, kubescape 4.0.20 and checkov 3.4.3. A pin is
+a *reviewed* version, not the newest one, so an issue raised on plain inequality
+would never close — the same failure as a Security tab with twenty alerts nobody
+reads any more, on a check built here to avoid exactly that.
+
+The check now raises only where being behind means something: a **minor or major**
+gap, which is the class of release that can move rule IDs (trivy 0.74 → 0.76
+did), or a pin older than **90 days**, because patches accumulate and a pin
+nobody has revisited in a season has stopped being a decision. A patch published
+this morning is printed as information and raises nothing.
 
 ## `verify-lab` counts, it does not attribute
 

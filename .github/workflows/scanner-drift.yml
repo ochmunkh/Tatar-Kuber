@@ -9,6 +9,17 @@
 # шинэ release-ийн өөрийнх нь нийтэлсэн checksum файлаас утгыг нь дахин уншиж,
 # scanner-ийн rule ID-ууд бүртгэлд бичсэн утгаараа хэвээр байгааг дахин батлах
 # ёстой (CONTRIBUTING: "зураглал бол байнгын үүрэг").
+#
+# БОСГО. Эхний хувилбар нь энгийн тэнцүү бишээр дохио өгдөг байв — буруу.
+# Хэрэглэж үзэхэд хагас цагийн дотор л нотлогдов: 2026-11-10-нд pin-үүдийг
+# шалгаж хөдөлгөх зуур trivy, kubescape, checkov гурвуулаа дахин гарлаа. Ийм
+# хурдтай төслүүдийн хувьд "хоцорсон" нь ҮҮРД үнэн, түүн дээр нээсэн issue
+# хэзээ ч хаагдахгүй — тэр нь хэн ч хардаггүй 20 анхааруулгатай самбартай
+# яг ижил эвдрэл. Pin бол ХЯНАГДСАН хувилбар, хамгийн шинэ нь биш.
+#
+# Тиймээс зөвхөн утга учиртай үед л дохио өгнө: minor/major хоцорсон
+# (trivy 0.74 -> 0.76 дээр rule ID өөрчлөгдсөн — яг энэ ангилал), эсвэл pin
+# нь 90 хоногоос хуучирсан. Өглөө гарсан patch нь мэдээлэл, дохио биш.
 name: Scanner pin drift
 
 on:
@@ -43,12 +54,12 @@ jobs:
           fi
           echo "stale=$([ "$code" = "1" ] && echo yes || echo no)" >> "$GITHUB_OUTPUT"
 
-      - name: Open or update the drift issue
+      - name: Open or update the review issue
         if: steps.drift.outputs.stale == 'yes'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          title="Scanner pins are behind upstream"
+          title="Scanner pins need review"
           body=$(printf '%s\n\n```\n%s\n```\n\n_%s_\n' \
             "Өдөр тутмын шалгалт пиннэсэн release-үүдийг upstream-тэй тулгав." \
             "$(cat drift.txt)" \
@@ -62,14 +73,14 @@ jobs:
             gh issue create --title "$title" --body "$body"
           fi
 
-      - name: Close the drift issue when every pin is current
+      - name: Close the review issue when nothing needs a human
         if: steps.drift.outputs.stale == 'no'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          title="Scanner pins are behind upstream"
+          title="Scanner pins need review"
           num=$(gh issue list --state open --search "$title in:title" --json number,title \
                   --jq ".[] | select(.title == \"$title\") | .number" | head -1)
           if [ -n "$num" ]; then
-            gh issue close "$num" --comment "Бүх pin upstream-тэй тэнцлээ."
+            gh issue close "$num" --comment "Хянах шаардлагатай зүйл үлдсэнгүй: pin бүр эсвэл хамгийн сүүлийнх, эсвэл зөвхөн саяхны patch-аас хоцорч байна."
           fi
