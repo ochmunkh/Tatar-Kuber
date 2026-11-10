@@ -99,3 +99,80 @@ jobs:
         with:
           sarif_file: gosec.sarif
           category: gosec
+
+  # Регрессийн тор — Lab корпусыг ЭНЭ commit-ийн engine-ээр дахин тоглуулна.
+  #
+  # ЯАГААД: Tatar-Kuber-Lab бол регрессийн суурь, гэвч түүний өөрийн workflow нь
+  # зөвхөн LAB руу push хийхэд ажилладаг. Өөрөөр хэлбэл engine дээрх өөрчлөлт
+  # зураглал, dedup, rollup, оноолтыг эвдсэн ч Lab чимээгүй хэвээр үлддэг —
+  # тор нь барих ёстой зүйлийнхээ хажууд биш газар өлгөөстэй байна гэсэн үг.
+  #
+  # Golden corpus (examples/demo) үүнийг орлохгүй: тэр бол engine дотор хөлдөөсөн
+  # ЖИЖИГ корпус, Lab бол тусдаа, томоохон, бодит гаралтын цуглуулга. Хоёулаа
+  # хэрэгтэй — нэг нь нөгөөгийнхөө сохор цэгийг хардаг.
+  #
+  # Унавал: гаралт Lab-ийн expected/expected-findings.json-оос зөрсөн гэсэн үг.
+  # Өөрчлөлт зориуд бол Lab дээрх expected файлыг тусдаа PR-аар шинэчилнэ.
+  # Энэ job-ыг алгасах нь зөв хариулт БИШ.
+  lab:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout engine
+        uses: actions/checkout@v4
+
+      - name: Checkout lab
+        uses: actions/checkout@v4
+        with:
+          repository: ochmunkh/Tatar-Kuber-Lab
+          path: lab
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "stable"
+          cache: true
+
+      # Нийтлэгдсэн хувилбар биш, ЭНЭ commit-ээс барина — эс бөгөөс тест нь
+      # өөрийгөө шалгахын оронд хуучин binary-г шалгана.
+      - name: Build tatar-kuber from this commit
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/bin"
+          go build -o "$GITHUB_WORKSPACE/bin/tatar-kuber" ./cmd/tatar-kuber
+          echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
+      - name: Run the lab (doctor · scan · report ×3 · gate · verify-lab)
+        run: ./run-lab.sh
+        working-directory: lab
+
+      # verify-lab нь ТООНД тулгуурладаг: control-ийн олонлог ба severity тус
+      # бүрийн тоо. Тиймээс нэг scanner-ийн хувь нэмэр БҮТЭН алга болохыг
+      # (өөр scanner тэр control-ыг мөн хамарч байвал) барихгүй — яг v1.0.0-ийн
+      # эвдрэл: Trivy юу ч оруулаагүй атлаа нийт тоо эрүүл харагдаж байсан.
+      #
+      # Энэ алхам тэр нүхийг хаана: scanner бүр ажиллаж, НЭГЭЭС ДЭЭШ олдвор
+      # оруулсан байхыг шаардана. Яг тоог энд бичихгүй — тэр нь
+      # expected-findings.json-ийг хоёр дахин бичсэнтэй адил болж хоёулаа
+      # хоорондоо хоцорно. Энд шалгаж байгаа зүйл нь "хувь нэмэр БАЙНА уу"
+      # гэдэг, "хэд вэ" гэдэг биш.
+      #
+      # Түр шийдэл: verify-lab өөрөө scanner тус бүрийн хүлээлтийг уншдаг
+      # болоход энэ алхам тийш нүүнэ (BLOCKED.md-д бүртгэв).
+      - name: Every scanner must have contributed something
+        run: |
+          python3 - <<'PY'
+          import json, sys
+          d = json.load(open("lab/normalized/tatar-findings.json", encoding="utf-8"))
+          runs = d.get("metadata", {}).get("scanner_runs") or []
+          if not runs:
+              sys.exit("metadata.scanner_runs хоосон — хамрах хүрээг шалгах боломжгүй")
+          bad = []
+          for r in runs:
+              if r.get("status") not in ("ok", "ingested"):
+                  bad.append(f"{r['scanner']}: status={r.get('status')}")
+              elif not r.get("findings"):
+                  bad.append(f"{r['scanner']}: 0 findings — хувь нэмэр чимээгүй алга болов")
+          for r in runs:
+              print(f"  {r['scanner']:<10} {r.get('status'):<10} findings={r.get('findings')}")
+          if bad:
+              sys.exit("ХАМРАХ ХҮРЭЭ БУУРСАН:\n  " + "\n  ".join(bad))
+          print(f"{len(runs)} scanner бүгд хувь нэмэр оруулав")
+          PY

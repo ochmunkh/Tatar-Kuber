@@ -92,3 +92,25 @@ Checked by hand on 2026-10-30, twelve days after the pins were written: trivy
 0.74.0 -> 0.76.1, kubescape 4.0.15 -> 4.0.17, checkov 3.3.20 -> 3.4.0. Only
 popeye was still current. Three of four drifted inside two weeks and nothing
 said so.
+
+## `verify-lab` counts, it does not attribute
+
+**Partly mitigated 2026-11-10.** The Lab corpus now runs inside the engine's CI
+(`ci.yml`, job `lab`), so a change here that breaks the corpus turns this
+repository red instead of leaving the net hanging on the wrong side.
+
+What is still missing is inside `verify-lab` itself. It compares the set of
+controls and the per-severity counts, so it cannot see one scanner's
+contribution disappearing when another scanner happens to cover the same
+control — the exact v1.0.0 failure, where Trivy contributed nothing and the
+totals stayed healthy.
+
+As a stopgap the CI job asserts that every scanner ran and contributed at least
+one finding. That is a floor, not an expectation: the real fix is for
+`expected-findings.json` to carry a per-scanner contribution and for
+`verify-lab` to check it, which is a change to the Lab's expected-file format
+and belongs in that repository.
+
+Until then the floor lives in `.github/workflows/ci.yml`. It deliberately does
+not record exact per-scanner numbers — that would be a second copy of
+`expected-findings.json`, and the two would drift.
