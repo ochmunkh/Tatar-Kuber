@@ -61,7 +61,7 @@ jobs:
         uses: anchore/sbom-action/download-syft@e22c389904149dbc22b58101806040fa8d37a610 # v0 (v0.24.x)
 
       - name: Login to GHCR
-        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3 (v3.6.0)
+        uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v3 (v3.6.0)
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
