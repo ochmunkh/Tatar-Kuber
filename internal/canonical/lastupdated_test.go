@@ -20,8 +20,8 @@ import (
 // зэрэг аль нэг нь өөрчлөгдвөл энэ тест унаж, `last_updated`-ыг шинэчлэхийг
 // шаардана.
 const (
-	registryDigest      = "3731ca39f705fd9bbfeb070f805dad1496ca61e19b961c4bb06a4942b4876876"
-	registryLastUpdated = "2026-10-18"
+	registryDigest      = "205b20310a3b6b07374912009499ea0e7c79f858511cefa23f6574bd7dab648c"
+	registryLastUpdated = "2026-11-11"
 )
 
 func TestRegistryLastUpdatedTracksContent(t *testing.T) {

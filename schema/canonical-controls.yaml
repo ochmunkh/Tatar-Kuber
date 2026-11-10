@@ -16,7 +16,7 @@
 # internal/canonical TestPopeyeMappingsMatchUpstreamMeaning тест бэхэлдэг.
 
 schema_version: '1.0'
-last_updated: '2026-10-18'
+last_updated: '2026-11-11'
 categories:
 - id: CON
   name: Container Security
@@ -104,7 +104,7 @@ controls:
     mn: "allowPrivilegeEscalation=true — процесс эрхээ өсгөх боломжтой."
   remediation:
     en: Set securityContext.allowPrivilegeEscalation=false.
-    mn: securityContext.allowPrivilegeEscalation=false.
+    mn: securityContext.allowPrivilegeEscalation=false болгоно.
   references:
   - CIS-5.2.5
   attack:
@@ -162,7 +162,7 @@ controls:
     mn: "hostPID=true — host-ийн процессын namespace ил гарсан."
   remediation:
     en: Set hostPID=false.
-    mn: hostPID=false.
+    mn: hostPID=false болгоно.
   references:
   - CIS-5.2.2
   attack:
@@ -190,7 +190,7 @@ controls:
     mn: "hostNetwork=true — сүлжээний тусгаарлалтыг тойрч гарна."
   remediation:
     en: Set hostNetwork=false.
-    mn: hostNetwork=false.
+    mn: hostNetwork=false болгоно.
   references:
   - CIS-5.2.4
   attack:
@@ -265,7 +265,7 @@ controls:
     mn: "readOnlyRootFilesystem=false — filesystem бичигдэх боломжтой."
   remediation:
     en: Set securityContext.readOnlyRootFilesystem=true.
-    mn: securityContext.readOnlyRootFilesystem=true.
+    mn: securityContext.readOnlyRootFilesystem=true болгоно.
   references:
   - CIS-5.2.11
   mappings:
@@ -323,7 +323,7 @@ controls:
     mn: "seccompProfile тохируулаагүй — syscall хязгаарлалт байхгүй."
   remediation:
     en: Set seccompProfile.type=RuntimeDefault.
-    mn: seccompProfile.type=RuntimeDefault.
+    mn: seccompProfile.type=RuntimeDefault болгоно.
   references:
   - CIS-5.7.2
   mappings:
@@ -716,7 +716,7 @@ controls:
     mn: "automountServiceAccountToken=true — шаардлагагүй token ил."
   remediation:
     en: Set automountServiceAccountToken=false.
-    mn: automountServiceAccountToken=false.
+    mn: automountServiceAccountToken=false болгоно.
   references:
   - CIS-5.1.6
   attack:
