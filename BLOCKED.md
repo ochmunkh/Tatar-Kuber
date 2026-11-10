@@ -122,14 +122,22 @@ the job it was written for.
 
 Two things this exercise exposed, both still open:
 
-**The pin is not what CI exercises.** `real-cluster.yml` and `static-scan.yml`
-install the scanners with each project's own `install.sh` or `pip`, which fetch
-**latest** — not the pinned release. So the daily runs prove the mappings
-survive against whatever shipped today, while `tools.lock.yaml` governs only
-what a *user* gets from `tatar-kuber update`. Those are two different versions
-and nothing says so. Making CI install from the lock would close the gap, at the
-cost of no longer learning about upstream breakage the day it lands; running
-both is the honest answer and is not written.
+**The pin was not what CI exercised.** *(Fixed the same day.)*
+`real-cluster.yml` and `static-scan.yml` install the scanners with each
+project's own `install.sh` or `pip`, which fetch **latest** — not the pinned
+release. So the daily runs proved the mappings survive against whatever shipped
+that morning, while `tools.lock.yaml` governed only what a *user* gets from
+`tatar-kuber update`, and nothing exercised that at all.
+
+Dropping the latest-install would have been the wrong fix: learning about
+upstream breakage the day it lands is worth keeping. Both now run. A second job
+in `static-scan.yml` copies the shipped lock to `~/.tatar-kuber/`, installs with
+`tatar-kuber update`, asserts the installed version is the pinned one, and runs
+`scripts/check-trivy-rules.py` over the vulnerable corpus to confirm the pinned
+trivy's rule IDs still resolve to the controls they are mapped to.
+
+That job is also the only place the supply-chain path — download, checksum,
+install — runs against the real network in CI.
 
 **"Behind upstream" is permanently true for fast-moving projects.** *(Fixed the
 same day.)* Within the half hour it took to verify and move the pins on

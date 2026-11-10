@@ -124,3 +124,64 @@ jobs:
           jq -r '.metadata.scanner_runs[] | select((.unmapped_count // 0) > 0)
                  | "\(.scanner): \(.unmapped_count) илрүүлэлт, \(.unmapped_rules | length) rule\n  \(.unmapped_rules | join(", "))"' out/scan-result.json
 # workflow-registration: repo re-created 2026-09-08
+
+  # ПИННЭСЭН хувилбарыг бодитоор ажиллуулна.
+  #
+  # ЯАГААД ТУСДАА JOB: дээрх job болон real-cluster.yml нь scanner-уудыг тухайн
+  # төслийн өөрийнх нь суулгагчаар татдаг — тэр нь ҮРГЭЛЖ ХАМГИЙН СҮҮЛИЙНХ,
+  # пиннэсэн нь БИШ. Өөрөөр хэлбэл өдөр тутмын ажиллалт өнөөдөр гарсан
+  # хувилбартай зураглал амьд байгааг нотолдог байсан бол tools.lock.yaml нь
+  # зөвхөн ХЭРЭГЛЭГЧИЙН `tatar-kuber update`-д үйлчилдэг — хоёр өөр хувилбар,
+  # хэн ч хэлээгүй. Энэ job тэр зөрүүг хаана.
+  #
+  # Нэмэлт ашиг: `update`-ийн бүтэн замыг (татах -> checksum -> суулгах) CI-д
+  # бодит сүлжээн дээр ажиллуулж байгаа цорын ганц газар нь энэ.
+  pinned:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "stable"
+          cache: true
+
+      - name: Build tatar-kuber
+        run: go build -o tatar-kuber ./cmd/tatar-kuber
+
+      # Shipped lock-ийг хэрэглэгчийн байдаг газарт тавина — хэрэглэгч яг үүнийг
+      # хийдэг (tools.lock.yaml-ийн толгойд бичсэнээр).
+      - name: Install the pinned scanners with `update`
+        run: |
+          mkdir -p "$HOME/.tatar-kuber"
+          cp tools.lock.yaml "$HOME/.tatar-kuber/tools.lock.yaml"
+          ./tatar-kuber update --scanner trivy
+          echo "$HOME/.tatar-kuber/tools" >> "$GITHUB_PATH"
+
+      - name: Which version did the pin actually give us
+        run: |
+          trivy --version | head -2
+          PINNED="$(grep -A1 '^  trivy:' tools.lock.yaml | grep version | tr -d ' "' | cut -d: -f2)"
+          GOT="$(trivy --version | head -1 | awk '{print $2}')"
+          echo "pinned=$PINNED installed=$GOT"
+          if [ "$PINNED" != "$GOT" ]; then
+            echo "::error::update нь $PINNED-ийг суулгах ёстой атлаа $GOT суув"
+            exit 1
+          fi
+
+      # trivy нь дүрмээ binary дотроо шигтгэдэг тул release нь rule ID-г
+      # ӨӨРЧИЛЖ чадна — 0.76.1 нь 0.74.0-ийн AVD-KSV0001-ийг KSV-0001 болгож,
+      # AVDID-г хоосон үлдээсэн. Энэ алхам тэр өөрчлөлт зураглалыг эвдсэн
+      # эсэхийг хэлнэ: нормчилол ажиллаж, заавал хүрэх control-ууд хүрч
+      # байгааг шалгана.
+      - name: The pinned trivy's rule IDs still resolve
+        run: |
+          trivy config --quiet --format json --output trivy-vuln.json examples/vulnerable/
+          python3 scripts/check-trivy-rules.py trivy-vuln.json
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pinned-scan
+          path: trivy-vuln.json
