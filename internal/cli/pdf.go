@@ -153,6 +153,12 @@ func renderAuditPDF(res finding.ScanResult, target, lang, failOn string) int {
 		errln(msg("report.pdf.failed", c.Name), err)
 		return 2
 	}
+	// PDF-ийг хөрвүүлэгч бичдэг тул эрх нь ТҮҮНИЙ umask-аас шалтгаална
+	// (ихэвчлэн 0644). Аудитын тайлан бол кластерын сул талуудын бүрэн
+	// жагсаалт — бусад гаралттай ижил эрхтэй байх ёстой.
+	if err := os.Chmod(abs, 0o600); err != nil {
+		warnln(err)
+	}
 	fmt.Println(msg("report.pdf.wrote", target, c.Name))
 
 	if failOn != "" {
