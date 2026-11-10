@@ -194,3 +194,59 @@ directory for the executable by name — the same shallowest-match rule
 `internal/update.findBinary` uses when it installs. Three tests build the exact
 layout `update` produces; reverting `Resolve` fails two of them. The CI job also
 asserts at the integration level that `doctor` sees what `update` just put down.
+
+## The release pipeline trusted mutable tags
+
+**Fixed 2026-11-11.**
+
+This project pins every scanner by SHA256 and refuses to install one it cannot
+verify — no trust-on-first-use. Its own release pipeline, meanwhile, ran three
+third-party actions (`goreleaser-action`, `sbom-action`, `docker/login-action`)
+at mutable major tags, in a job with `contents: write` and `packages: write`.
+
+A tag is a pointer. Whoever controls an action can move `v6` to another commit,
+and the next release runs it. That is not hypothetical: in March 2025 the
+`tj-actions/changed-files` tag was moved to a malicious commit and leaked
+secrets out of thousands of repositories.
+
+What made it worse here is specific to this project: `checksums.txt` and the
+SBOM are produced *by those same steps*. A compromised goreleaser would emit a
+backdoored binary together with a matching checksum and a matching SBOM, so the
+integrity controls this project advertises would confirm the forgery. A user
+verifying the checksum would get a clean answer.
+
+All five third-party actions are now pinned to commit SHAs, with the
+human-readable version beside each. `actions/*` and `github/codeql-action` stay
+on major tags: compromising GitHub's own namespace is a different and much
+larger class of event.
+
+### The cost of pinning, and what pays it
+
+A SHA pin also stops security fixes arriving. Pinning and forgetting turns a
+mitigation into a permanently vulnerable dependency, which is the same mistake
+as a scanner pin nobody revisits.
+
+`.github/dependabot.yml` now watches both the actions and the Go modules weekly
+and raises updates as pull requests. The pins stay reviewed rather than frozen.
+
+Pinning also made existing staleness visible, which is worth recording rather
+than quietly fixing: `goreleaser-action` is on v6 while v7.3.0 exists,
+`docker/login-action` on v3 against v4.8.0, `gosec` on v2.22.8 against v2.30.0,
+and `kind-action` on v1.10.0 against v1.15.2. Each was pinned at the version
+that was already running, so nothing changed behaviour today; the upgrades will
+now arrive as reviewable pull requests instead of silently, or never.
+
+### Not fixed, and deliberately: `curl | sudo sh` in `real-cluster.yml`
+
+The daily cluster job installs trivy through the project's own `install.sh`,
+piped into `sudo sh`, with no checksum. It looks like the same failure as the
+above and mostly is not.
+
+That workflow installs **latest on purpose** — it exists to learn about upstream
+breakage the day it lands. Anyone able to alter `install.sh` in that repository
+can alter the trivy binary it fetches, which defeats the check more directly,
+and no pin in CI prevents that because CI is not supposed to be pinned. `sudo`
+buys an attacker little on an ephemeral runner holding a read-only token.
+
+It is untidy, not a vulnerability, and it is recorded here so the distinction
+does not have to be rediscovered.

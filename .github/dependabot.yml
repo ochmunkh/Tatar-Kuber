@@ -1,0 +1,30 @@
+# Dependabot — пиннэсэн зүйлс ХУУЧРАХААС хамгаална.
+#
+# Гуравдагч этгээдийн action-ууд commit SHA-гаар пиннэгдсэн (release.yml-ийн
+# тайлбарыг үз). Тэр нь tag зөөх халдлагыг хаадаг ч нэг шинэ эрсдэл нээнэ:
+# пиннэсэн хувилбарын аюулгүй байдлын засвар автоматаар ирэхээ болино. Пин
+# бол ХЯНАГДСАН хувилбар байх ёстой, мартагдсан хувилбар биш.
+#
+# Тиймээс долоо хоног тутам шалгаж, шинэчлэлтийг PR болгон ирүүлнэ. Хүн
+# уншиж, нэгтгэх эсэхээ шийднэ — чимээгүй шинэчлэхгүй, чимээгүй хоцрохгүй.
+#
+# Go модулиудыг мөн хамруулав: энэ төсөлд гадаад хамаарал ердөө нэг
+# (gopkg.in/yaml.v3) тул ачаалал бага, харин тэр нэг нь untrusted YAML
+# (бодлого, attestation) задалдаг тул хамгийн чухал нь.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci"
+
+  - package-ecosystem: gomod
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore"
