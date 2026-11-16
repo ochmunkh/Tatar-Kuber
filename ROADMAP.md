@@ -138,13 +138,9 @@ turned red.
 
 Theme: **every rule this tool enforces on a cluster, applied to the tool's own pipeline.**
 
-- **The declared gap can be closed** — `attest` records a human's signed decision for controls
-  no scanner checks: a reason, a name, and a **mandatory expiry**. `non-compliant` fails the
-  gate; an expired attestation counts as unchecked again and `gate` names it. Attestations never
-  enter `findings`, so `found_by` cannot claim a scanner saw something it did not.
-- **The audit deliverable** — `report --format audit` renders a paged, self-contained, bilingual
-  report; `--format pdf` converts it with a browser or `wkhtmltopdf` already on the machine and
-  **refuses clearly** when none is present rather than writing an empty file.
+- **`update` installed scanners `doctor` could not see** — `update` leaves the binary inside a
+  directory, and the resolver looked for a file there and rejected the directory. Every scanner
+  it installed was invisible to `doctor` and to every live scan, with no error from either.
 - **The regression net moved to the side it guards** — the Lab corpus now runs inside this
   repository's CI on every push, and the run asserts every scanner contributed something, which
   the count-based `verify-lab` cannot see.
@@ -164,15 +160,16 @@ Theme: **every rule this tool enforces on a cluster, applied to the tool's own p
 
 Theme: **make it the tool a security auditor reaches for.**
 
-- **Bilingual professional PDF audit report** — a client-ready deliverable (cover, executive
-  summary, methodology, findings, evidence, remediation, appendix) in EN and MN. *Highest
-  business lever for consulting.*
+- **Audit report: the compliance section** — the paged bilingual report and its PDF shipped in
+  v1.0.4 (`report --format audit|pdf`). What it still lacks is the compliance view described in
+  the next item.
 - **Compliance mapping** — map canonical controls to **CIS Kubernetes Benchmark, NSA/CISA
   Hardening, ISO/IEC 27001 Annex A, MITRE ATT&CK for Containers**; add a compliance view/section
   to the report ("X% aligned, these gaps").
 - **Expanded control coverage** — grow the canonical registry well beyond the current set;
   broaden per-scanner rule mappings. Gaps the v1.0.2 audit already surfaced, visible in every
-  report: `TATAR-NET-004` (Ingress without TLS) has no scanner rule mapped at all; and these are
+  report: `TATAR-NET-004` (Ingress without TLS) has no scanner rule mapped at all (since v1.0.4
+  it can be closed by `attest`, but no scanner checks it); and these are
   deliberately unmapped for want of a matching control — Trivy `KSV-0020/0021` (low UID/GID),
   `KSV-0110` (default namespace); Kubescape `C-0079` (a single CVE), `C-0055` (Linux hardening),
   `C-0054` (cluster internal networking); Checkov `CKV_K8S_40` (high UID), `CKV_K8S_21` (default
@@ -201,8 +198,8 @@ Theme: **from point-in-time CLI to a living security posture service.**
 - **Multi-cluster aggregation** — one posture view across many clusters / environments.
 - **Notifications & integrations** — Slack / Teams / email on new-critical or regression; export
   to Jira / DefectDojo; webhook events.
-- **Team features** — org policies, RBAC, audit log (open-core boundary begins here).
-- **MCP server (read-only first)** — expose the posture as tools an AI assistant can call, so an
+- **Team features** — org policies, RBAC, audit log.
+- **MCP server (read-only first)** — expose the posture as tools an assistant can call, so an
   engineer can ask "what changed since last week" or "why is this CRITICAL" in plain language.
   TATAR-Kuber is unusually well suited to this: the answer to "why" is already machine-readable
   (`canonical_control`, `found_by`, `confidence`, `risk_factors`, `attack`), so the model reads
@@ -217,15 +214,14 @@ Theme: **from point-in-time CLI to a living security posture service.**
     messages are attacker-influenced strings. The server marks them as untrusted content, so a
     security tool never becomes the injection path into the assistant.
   - Order: after v2. MCP is a distribution channel, not the differentiator — mapping accuracy is.
-    An AI-connected tool that answers confidently and wrongly is worse than no integration.
+    A connected tool that answers confidently and wrongly is worse than no integration.
 
 ---
 
 ## Beyond v3 — the bold vision
 
-- **Open-core KSPM/ASPM layer** — the de-facto open-source layer that unifies K8s security
-  scanners into one canonical, explainable, bilingual posture — with an optional hosted/SaaS and
-  team tier (a natural managed-service offering for security consultancies).
+- **The open-source KSPM layer** — the de-facto open layer that unifies K8s security scanners
+  into one canonical, explainable, bilingual posture. Free and MIT-licensed, in every release.
 - **Compliance-as-evidence** — generate ISO 27001 / CIS / regulatory **evidence packs**
   (bilingual) straight from a scan — turning a scan into an audit artifact.
 - **Beyond Kubernetes** — extend the canonical model outward to cloud posture (CSPM) and IaC at
@@ -379,14 +375,9 @@ v1.0.0-ийн бодит live run-ыг аудит хийхэд 11 finding бүг
 
 Сэдэв: **кластерт тавьдаг шаардлага бүрээ хэрэгслийн өөрийнх нь зам дээр хэрэгжүүлэх.**
 
-- **Зарлагдсан цоорхойг хаах боломжтой боллоо** — `attest` нь scanner шалгадаггүй хяналтад
-  хүний гарын үсэгтэй шийдвэрийг бүртгэнэ: үндэслэл, нэр, мөн **заавал хугацаа**.
-  `non-compliant` нь gate-ийг унагаана; хугацаа дууссан баталгаа дахин шалгагдаагүйд
-  тооцогдож, `gate` нэрээр нь хэлнэ. Attestation нь `findings`-д хэзээ ч орохгүй тул
-  `found_by` нь scanner хараагүй зүйлээ харсан гэж хэлэхгүй.
-- **Аудитын deliverable** — `report --format audit` нь хуудаслагдсан, бие даасан, хоёр хэлт
-  тайлан гаргана; `--format pdf` нь машин дээр байгаа хөтөч эсвэл `wkhtmltopdf`-ээр хөрвүүлж,
-  хөрвүүлэгч байхгүй бол хоосон файл гаргахын оронд **ил татгалзана**.
+- **`update` суулгасан scanner-ийг `doctor` олдоггүй байв** — `update` нь binary-г хавтас
+  дотор үлдээдэг, харин resolver тэнд файл хайж, хавтсыг голдог байв. Түүний суулгасан scanner
+  бүр `doctor`-т ч, амьд scan-д ч харагдахгүй, аль аль нь алдаа өгөхгүй байсан.
 - **Регрессийн тор барих ёстой талдаа шилжив** — Lab корпус одоо энэ repo-гийн CI дотор push
   бүр дээр ажиллаж, scanner бүр хувь нэмэр оруулсан эсэхийг шаардана — тоонд тулгуурласан
   `verify-lab` үүнийг хардаггүй.
@@ -408,9 +399,9 @@ v1.0.0-ийн бодит live run-ыг аудит хийхэд 11 finding бүг
 
 Сэдэв: **аудиторын гар татдаг багаж болгох.**
 
-- **Хоёр хэлт мэргэжлийн PDF аудит тайлан** — үйлчлүүлэгчид бэлэн deliverable (нүүр хуудас,
-  гүйцэтгэх хураангуй, аргачлал, олдворууд, нотолгоо, засварын зөвлөмж, хавсралт) EN/MN.
-  *Консалтингийн хамгийн том хөшүүрэг.*
+- **Аудит тайлан: compliance хэсэг** — хуудаслагдсан хоёр хэлт тайлан ба түүний PDF нь
+  v1.0.4-т гарсан (`report --format audit|pdf`). Түүнд дутуу байгаа зүйл бол дараагийн мөрөнд
+  бичсэн compliance харагдац.
 - **Compliance mapping** — canonical control-уудыг **CIS Kubernetes Benchmark, NSA/CISA,
   ISO/IEC 27001 Annex A, MITRE ATT&CK for Containers**-т зурах; тайланд compliance хэсэг нэмэх
   ("X% нийцсэн, эдгээр цоорхой").
@@ -419,7 +410,7 @@ v1.0.0-ийн бодит live run-ыг аудит хийхэд 11 finding бүг
   тайлагнавал нэг файл дахь хэд хэдэн ижил зөрчил нэг finding болж нийлнэ. Манифестыг парслах
   шаардлагатай.
 - **Зураглалын хийдлүүд** (v1.0.2 аудитаар илэрсэн, тайлан бүрт ил): `TATAR-NET-004`-д ямар ч
-  scanner rule зурагдаагүй; тохирох control байхгүйн улмаас зориудаар зураглаагүй — Trivy
+  scanner rule зурагдаагүй (v1.0.4-өөс `attest`-ээр хааж болно, гэхдээ scanner шалгадаггүй); тохирох control байхгүйн улмаас зориудаар зураглаагүй — Trivy
   `KSV-0020/0021`, `KSV-0110`; Kubescape `C-0079`, `C-0055`, `C-0054`; Checkov `CKV_K8S_40`,
   `CKV_K8S_21`, `CKV_K8S_18`, `CKV_K8S_43` (digest), `CKV_K8S_27` (docker socket — тусдаа
   critical control болох ёстой).
@@ -445,8 +436,8 @@ v1.0.0-ийн бодит live run-ыг аудит хийхэд 11 finding бүг
 - **Олон cluster нэгтгэл** — олон cluster/орчны нэг posture харагдац.
 - **Мэдэгдэл ба интеграци** — шинэ-critical/регресст Slack / Teams / имэйл; Jira / DefectDojo руу
   export; webhook.
-- **Багийн боломжууд** — байгууллагын бодлого, RBAC, аудит лог (open-core хил эндээс эхэлнэ).
-- **MCP сервер (эхлээд зөвхөн уншдаг)** — posture-ыг AI туслах дуудаж болох tool болгон гаргана:
+- **Багийн боломжууд** — байгууллагын бодлого, RBAC, аудит лог.
+- **MCP сервер (эхлээд зөвхөн уншдаг)** — posture-ыг туслах программ дуудаж болох tool болгон гаргана:
   инженер "өнгөрсөн долоо хоногоос юу өөрчлөгдсөн бэ", "энэ яагаад CRITICAL вэ" гэж энгийн хэлээр
   асууна. TATAR-Kuber үүнд ер бусын сайн тохирно: "яагаад" гэсэн асуултын хариу нь аль хэдийн
   машин уншигдах хэлбэртэй (`canonical_control`, `found_by`, `confidence`, `risk_factors`,
@@ -461,16 +452,15 @@ v1.0.0-ийн бодит live run-ыг аудит хийхэд 11 finding бүг
     мессеж нь халдагчийн нөлөөлж болох текст. Сервер тэдгээрийг итгэмжлэгдээгүй агуулга гэж
     тэмдэглэнэ — аюулгүй байдлын хэрэгсэл өөрөө туслах руу орох инъекцийн гарц болох ёсгүй.
   - Дараалал: v2-ын ДАРАА. MCP бол түгээх суваг, ялгарах давуу тал биш — давуу тал нь зураглалын
-    нарийвчлал. Итгэлтэйгээр БУРУУ хариулдаг "AI-д холбогдсон" хэрэгсэл бол холбоогүй байснаас дор.
+    нарийвчлал. Итгэлтэйгээр БУРУУ хариулдаг "холбогдсон" хэрэгсэл бол холбоогүй байснаас дор.
 
 ---
 
 ## v3-аас цааш — зоригтой алсын хараа
 
-- **Open-core KSPM/ASPM давхарга** — K8s аюулгүй байдлын scanner-уудыг нэг canonical,
-  тайлбарлагдах, хоёр хэлт posture болгон нэгтгэдэг de-facto open-source давхарга — сонголтоор
-  hosted/SaaS ба багийн tier-тэй (аюулгүй байдлын консалтингийн managed-service санал болгоход
-  төгс тохирно).
+- **Нээлттэй эхийн KSPM давхарга** — K8s аюулгүй байдлын scanner-уудыг нэг canonical,
+  тайлбарлагдах, хоёр хэлт posture болгон нэгтгэдэг de-facto нээлттэй давхарга. Release бүр
+  үнэгүй, MIT лицензтэй.
 - **Compliance-as-evidence** — scan-аас шууд ISO 27001 / CIS / зохицуулалтын **нотолгооны багц**
   (хоёр хэлт) гаргах — scan-ыг аудитын баримт болгох.
 - **Kubernetes-ээс цааш** — canonical загварыг cloud posture (CSPM), IaC руу өргөтгөх, "олон

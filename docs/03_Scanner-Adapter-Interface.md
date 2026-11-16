@@ -92,7 +92,7 @@ deduped := dedup.Deduplicate(allFindings)
 | Checkov | checkov -d ./ -o json | JSON | local | checkov --version |
 | Popeye | popeye -o json --kubeconfig \<path\> --context \<ctx\> | JSON | remote | popeye version |
 
-**Тэмдэглэл:** Kubescape нь олон framework (NSA, MITRE, CIS-workload)-ийг нэг ажиллуулалтаар өгдөг тул primary posture engine. Trivy нь image CVE + config + secret-ийг барина. Checkov нь local IaC (YAML/Helm/Terraform)-д гүн. Popeye нь remote cluster-ийн ажиллагааны цэвэршилт (dead service, broken ref)-д онцгой. kube-bench нь node-level тул MVP-д БАГТААГҮЙ (Enterprise Agent).
+**Тэмдэглэл:** Kubescape нь олон framework (NSA, MITRE, CIS-workload)-ийг нэг ажиллуулалтаар өгдөг тул primary posture engine. Trivy нь image CVE + config + secret-ийг барина. Checkov нь local IaC (YAML/Helm/Terraform)-д гүн. Popeye нь remote cluster-ийн ажиллагааны цэвэршилт (dead service, broken ref)-д онцгой. kube-bench нь node-level тул MVP-д БАГТААГҮЙ.
 
 ## 6. Алдаа ба timeout
 

@@ -86,6 +86,11 @@ fi
 tar -xzf "$tmp/$archive" -C "$tmp" || die "задлаж чадсангүй"
 
 # --- суулгах ---
+# BIN_DIR-ийг хэрэглэгч ӨӨРӨӨ заасан бол тэр хавтсыг үүсгэнэ. Өмнө нь байхгүй хавтас
+# "бичих эрхгүй" гэж уншигдаж, хэрэглэгчийн өөрийн home доторх зам дээр ч sudo асуудаг байв.
+if [ -n "${BIN_DIR:-}" ] && [ ! -d "$BIN_DIR" ]; then
+  mkdir -p "$BIN_DIR" 2>/dev/null || true
+fi
 BIN_DIR="${BIN_DIR:-/usr/local/bin}"
 if [ ! -w "$BIN_DIR" ] 2>/dev/null; then
   if [ "$(id -u)" != "0" ] && have sudo; then

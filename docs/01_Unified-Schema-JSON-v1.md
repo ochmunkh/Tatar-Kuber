@@ -110,7 +110,7 @@ Canonical control-ийн prefix-тэй нэг мөр байна: Container Secur
 
 #### status — finding lifecycle
 
-Finding нь амьдралын мөчлөгтэй. MVP-д CLI нь stateless тул бүх finding OPEN төлөвтэй үүснэ. Жинхэнэ шилжилт (OPEN → CLOSED), first_seen/last_seen мөрдөлт нь state store шаарддаг тул Enterprise/v2-д хэрэгжинэ. Талбаруудыг схемд одооноос оруулж forward-compatible болгосон.
+Finding нь амьдралын мөчлөгтэй. MVP-д CLI нь stateless тул бүх finding OPEN төлөвтэй үүснэ. Жинхэнэ шилжилт (OPEN → CLOSED), first_seen/last_seen мөрдөлт нь state store шаарддаг тул v3-д хэрэгжинэ. Талбаруудыг схемд одооноос оруулж forward-compatible болгосон.
 
 ```mermaid
 flowchart LR
@@ -203,7 +203,7 @@ id = "TK-" + substr( SHA256(canonical_control + "|" + resource + "|" + namespace
 
 ### 7.2 Forward-compatible lifecycle талбарууд
 
-status, owner, first_seen, last_seen талбарууд MVP-д бүрэн ашиглагдахгүй ч схемд байх нь Enterprise хувилбар руу шилжихэд schema migration хийхээс сэргийлнэ. MVP consumer эдгээрийг үл тоомсорлож болно.
+status, owner, first_seen, last_seen талбарууд MVP-д бүрэн ашиглагдахгүй ч схемд байх нь v3 руу шилжихэд schema migration хийхээс сэргийлнэ. MVP consumer эдгээрийг үл тоомсорлож болно.
 
 ### 7.3 Blind shot нь өгөгдлийг устгахгүй
 

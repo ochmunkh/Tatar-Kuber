@@ -93,7 +93,7 @@ Full walk-through: [`docs/dedup-example.md`](docs/dedup-example.md).
 > actually runs against every day. Scanner CLIs rename flags between releases, so a mismatch shows up as
 > `status: error` / `unavailable` in the report's *Scanner coverage* table rather than as a silent zero.
 
-> `kube-bench` (node/CIS) needs a privileged DaemonSet and is out of MVP scope (Enterprise Agent).
+> `kube-bench` (node/CIS) needs a privileged DaemonSet and is out of MVP scope.
 
 ## Features
 
@@ -564,7 +564,7 @@ TATAR-Kuber эдгээрийг **нэг** finding болгож нэгтгэнэ:
 > тайлангийн *Scanner хамрах хүрээ* хүснэгтэд `status: error` / `unavailable` болж харагдана — чимээгүй
 > тэг болохгүй.
 
-> `kube-bench` (node/CIS) нь privileged DaemonSet шаарддаг тул MVP-д багтаагүй (Enterprise Agent).
+> `kube-bench` (node/CIS) нь privileged DaemonSet шаарддаг тул MVP-д багтаагүй.
 
 ### Онцлог
 

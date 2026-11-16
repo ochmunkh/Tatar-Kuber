@@ -25,7 +25,7 @@ const (
 	TypeHygiene       Type = "hygiene"
 )
 
-// Status — finding lifecycle. MVP-д бүх finding OPEN. Шилжилт нь Enterprise/v2.
+// Status — finding lifecycle. MVP-д бүх finding OPEN. Шилжилт нь v3-ын ажил.
 type Status string
 
 const (
