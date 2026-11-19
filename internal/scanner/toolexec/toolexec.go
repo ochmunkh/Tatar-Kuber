@@ -292,15 +292,15 @@ var secretEnv = map[string]bool{
 	"BITBUCKET_TOKEN":                true,
 }
 
-// PassEnvVar names the escape hatch: a comma-separated list of variables that
+// ForwardEnvVar names the escape hatch (the variable's own name is TATAR_PASS_ENV): a comma-separated list of variables that
 // are handed to the scanners even though they are on the list above.
-const PassEnvVar = "TATAR_PASS_ENV"
+const ForwardEnvVar = "TATAR_PASS_ENV"
 
 // childEnv — os.Environ() minus the credentials in secretEnv, plus extra.
 // extra wins over the inherited value, as before.
 func childEnv(environ, extra []string) []string {
 	pass := map[string]bool{}
-	for _, n := range strings.Split(lookupEnv(environ, PassEnvVar), ",") {
+	for _, n := range strings.Split(lookupEnv(environ, ForwardEnvVar), ",") {
 		if n = strings.TrimSpace(n); n != "" {
 			pass[n] = true
 		}

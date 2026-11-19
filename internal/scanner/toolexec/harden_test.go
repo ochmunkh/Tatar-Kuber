@@ -43,7 +43,7 @@ func TestChildEnv_DropsForgeCredentialsKeepsTheRest(t *testing.T) {
 }
 
 func TestChildEnv_PassEnvEscapeHatch(t *testing.T) {
-	environ := []string{"GITHUB_TOKEN=ghp_x", "GH_TOKEN=y", PassEnvVar + "=GITHUB_TOKEN"}
+	environ := []string{"GITHUB_TOKEN=ghp_x", "GH_TOKEN=y", ForwardEnvVar + "=GITHUB_TOKEN"}
 	got := envMap(childEnv(environ, nil))
 	if got["GITHUB_TOKEN"] != "ghp_x" {
 		t.Error("a variable named in TATAR_PASS_ENV must be passed")
