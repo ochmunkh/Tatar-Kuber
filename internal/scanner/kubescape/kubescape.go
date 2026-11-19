@@ -66,7 +66,7 @@ func (s *Scanner) Scan(ctx context.Context, t scanner.Target) (scanner.RawResult
 	defer os.RemoveAll(tmpDir)
 	tmpPath := filepath.Join(tmpDir, "scan.json")
 
-	args := []string{"scan", "--format", "json", "--output", tmpPath}
+	args := baseArgs(tmpPath)
 	if len(t.Namespaces) > 0 {
 		args = append(args, "--include-namespaces", strings.Join(t.Namespaces, ","))
 	}
@@ -77,7 +77,7 @@ func (s *Scanner) Scan(ctx context.Context, t scanner.Target) (scanner.RawResult
 	if t.Context != "" {
 		args = append(args, "--kube-contexts", t.Context)
 	}
-	var env []string
+	env := baseEnv()
 	if t.Kubeconfig != "" {
 		env = append(env, "KUBECONFIG="+t.Kubeconfig)
 	}
@@ -92,6 +92,20 @@ func (s *Scanner) Scan(ctx context.Context, t scanner.Target) (scanner.RawResult
 	}
 	return scanner.RawResult{Scanner: "kubescape", Format: "json", Data: data, ExitCode: res.ExitCode}, nil
 }
+
+// baseArgs — the fixed part of the command line. --keep-local stops Kubescape
+// from submitting results to a Kubescape cloud account even when the user's
+// machine has one configured: a posture scan of a customer's cluster must not
+// leave the machine as a side effect.
+func baseArgs(outPath string) []string {
+	return []string{"scan", "--format", "json", "--output", outPath, "--keep-local"}
+}
+
+// baseEnv — KS_SKIP_UPDATE_CHECK stops the per-run "is there a newer release"
+// request to a third-party service (observed with a DNS-logging resolver:
+// version-check.ks-services.co). The scan itself still loads its policies from
+// github.com and verifies them against sigstore's TUF repository.
+func baseEnv() []string { return []string{"KS_SKIP_UPDATE_CHECK=true"} }
 
 // readOutput — tmpDir доторх хамгийн том JSON файлыг уншина. Fleet mode-д
 // kubescape `scan.<context>.json` гэж бичдэг тул нэрээр таамаглахгүй, хайна.
