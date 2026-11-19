@@ -8,7 +8,7 @@
 [![CI](https://github.com/ochmunkh/Tatar-Kuber/actions/workflows/ci.yml/badge.svg)](https://github.com/ochmunkh/Tatar-Kuber/actions/workflows/ci.yml)
 [![Real cluster](https://github.com/ochmunkh/Tatar-Kuber/actions/workflows/real-cluster.yml/badge.svg)](https://github.com/ochmunkh/Tatar-Kuber/actions/workflows/real-cluster.yml)
 ![Tests](https://img.shields.io/badge/tests-23%20packages%20green-brightgreen)
-![Release](https://img.shields.io/badge/release-v1.0.5-brightgreen)
+![Release](https://img.shields.io/badge/release-v1.0.6-brightgreen)
 
 **Kubernetes security posture assessment — one command, four scanners, one report.**
 
@@ -168,7 +168,7 @@ checks: [`docs/coverage.md`](docs/coverage.md).
 ```bash
 go build ./...
 go test ./...          # 23 packages, all green
-./scripts/build.sh 1.0.5
+./scripts/build.sh 1.0.6
 ```
 
 ## Documentation
@@ -186,7 +186,7 @@ Guides in Markdown: [commands](docs/cli.md) · [CI gate](docs/gate.md) · [secur
 
 ## Status
 
-**v1.0.5** — see [`docs/releases/`](docs/releases) for what each release changed and [`ROADMAP.md`](ROADMAP.md)
+**v1.0.6** — see [`docs/releases/`](docs/releases) for what each release changed and [`ROADMAP.md`](ROADMAP.md)
 for what comes next. Every mapped rule of all four scanners is pinned by a test against the scanner's own
 definition, so a scanner renaming or renumbering a check fails the build.
 
@@ -355,7 +355,7 @@ TATAR-Kuber нь **posture, тохиргоо, IaC, image, RBAC-ийн шинжи
 ```bash
 go build ./...
 go test ./...          # 23 багц, бүгд ногоон
-./scripts/build.sh 1.0.5
+./scripts/build.sh 1.0.6
 ```
 
 ### Баримт бичиг
@@ -373,7 +373,7 @@ Markdown гарын авлага: [командууд](docs/cli.md) · [CI gate]
 
 ### Төлөв
 
-**v1.0.5** — хувилбар бүр юуг өөрчилсөн нь [`docs/releases/`](docs/releases)-д, цаашид юу ирэх нь [`ROADMAP.md`](ROADMAP.md)-д.
+**v1.0.6** — хувилбар бүр юуг өөрчилсөн нь [`docs/releases/`](docs/releases)-д, цаашид юу ирэх нь [`ROADMAP.md`](ROADMAP.md)-д.
 Дөрвөн scanner-ийн зураглагдсан rule бүр scanner-ийн өөрийн тодорхойлолттой тестээр тулгагдсан тул scanner
 шалгалтаа нэрлэж сольсон эсвэл дугаарыг нь өөрчилсөн бол build унана.
 

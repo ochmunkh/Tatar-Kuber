@@ -134,6 +134,21 @@ turned red.
 
 ---
 
+## v1.0.6 — Checking what the tool trusts ✅ (shipped)
+
+Theme: **the tool's own inputs, programs and evidence, held to the standard it applies to a cluster.**
+
+- **The gate checks the file it is given** — result hash, counts and score are recomputed; a file
+  that disagrees with itself is refused. A consistency check, not a signature.
+- **Scanners are untrusted programs** — the report records which binary ran and its SHA-256; a binary
+  changed after `update` verified it is not run; forge credentials are withheld; Kubescape and Popeye
+  network behaviour was measured instead of assumed.
+- **Evidence is sealed** — `raw/SHA256SUMS`, and `--raw-dir` refuses a directory that no longer matches.
+- **Bounded inputs, fuzz tests, a Content-Security-Policy on reports**, and a supply chain where every
+  action and base image is pinned and CI installs scanners through `update`.
+
+---
+
 ## v1.0.5 — Doing to ourselves what we demand of others ✅ (shipped)
 
 Theme: **every rule this tool enforces on a cluster, applied to the tool's own pipeline.**
@@ -368,6 +383,21 @@ v1.0.0-ийн бодит live run-ыг аудит хийхэд 11 finding бүг
   худал хэлэхээ болив.
 - **Эхний гадны хувь нэмэр** — [fg0x0](https://github.com/fg0x0)-оос 13 commit, мөн
   CONTRIBUTING нь өөрчлөлт юу нотлох ёстойг тодорхой бичив.
+
+---
+
+## v1.0.6 — Итгэдэг зүйлээ шалгах ✅ (гарсан)
+
+Сэдэв: **хэрэгслийн өөрийн оролт, програм, нотолгоог кластерт хэрэглэдэг стандартаараа шалгах.**
+
+- **Gate өөрт өгсөн файлаа шалгана** — result hash, тоо, оноог дахин бодно; өөртэйгөө зөрсөн файлаас
+  татгалзана. Тууштай байдлын шалгалт, гарын үсэг биш.
+- **Scanner бол итгэлгүй програм** — тайлан аль binary ажилласан, түүний SHA-256-г бичнэ; `update` шалгасны
+  дараа өөрчлөгдсөн binary ажиллахгүй; forge credential дамжихгүй; Kubescape, Popeye-ийн сүлжээний
+  зан төлвийг таамаглалгүй хэмжсэн.
+- **Нотолгоо битүүмжлэгдсэн** — `raw/SHA256SUMS`, `--raw-dir` таарахгүй хавтсыг татгалзана.
+- **Оролтын хязгаар, fuzz тест, тайланд Content-Security-Policy**, мөн action, суурь image бүр пиннэгдсэн,
+  CI scanner-уудыг `update`-ээр суулгадаг supply chain.
 
 ---
 

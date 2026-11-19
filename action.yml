@@ -42,7 +42,7 @@ inputs:
       tatar-kuber version (go install tag). Default: the latest published release tag (pinned, not a moving `latest`).
       tatar-kuber хувилбар (go install tag). Default: сүүлд нийтэлсэн release tag (`latest` биш, тогтсон).
     required: false
-    default: "v1.0.5"
+    default: "v1.0.6"
   registry:
     description: |-
       Path to canonical-controls.yaml. Leave empty to use the registry embedded in the binary — correct for almost every repo.
