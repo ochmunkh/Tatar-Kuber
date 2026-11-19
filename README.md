@@ -10,137 +10,55 @@
 ![Tests](https://img.shields.io/badge/tests-23%20packages%20green-brightgreen)
 ![Release](https://img.shields.io/badge/release-v1.0.5-brightgreen)
 
-**Kubernetes security posture assessment framework — one command, four scanners, one standard report.**
+**Kubernetes security posture assessment — one command, four scanners, one report.**
 
-TATAR-Kuber runs **Trivy · Kubescape · Checkov · Popeye**, unifies their output into one
-**canonical control model**, de-duplicates it (so "3 scanners found 1 issue" instead of
-"3 findings"), scores risk, and produces a single report — **JSON / SARIF / HTML**, in
-**English or Mongolian** — that engineers, auditors and CISOs can all read.
+TATAR-Kuber is not a scanner. It runs **Trivy · Kubescape · Checkov · Popeye**, maps their
+different rule IDs onto one set of **canonical controls**, merges duplicates ("3 scanners found
+1 issue", not "3 findings"), scores the risk, and writes a single report — **JSON, SARIF or
+HTML, in English or Mongolian** — that engineers, auditors and managers can all read.
 
 ```bash
-tatar-kuber scan   --kubeconfig ~/.kube/config --out-dir out   # or: --raw-dir ./raw  (offline)
+tatar-kuber scan   --kubeconfig ~/.kube/config --out-dir out     # live cluster, read-only
+tatar-kuber scan   --raw-dir ./raw --out-dir out                 # or: offline, from saved scanner output
 tatar-kuber report --input out/scan-result.json --format html --out report.html
-tatar-kuber report --input out/scan-result.json --format html --lang mn --out mn.html
 ```
-
-One scan, either language: `report` takes `--lang` too, so switching the report's
-language never re-runs the scanners or touches the cluster again.
-
-The CLI itself is **English by default** — usage, every flag description, errors, the
-per-scanner progress lines and the gate verdict. `--lang mn` (or `TATAR_LANG=mn`)
-switches all of it to Mongolian.
 
 ## Report — one issue, every scanner, both languages
 
 The same scan rendered in **English** and **Mongolian** (`--lang en|mn`). Note
-`found_by = checkov · kubescape · trivy` on the privileged container: the unified,
-de-duplicated view with confidence, evidence and remediation.
-
-**🇬🇧 English report**
+`found_by = checkov · kubescape · trivy` on the privileged container: one finding, three tools
+agreeing, with confidence, evidence and remediation.
 
 ![TATAR-Kuber report — English](docs/img/report-en.jpg)
 
-**🇲🇳 Монгол тайлан**
-
 ![TATAR-Kuber тайлан — Монгол](docs/img/report-mn.jpg)
 
-**See a real report without installing anything:** live example at
-**https://ochmunkh.github.io/Tatar-Kuber/** ([English](https://ochmunkh.github.io/Tatar-Kuber/report.html) ·
+See a real report without installing anything: **https://ochmunkh.github.io/Tatar-Kuber/**
+([English](https://ochmunkh.github.io/Tatar-Kuber/report.html) ·
 [Монгол](https://ochmunkh.github.io/Tatar-Kuber/report-mn.html) ·
-[SARIF](https://ochmunkh.github.io/Tatar-Kuber/tatar-kuber.sarif)), or open the committed
-files in [`examples/report/`](examples/report).
+[SARIF](https://ochmunkh.github.io/Tatar-Kuber/tatar-kuber.sarif)), or open the files in
+[`examples/report/`](examples/report).
 
-## Deduplication in action (`3 findings → 1`)
+## How it works
 
-Trivy, Kubescape and Checkov each flag the **same** privileged container on
-`deployment/api` — with three different rule IDs:
+![TATAR-Kuber architecture](docs/img/architecture.png)
 
 ```
-Trivy      AVD-KSV0017  Privileged container      Deployment/api
-Kubescape  C-0057       Privileged container      .../Deployment/production/api
-Checkov    CKV_K8S_16   Container ... privileged   Deployment.production.api
+sources → scanners (parallel) → normalize → canonical + dedup → blind-shot → risk score → report → CI gate
 ```
 
-TATAR-Kuber merges them into **one** finding:
+1. **Collect.** From a live cluster (read-only), local manifests (`-f`), or saved scanner output (`--raw-dir`).
+   The four scanners run in parallel, each with its own timeout; if one fails the others still finish.
+2. **Normalize.** Every scanner's rule IDs become stable `TATAR-*` controls.
+3. **De-duplicate.** The same issue seen by several scanners becomes one finding with `found_by` and a confidence level.
+   Example: Trivy `AVD-KSV0017`, Kubescape `C-0057` and Checkov `CKV_K8S_16` are all the same privileged
+   container → one `TATAR-CON-001` on `deployment/api`, confidence HIGH. See [`docs/dedup-example.md`](docs/dedup-example.md).
+4. **Score.** Risk is explainable: every finding carries its factors, and the cluster score shows its formula and top contributors.
+   Findings that are only reachable in unusual contexts are down-graded, never hidden.
+5. **Report and gate.** JSON, SARIF 2.1.0 and a bilingual HTML dashboard; a `gate` command fails a pipeline when a policy is broken.
 
-```json
-{ "canonical_control": "TATAR-CON-001", "resource": "deployment/api",
-  "found_by": ["checkov", "kubescape", "trivy"], "confidence": "HIGH",
-  "raw_refs": [{"scanner":"checkov","rule_id":"CKV_K8S_16"},
-               {"scanner":"kubescape","rule_id":"C-0057"},
-               {"scanner":"trivy","rule_id":"AVD-KSV0017"}] }
-```
-
-One issue, three tools agreeing (→ HIGH confidence), original rule IDs preserved.
-Full walk-through: [`docs/dedup-example.md`](docs/dedup-example.md).
-
-## Design principles
-
-- **Read-Only First** — never modifies the customer environment (`get` / `list` / `watch` only).
-- **Scanner Agnostic** — TATAR-Kuber is not a scanner; it is an Orchestrator + Normalizer +
-  Risk Engine + Reporting Engine. Scanners are pluggable adapters.
-
-## Scanner stack
-
-| Scanner | Purpose | Live-tested with |
-|---|---|---|
-| Trivy | Image CVEs, secrets, misconfiguration | 0.74 (`k8s --report all`) |
-| Kubescape | NSA / MITRE / RBAC / compliance (primary posture engine) | 4.0 (`--kube-contexts`) |
-| Checkov | IaC (YAML / Helm / Terraform) | 3.2 (local mode) |
-| Popeye | Runtime hygiene (dead service, unused, broken reference) | 0.22 |
-
-> The "live-tested with" column is the version the [real-cluster workflow](.github/workflows/real-cluster.yml)
-> actually runs against every day. Scanner CLIs rename flags between releases, so a mismatch shows up as
-> `status: error` / `unavailable` in the report's *Scanner coverage* table rather than as a silent zero.
-
-> `kube-bench` (node/CIS) needs a privileged DaemonSet and is out of MVP scope.
-
-## Features
-
-- **Live Mode B** — scans a running cluster (read-only) by orchestrating the real scanner CLIs
-- Local (Mode A) + **offline ingest** of pre-collected raw output
-- **Parallel adapters** — scanners run concurrently, each with its own timeout; one failing scanner never drops the others (graceful degradation), output stays deterministic
-- **Canonical Control Mapping** — every scanner's rule IDs unified into stable `TATAR-*` controls
-- **Deduplication** — merges the same issue across scanners; keeps `found_by` + evidence
-- **Confidence engine** — multi-scanner agreement and check determinism (a Trivy-only CVE is still HIGH)
-- **Blind-shot engine** — context-aware severity down-grade (never suppresses; stays visible)
-- **Explainable risk scoring v1.2.1** — per-finding `risk_factors` (base × context × exposure × confidence) + a cluster `risk_breakdown` with formula and top contributors
-- **MITRE ATT&CK for Containers** — findings map to the adversary techniques they *may enable* (e.g. privileged container → T1611 Escape to Host), with a per-tactic **ATT&CK exposure** summary. Framed as exposure, **not** detection — see [`docs/MITRE_ATTACK.md`](docs/MITRE_ATTACK.md)
-- **CI/CD gatekeeper** — `.tatar-kuber.yaml` policy (`fail_on`, `min_score`, `suppress` with expiry) + `gate` command + GitHub Action + SARIF upload to Code Scanning
-- **Reports** — JSON · SARIF 2.1.0 (GitHub/GitLab/Azure) · HTML dashboard (bilingual)
-- **verify-lab** — regression check against an expected-findings baseline
-- **Self-contained binary** — canonical registry embedded; `brew` / `curl | sh` / Docker
-
-## Scope & positioning
-
-TATAR-Kuber focuses on **security posture, configuration, IaC, image and RBAC analysis
-with unified reporting**. It is **complementary to — not a replacement for** — runtime
-detection, admission control and secrets management. Run it *alongside* Falco/Tetragon,
-Kyverno/OPA and Vault for full coverage.
-
-**In scope**
-
-| Domain | | Notes |
-|---|:--:|---|
-| Cluster configuration & posture | ✅ | via Kubescape / Trivy (live Mode B) |
-| Kubernetes misconfiguration | ✅ | Trivy · Kubescape · Checkov |
-| RBAC security | ✅ | excessive permissions, wildcard, cluster-admin |
-| Pod / Workload security | ✅ | privileged, hostPath, capabilities, runAsRoot… |
-| Image vulnerabilities | ✅ | CVEs via Trivy |
-| IaC security | ✅ | YAML / Helm (Terraform partial, via Checkov) |
-| Compliance mapping | ✅ | NSA / CIS / MITRE refs via canonical controls (partial) |
-| Reporting & risk scoring | ✅ | dedup, risk score, JSON / SARIF / HTML |
-| Runtime hygiene | ⚠️ | Popeye (dead / unused / broken refs) — not threat detection |
-
-**Out of scope (by design) — use alongside**
-
-| Not covered | Use instead |
-|---|---|
-| Runtime threat detection | Falco · Tetragon |
-| Network traffic monitoring (eBPF) | Cilium/Hubble · Falco |
-| Container behavioral detection | Falco · Tetragon |
-| Admission control (block deploys) | Kyverno · OPA Gatekeeper |
-| Secrets management | HashiCorp Vault · External Secrets |
+Design rules: **read-only first** (`get`/`list`/`watch` only), **scanner agnostic** (adapters are pluggable),
+**honest about gaps** (a control no scanner checks is listed as *not checked*, never counted as passed).
 
 ## Install
 
@@ -148,7 +66,7 @@ Kyverno/OPA and Vault for full coverage.
 # Homebrew (macOS / Linux)
 brew install ochmunkh/tap/tatar-kuber
 
-# curl | sh (Linux / macOS) — downloads the release binary + verifies checksum
+# Linux / macOS — downloads the release binary and verifies its checksum
 curl -fsSL https://raw.githubusercontent.com/ochmunkh/Tatar-Kuber/master/install.sh | sh
 
 # Docker
@@ -159,54 +77,91 @@ docker run --rm -v "$PWD:/work" -w /work ghcr.io/ochmunkh/tatar-kuber:latest \
 go install github.com/ochmunkh/tatar-kuber/cmd/tatar-kuber@latest
 ```
 
-Check which scanners are installed for live scanning:
-
-```bash
-tatar-kuber doctor
-```
+For live scanning the four scanners must be installed. `tatar-kuber doctor` shows which are, and
+`tatar-kuber update` installs the pinned versions after verifying each checksum.
 
 ## Quick start (offline, no cluster, no scanner install)
 
-This repo ships real scanner output in [`examples/demo`](examples/demo), so the full pipeline
-runs in ~30 seconds — no `--registry` flag needed, the canonical registry is embedded in
-the binary:
+This repository ships real scanner output in [`examples/demo`](examples/demo), so the whole
+pipeline runs in about 30 seconds:
 
 ```bash
 git clone https://github.com/ochmunkh/Tatar-Kuber && cd Tatar-Kuber
 tatar-kuber scan   --raw-dir examples/demo --out-dir out
 tatar-kuber report --input out/scan-result.json --format html --out report.html
+tatar-kuber report --input out/scan-result.json --format html --lang mn --out report-mn.html
 ```
 
-For the full regression corpus — vulnerable & hardened manifests plus the
-`expected-findings.json` baseline — add the companion
-[**tatar-kuber-lab**](https://github.com/ochmunkh/tatar-kuber-lab) repo:
+`--lang` re-renders the report, so switching language never re-runs the scanners or touches the
+cluster. The CLI itself speaks English by default; `--lang mn` or `TATAR_LANG=mn` switches it to Mongolian.
+A larger regression corpus (vulnerable and hardened manifests) lives in
+[**tatar-kuber-lab**](https://github.com/ochmunkh/tatar-kuber-lab).
 
-```bash
-git clone https://github.com/ochmunkh/tatar-kuber-lab
-tatar-kuber scan       --raw-dir tatar-kuber-lab/raw --out-dir lab-out
-tatar-kuber verify-lab --input lab-out/scan-result.json \
-    --expected tatar-kuber-lab/expected/expected-findings.json
+## Scanners
+
+| Scanner | Purpose | Live-tested with |
+|---|---|---|
+| Trivy | Image CVEs, secrets, misconfiguration | 0.76 |
+| Kubescape | NSA / MITRE / RBAC / compliance (primary posture engine) | 4.0 |
+| Checkov | IaC (YAML / Helm / Terraform) | 3.4 |
+| Popeye | Runtime hygiene (dead service, unused, broken reference) | 0.22 |
+
+The versions are the ones pinned in [`tools.lock.yaml`](tools.lock.yaml) and exercised daily by the
+[real-cluster workflow](.github/workflows/real-cluster.yml). A scanner that renames a flag shows up as
+`error` / `unavailable` in the report's *Scanner coverage* table, not as a silent zero.
+
+## Commands
+
+| Command | What it does |
+|---|---|
+| `scan` | Run the scanners (or read `--raw-dir`) and write `scan-result.json`; live scans also keep the raw scanner output as evidence |
+| `report` | Render a result as `json`, `sarif`, `html`, `audit` or `pdf` (`--format`, `--lang`) |
+| `gate` | Fail (exit 1) when the result breaks the policy in `.tatar-kuber.yaml` (`--fail-on`, `--baseline`) |
+| `diff` | What is new, fixed or worse between two scans |
+| `top` | What to fix first: the worst workloads and the controls that hit the most resources |
+| `attest` | A person's signed answer, with an expiry, for controls no scanner checks |
+| `doctor`, `update` | Which scanners are installed; install the pinned versions |
+
+Every command takes `--lang en|mn`. Exit codes: `0` ok, `1` policy violated, `2` runtime error,
+`3` usage error. Full flags, exit codes and the read-only RBAC for live scans:
+[`docs/cli.md`](docs/cli.md).
+
+## CI/CD gate
+
+Add a `.tatar-kuber.yaml` ([example](.tatar-kuber.yaml.example)) and gate the pipeline, or use the GitHub Action:
+
+```yaml
+- uses: ochmunkh/Tatar-Kuber@v1
+  with:
+    raw-dir: ./raw      # or path: ./k8s
+    fail-on: high
 ```
 
-## Architecture
+The first scan of a real cluster returns a lot, and a gate that fails on all of it on day one gets
+switched off. Accept today's findings with a **baseline** (`gate --baseline`) and fail only on new or
+worse ones; accept single findings with a reason and an expiry date through `suppress`. How, with
+examples: [`docs/gate.md`](docs/gate.md).
 
-![TATAR-Kuber architecture](docs/img/architecture.png)
+## Security
 
-```
-sources → scanners (parallel) → normalize → canonical + dedup → blind-shot → risk score → report → CI gate
-```
+A security tool should hold itself to the standard it enforces. In short:
 
-**Sources** — a live cluster (read-only, Mode B), local manifests (`-f`), or pre-collected raw output (`--raw-dir`).
+- **Read-only.** The cluster role grants only `get` / `list` / `watch`, and does not include Secrets.
+- **Small supply chain.** One direct dependency (`gopkg.in/yaml.v3`); every GitHub Action and container image is pinned; `govulncheck` and `gosec` run on every push.
+- **Scanners are untrusted programs.** The report records which binary ran and its SHA-256; a binary changed after `update` verified it is not run; forge credentials are not passed to scanners; raw output carries a `SHA256SUMS` manifest.
+- **The gate checks its input.** A `scan-result.json` that disagrees with itself is refused. This is a consistency check, not a signature.
+- **Inputs are bounded and output is owner-only** (mode `0600`).
 
-**Scanners (parallel)** — Trivy, Kubescape, Checkov and Popeye run **concurrently**, each with its own timeout. If one scanner fails or times out, the others still finish (graceful degradation) and the output stays deterministic.
+Details and the network behaviour measured for each scanner: [`docs/security.md`](docs/security.md).
+Found a vulnerability? See [`SECURITY.md`](SECURITY.md) — GitHub's **Security → Report a vulnerability** (private disclosure).
 
-**Core engine** — normalize each tool's output into the unified schema, map to canonical `TATAR-*` controls and **de-duplicate** (one issue, `found_by` = every scanner that saw it), apply the blind-shot down-grade, then compute the **explainable** risk score (`risk_factors` per finding + a cluster `risk_breakdown`).
+## Scope
 
-**Output** — JSON, SARIF 2.1.0 and a bilingual HTML dashboard, plus `verify-lab` regression.
-
-**Adoption layer** — the `gate` command enforces a `.tatar-kuber.yaml` policy in CI (exit code), a GitHub Action uploads SARIF to Code Scanning, and the binary ships via brew / curl / Docker.
-
-> **What changed in v1.0.0:** live-cluster scanning and parallel execution went from partial/experimental to fully working, the risk score became explainable, and the CI gate + distribution are new.
+TATAR-Kuber covers **posture, configuration, IaC, image and RBAC analysis with unified reporting**. It is
+**complementary to** runtime detection, admission control and secrets management — run it alongside
+Falco/Tetragon, Kyverno/OPA and Vault, not instead of them. Features, what is and is not covered:
+[`docs/scope.md`](docs/scope.md). Every control against every scanner, including the one no scanner
+checks: [`docs/coverage.md`](docs/coverage.md).
 
 ## Build
 
@@ -216,309 +171,30 @@ go test ./...          # 23 packages, all green
 ./scripts/build.sh 1.0.5
 ```
 
-## CLI
-
-```
-tatar-kuber scan        --kubeconfig | --context | -f | --raw-dir  [--out-dir DIR] [--namespace ns1,ns2] [--no-raw] [--no-rollup]
-                        # live scan keeps raw scanner output in <out>/raw/ (evidence; re-ingestable via --raw-dir)
-tatar-kuber report      --input scan-result.json --format json | sarif | html | audit | pdf  [--out FILE] [--fail-on high]
-                        # audit = print-ready bilingual audit report; pdf = the same, converted on this machine
-tatar-kuber gate        --input scan-result.json [--policy .tatar-kuber.yaml] [--fail-on high] [--min-score N]
-                        # --baseline prev/scan-result.json : fail only on NEW and WORSENED
-                        # refuses (exit 2) a scan-result.json that disagrees with itself; --skip-integrity-check
-tatar-kuber doctor      # which scanners are installed, versions, supported modes
-tatar-kuber diff        --old prev/scan-result.json --new out/scan-result.json
-                        # trending: new / fixed / worsened / improved  [--fail-on-new high] [--format json]
-tatar-kuber top         --input scan-result.json [--limit 10]
-                        # what to fix first: worst workloads, and the controls that hit the most resources
-tatar-kuber attest create --out attestations.yaml [--all] [--cluster NAME]
-tatar-kuber attest apply  --input scan-result.json --attestations attestations.yaml [--out-dir DIR]
-                        # a human's signed answer for controls no scanner checks
-tatar-kuber verify-lab  --input scan-result.json --expected expected-findings.json
-tatar-kuber update      [--scanner trivy,popeye] [--dry-run] [--check] [--home ~/.tatar-kuber]
-tatar-kuber version
-
-every command also accepts   [--lang en|mn]
-```
-
-`scan --out-dir` is a **directory**; `report --format` / `diff --format` is a **format**. Both
-still accept the older `-o` spelling, so existing pipelines keep working — but `-o` meant two
-different things depending on the command, so the long names are what the docs use. Severity
-thresholds (`--fail-on`, `--fail-on-new`, `fail_on:`) are case-insensitive.
-
-**Where to start.** `tatar-kuber top` reads a finished scan and prints two tables: the
-workloads carrying the most weight (summed by severity, not just counted) and the controls
-that hit the most distinct resources. The second table is the one that usually matters — a
-single control failing across thirty workloads is one fix, not thirty. `--limit` sets the
-rows per table. It changes nothing on disk; it is a reading of `scan-result.json`.
-
-**Closing a declared gap.** `docs/coverage.md` names every control no scanner checks — today
-that is one, `TATAR-NET-004`. Naming it is honest, but it is still a gap. `attest` is how it
-gets closed: `attest create` writes a template for exactly those controls, a human fills in a
-decision, a reason, their name and an **expiry**, and `attest apply` merges it into the result.
-
-Four things make it an audit record rather than a checkbox:
-
-- **An expiry is mandatory.** When it lapses the control counts as unchecked again and `gate`
-  says so by name. An attestation with no expiry gets written once and reads as true forever.
-- **`non-compliant` fails the gate** at or above the control's severity. If a person has
-  confirmed a control is broken, the result has to show it — otherwise attestation is a way to
-  write things down and never act on them.
-- **It is not a finding.** Attestations live in their own `attestations[]` block, never in
-  `findings`, so `found_by` never claims a scanner saw something it did not — and because
-  `metadata.result_hash` covers only the findings, a human's answer cannot quietly alter the
-  scanners' evidence.
-- **Severity comes from the registry**, not from the file. Letting the attestation set its own
-  severity would be a silent way around the gate.
-
-**The audit deliverable.** `report --format html` is a dashboard — filters, collapsible
-sections, meant for a screen. What an auditor hands a client is a different document, so it is
-a different format: `--format audit` renders a paged, self-contained, bilingual report with the
-scope, the method, **what did not run**, the score and how it was derived, the manually attested
-controls, and the findings grouped by canonical control with their remediation.
-
-`--format pdf` produces the same document as a PDF. TATAR-Kuber does not write PDF itself: it
-converts with a headless browser or `wkhtmltopdf` already on the machine. That is a deliberate
-trade — a Go PDF library would double the dependency count and bring font embedding for
-Cyrillic with it. **If no converter is found the command refuses and says so**, naming what it
-looked for and pointing at `--format audit` plus the browser's own Print → Save as PDF. It does
-not emit an empty file and call it done.
-
-**Updating the scanners.** `tatar-kuber update` downloads each scanner, checks its SHA256
-against the pin in `~/.tatar-kuber/tools.lock.yaml`, and only then installs it. A mismatch
-installs nothing at all — not even the scanners that did verify — and a scanner with no
-pinned checksum is refused *before* the download is made, so there is no trust-on-first-use
-path. `--dry-run` prints exactly what would be fetched (scanner, version, URL, expected
-checksum) and writes nothing; `--check` compares the pins with what the lock records as
-installed. The cosign step of the specification is **not implemented yet**: signatures are
-not verified, the command says so on every run, and `tools.lock.yaml` records
-`cosign: unverified` rather than claiming otherwise.
-
-**Output language.** Everything the tool prints is **English by default**. `--lang mn`
-switches all of it — usage, flag descriptions, errors, progress and gate verdicts — to
-Mongolian, and `TATAR_LANG=mn` sets it for a whole session (the flag wins over the
-environment). Every command takes `--lang`, and an unknown value is a usage error
-(exit `3`) on every one of them. On `report`, `--lang` re-renders the report itself as
-well; without it the report keeps the language chosen at scan time, so existing
-pipelines are unaffected.
-
-One known exception: a few **finding descriptions produced by the scanner adapters**
-are still Mongolian-only and are written that way into `scan-result.json`, so they
-appear untranslated even in an `en` document — Trivy's secret findings ("Илэрсэн
-нууц: …") are the case you will actually hit. These are serialised schema fields
-rather than console output, so making them bilingual changes the v1 document shape
-and is tracked separately.
-
-### Live Mode B — granting read-only access
-
-Live cluster scanning needs credentials, and "trust me, it's read-only" is not an answer a
-platform team should accept. The RBAC is therefore a reviewable file in this repo:
-
-```bash
-kubectl apply -f deploy/least-privilege-clusterrole.yaml
-tatar-kuber scan --kubeconfig ~/.kube/config --namespace prod --out-dir ./out
-```
-
-[`deploy/least-privilege-clusterrole.yaml`](deploy/least-privilege-clusterrole.yaml) is
-self-contained — it creates the ClusterRole `tatar-kuber-reader`, the ServiceAccount
-`tatar-kuber` in `kube-system`, and the ClusterRoleBinding between them. Nothing else is
-needed. Every rule in it grants only `get` / `list` / `watch`: there is no `create`,
-`update`, `patch` or `delete` verb anywhere in the file, which is the whole of the
-**Read-Only First** promise in a form you can diff.
-
-Secrets are the one place worth stating plainly: **the ClusterRole does not grant access to
-`secrets` at all.**
-
-It used to, with a comment promising that only metadata would be read. That promise cannot be
-kept: RBAC has no "metadata only" permission for a Secret, and `get` / `list` return the whole
-`data:` field. The role asked for a capability it then pledged not to use — which is a pledge,
-not a control. It was removed in v1.0.4.
-
-Nothing is lost by removing it. Which secret is mounted where is written in the pod spec
-(`volumes.secret`, `envFrom.secretRef`), which this role already reads, and the RBAC analysis
-works from `Role` / `RoleBinding` objects rather than from Secrets themselves.
-
-### Exit codes
-
-The `gate` command exists to be wired into a pipeline, so its exit code is a contract. Under
-`set -e`, "policy violated" and "the tool could not read its input" must not look the same:
-
-| Code | Meaning | Where it comes from |
-|---|---|---|
-| `0` | success / gate passed | every command |
-| `1` | policy or threshold violation | `gate` FAILED, `diff --fail-on-new`, `report --fail-on`, `verify-lab` FAIL, `doctor` with **no scanner installed** |
-| `2` | runtime error — input unreadable or malformed, **or an unrecognised flag** | a missing or corrupt `scan-result.json` or expected-findings file, or a **corrupt** policy file — a *missing* policy file is not an error (`.tatar-kuber.yaml` is optional: the built-in `fail_on: high` default applies, so the gate still runs and can return `1`); also `--no-such-flag`, which Go's flag parser rejects before the command runs |
-| `3` | usage error — unknown command, format or language, or a missing required flag | `tatar-kuber frobnicate`, `report --format nope`, `report --lang de`, `diff` without `--old`, `scan` without an input |
-
-An **unrecognised** severity threshold is deliberately *not* a usage error, so it never
-appears as `3`. `report --fail-on` and `diff --fail-on-new` warn on stderr and skip the check
-(exit `0`); `gate --fail-on` and `fail_on:` warn and fall back to the built-in `high`, which
-is the strict direction. A typo therefore never silently *tightens* a gate — but on `report`
-and `diff` it silently *disables* one, so treat that warning as actionable in CI.
-
-`tatar-kuber doctor` returns **1** on a machine with no scanners installed. That is a
-deliberate readiness signal, not an error — but it means `doctor` under `set -e` will stop a
-fresh runner, so guard it (`tatar-kuber doctor || true`) if you only want the table.
-
-## CI/CD gate
-
-Add a `.tatar-kuber.yaml` (see [`.tatar-kuber.yaml.example`](.tatar-kuber.yaml.example)) and gate your pipeline, or use the GitHub Action:
-
-```yaml
-- uses: ochmunkh/Tatar-Kuber@v1
-  with:
-    raw-dir: ./raw      # or path: ./k8s
-    fail-on: high
-```
-
-The action produces a SARIF file; upload it with `github/codeql-action/upload-sarif` to see findings in the **Security → Code scanning** tab (see [`.github/workflows/security-gate.yml`](.github/workflows/security-gate.yml)).
-
-### Adopting the gate on an existing cluster
-
-The first scan of a real cluster returns a lot. A gate that fails on all of it on day one
-gets switched off in a week, and a switched-off gate is not a gate. Two mechanisms exist so
-that does not happen — use them in this order.
-
-**1. Baseline — accept today, fail on tomorrow.** Keep the current scan as a reference and
-let the gate count only what is new or has got worse:
-
-```bash
-tatar-kuber gate --input out/scan-result.json --baseline baseline/scan-result.json
-```
-
-Findings already in the baseline are not counted. Findings that were there but whose
-severity has risen **are** counted — a LOW that becomes CRITICAL is new risk, not an old
-problem. `min_score` stays absolute: it is a property of the cluster, not of the diff.
-
-If the comparison cannot be trusted — a different cluster, a different mode, one side
-scanned with `--no-rollup` — the baseline is **ignored** and every finding counts. A
-security gate fails closed when it is unsure.
-
-*Where to keep it.* Commit `baseline/scan-result.json` to the repo. It is a few hundred KB
-of JSON, it belongs under review like any other accepted risk, and `git log` then answers
-"when did we accept this, and who signed it off". A CI cache or artifact works too, but it
-expires, and a baseline that silently disappears turns the gate red on a Monday for no
-reason anyone can explain. Refresh it deliberately — a commit that moves the baseline is a
-commit that says "we accept this list now".
-
-**2. Suppression — accept one finding, with a reason and an expiry date.** For the handful
-you decide to live with, name them in `.tatar-kuber.yaml`:
-
-```yaml
-suppress:
-  - control: TATAR-CON-001
-    resource: deployment/legacy-api
-    reason: "Legacy system, migrating Q1 2027 (JIRA-1234)"
-    expires: 2027-03-31
-```
-
-`expires` is not decoration: the rule stops applying on that date and the finding comes
-back. A date that cannot be read (`2026-13-45`, `tomorrow`) is **not** "no expiry": the rule is
-not applied and the gate says so. The gate also reports rules that have expired, rules
-pointing at a control that does not exist, and rules that matched nothing — a suppression
-nobody notices is how an accepted risk becomes a forgotten one.
-
-Baseline is for the bulk at adoption; suppression is for the few you consciously keep.
-
 ## Documentation
 
-Six engineering documents in `docs/`, as **Word (`.docx`) files** — GitHub will not render
-them in the browser, so download them:
+Six engineering documents in `docs/` as **Word (`.docx`) files** (GitHub does not render them in the browser):
 [01 Unified Schema](docs/01_Unified-Schema-JSON-v1.docx) ·
 [02 Canonical Mapping](docs/02_Canonical-Control-Mapping.docx) ·
 [03 Scanner Adapter Interface](docs/03_Scanner-Adapter-Interface.docx) ·
 [04 Severity & Risk Scoring](docs/04_Severity-Risk-Scoring-Model.docx) ·
 [05 CLI Spec](docs/05_CLI-Specification.docx) ·
 [06 Repository Structure](docs/06_Repository-Structure.docx).
-
-**[`docs/coverage.md`](docs/coverage.md)** — what the tool actually checks: every canonical
-control against every scanner, generated from the registry and kept in step with it by a
-test. Controls that no rule maps to are listed as **not checked** rather than quietly
-counted. Today that is 1 of 33.
-
-**[`pkg/schema/tatar-schema-v1.json`](pkg/schema/tatar-schema-v1.json)** — the JSON Schema
-for `scan-result.json`, the interchange format `report` / `gate` / `diff` / `verify-lab` all
-consume and adopters commit as a baseline. Pinned against the Go structs by a test, so it
-cannot drift silently.
-
-**[`docs/releases/`](docs/releases)** — the source of truth for every release's notes;
-GitHub's release page is a copy, and CI diffs the two daily.
+Guides in Markdown: [commands](docs/cli.md) · [CI gate](docs/gate.md) · [security model](docs/security.md) ·
+[scope](docs/scope.md) · [coverage](docs/coverage.md). The JSON Schema of `scan-result.json` is
+[`pkg/schema/tatar-schema-v1.json`](pkg/schema/tatar-schema-v1.json). Release notes: [`docs/releases/`](docs/releases).
 
 ## Status
 
-**v1.0.5** — `attest` · bilingual audit report / PDF · pinned release pipeline
-(policy + GitHub Action + SARIF) · goreleaser + brew/curl/Docker · scanner coverage report ·
-Pod → controller rollup · **scan trending (`diff`)** · **`report --lang` — one scan, either
-language** · **honest `scan_mode`**.
-
-Per-release detail — the four-scanner mapping audit, the rollup design, the trending
-rationale — is in [**docs/releases/**](docs/releases) rather than repeated here.
-
-Scoreboard for the mapping audit: **Popeye 7 of 10 wrong, Kubescape 6 of 28, Checkov 2 of 18,
-Trivy 0 of 11.** Every mapped rule in all four scanners is now pinned by a test against upstream's
-own definitions, so a scanner renaming or renumbering a check fails the build.
-
-Where it's headed — v2 (audit-grade PDF + compliance mapping + trending), v3 (continuous +
-dashboard): see the [**Roadmap**](ROADMAP.md).
-
-## Security
-
-A security tool should hold itself to the standard it enforces:
-
-- **SAST + vuln scanning in CI** — every push runs [`govulncheck`](https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck)
-  (known CVEs in dependencies **and** the Go standard library) and [`gosec`](https://github.com/securego/gosec)
-  (static analysis), with gosec results uploaded to the GitHub **Code scanning** tab. See
-  [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
-- **Patched toolchain** — release binaries are built with a current, patched Go stdlib
-  (pinned via `toolchain` in `go.mod`), so the report renderer stays clear of `html/template` CVEs.
-- **Minimal supply chain** — one direct dependency (`gopkg.in/yaml.v3`) plus the standard library.
-- **Pinned release pipeline** — every third-party GitHub Action runs at a **commit SHA**, not a
-  movable tag. A tag can be repointed by whoever owns the action, and `checksums.txt` and the
-  SBOM are produced by those same steps — so a compromised one would ship a backdoored binary
-  *with a matching checksum*. `.github/dependabot.yml` raises updates weekly as pull requests,
-  so the pins stay reviewed rather than frozen.
-- **Safe by construction** — read-only cluster access (`get`/`list`/`watch`, granted by the
-  reviewable [`deploy/least-privilege-clusterrole.yaml`](deploy/least-privilege-clusterrole.yaml)
-  — Secrets are **not** in that role at all: RBAC has no "metadata only" for a Secret, and
-  `get`/`list` return the whole `data:` field), no shell invocation (scanners run via `exec`
-  with fixed args, no `sh -c`), and reports render through `html/template` auto-escaping.
-- **Output is written owner-only** — `scan-result.json`, the raw scanner output and every report
-  (`html`, `audit`, `sarif`, `json`, `pdf`) are created with mode `0600`. A report is a list of a
-  cluster's weaknesses in readable form; treat it as confidential wherever it travels.
-- **The scanners are third-party programs, and the report says which one ran.** Each
-  `metadata.scanner_runs[]` entry records the binary's path, where it was found (`path` or
-  `tools`) and its SHA-256. PATH is searched before `~/.tatar-kuber/tools`, so a scanner that
-  `update` pinned can be shadowed by another copy; when that happens a warning is printed and
-  stored in the run. Scanners inherit your environment **except** forge/CI credentials
-  (`GITHUB_TOKEN`, `GH_TOKEN`, `ACTIONS_*` tokens, …); `TATAR_PASS_ENV=NAME,NAME` hands a named
-  one over. `TATAR_STRICT_ENV=1` switches this to an allow-list (only `PATH`, `HOME`, `KUBECONFIG`,
-  proxy/CA variables, `TRIVY_*`-style tool prefixes and what `TATAR_PASS_ENV` names); cloud
-  credentials are then withheld too. A scanner binary in `~/.tatar-kuber/tools` is compared with
-  the SHA-256 `update` recorded (`installed_sha256` in `tools.lock.yaml`); if it was changed
-  afterwards the scanner is reported `unavailable` and not run. `scan` writes `raw/SHA256SUMS`
-  (`sha256sum` format) and `scan --raw-dir` refuses a directory that no longer matches it.
-  Checkov is started with `BC_SKIP_MAPPING=TRUE`: without it, it calls
-  `api0.prismacloud.io` on every run. Trivy's secret and misconfiguration scans make no network
-  call; its vulnerability scan downloads its database. What Kubescape and Popeye send over the
-  network has not been verified here.
-- **The gate checks the file it is given.** `gate` recomputes the result hash, the finding
-  counts and the risk score from the findings and refuses (exit 2) a `scan-result.json` that
-  disagrees with itself. This catches hand edits, truncated files and files from another
-  scoring model; it is a consistency check, not a signature — someone who can recompute every
-  field is not stopped. `--skip-integrity-check` turns it off and says so each time.
-- **Inputs are bounded.** Scanner output, raw JSON and scan results are capped at 256 MiB, and
-  policy / attestation / registry files at 16 MiB; a larger file is an error, never a
-  truncated read. A kube context or namespace that starts with `-` is refused rather than
-  passed to a scanner as a flag.
-
-Found a vulnerability? See [`SECURITY.md`](SECURITY.md) — GitHub's **Security → Report a vulnerability** (private disclosure).
+**v1.0.5** — see [`docs/releases/`](docs/releases) for what each release changed and [`ROADMAP.md`](ROADMAP.md)
+for what comes next. Every mapped rule of all four scanners is pinned by a test against the scanner's own
+definition, so a scanner renaming or renumbering a check fails the build.
 
 ## Contributing
 
-Contributions are welcome! 🎉 The cleanest first PR is a **new scanner adapter** — see
-[CONTRIBUTING.md](CONTRIBUTING.md) and
-[`docs/03_Scanner-Adapter-Interface.docx`](docs/03_Scanner-Adapter-Interface.docx).
-Please keep `go test ./...` green and read the [Code of Conduct](CODE_OF_CONDUCT.md).
+Contributions are welcome. Start with [CONTRIBUTING.md](CONTRIBUTING.md) and
+[`docs/03_Scanner-Adapter-Interface.docx`](docs/03_Scanner-Adapter-Interface.docx); please keep `go test ./...`
+green and read the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Contact
 
@@ -529,146 +205,32 @@ Please keep `go test ./...` green and read the [Code of Conduct](CODE_OF_CONDUCT
 
 ## License
 
-Open Core. Community CLI — Apache-2.0.
+Apache-2.0 — see [LICENSE](LICENSE).
 
 ---
 
 ## Монгол хэл дээр
 
-**Kubernetes аюулгүй байдлын үнэлгээний framework — нэг команд, дөрвөн scanner, нэг стандарт тайлан.**
+**Kubernetes аюулгүй байдлын үнэлгээ — нэг команд, дөрвөн scanner, нэг тайлан.**
 
-TATAR-Kuber нь **Trivy · Kubescape · Checkov · Popeye**-ийг ажиллуулж, тэдгээрийн гаралтыг
-нэгдсэн **canonical control загварт** нэгтгэж, давхардлыг арилгаж ("3 scanner нэг асуудал
-олсон" — 3 finding биш), эрсдэлийг үнэлж, нэг тайлан гаргана — **JSON / SARIF / HTML**,
-**англи эсвэл монгол** хэлээр. Инженер, аудитор, CISO аль аль нь ойлгоход хялбар.
-
-### Давхардлыг арилгах жишээ (`3 finding → 1`)
-
-Trivy, Kubescape, Checkov гурав `deployment/api` дээрх **ижил** privileged контейнерыг
-гурван өөр rule ID-гаар илрүүлнэ:
-
-```
-Trivy      AVD-KSV0017  Privileged container      Deployment/api
-Kubescape  C-0057       Privileged container      .../Deployment/production/api
-Checkov    CKV_K8S_16   Container ... privileged   Deployment.production.api
-```
-
-TATAR-Kuber эдгээрийг **нэг** finding болгож нэгтгэнэ:
-
-```json
-{ "canonical_control": "TATAR-CON-001", "resource": "deployment/api",
-  "found_by": ["checkov", "kubescape", "trivy"], "confidence": "HIGH",
-  "raw_refs": [{"scanner":"checkov","rule_id":"CKV_K8S_16"},
-               {"scanner":"kubescape","rule_id":"C-0057"},
-               {"scanner":"trivy","rule_id":"AVD-KSV0017"}] }
-```
-
-Нэг асуудал, гурван багаж санал нийлсэн (→ HIGH итгэл), эх rule ID-ууд хадгалагдсан.
-Бүрэн тайлбар: [`docs/dedup-example.md`](docs/dedup-example.md).
-
-**Суулгалгүйгээр жинхэнэ тайлан үзэх:** амьд жишээ
-**https://ochmunkh.github.io/Tatar-Kuber/** ([Англи](https://ochmunkh.github.io/Tatar-Kuber/report.html) ·
-[Монгол](https://ochmunkh.github.io/Tatar-Kuber/report-mn.html) ·
-[SARIF](https://ochmunkh.github.io/Tatar-Kuber/tatar-kuber.sarif)), эсвэл
-[`examples/report/`](examples/report)-д commit хийсэн файлуудыг нээ.
-
-### Гол зарчим
-
-- **Read-Only First** — customer орчинг хэзээ ч өөрчлөхгүй (зөвхөн `get` / `list` / `watch`).
-- **Scanner Agnostic** — өөрөө scanner биш; Orchestrator + Normalizer + Risk Engine + Reporting.
-
-### Scanner-ууд
-
-| Scanner | Зорилго | Бодит орчинд шалгасан |
-|---|---|---|
-| Trivy | Image CVE, secret, misconfiguration | 0.74 (`k8s --report all`) |
-| Kubescape | NSA / MITRE / RBAC / compliance (үндсэн posture engine) | 4.0 (`--kube-contexts`) |
-| Checkov | IaC (YAML / Helm / Terraform) | 3.2 (local горим) |
-| Popeye | Runtime hygiene (dead service, unused, broken reference) | 0.22 |
-
-> "Бодит орчинд шалгасан" гэдэг нь [real-cluster workflow](.github/workflows/real-cluster.yml) өдөр бүр
-> бодитоор ажиллуулдаг хувилбар. Scanner CLI-ууд хувилбар хооронд флагаа нэрлэж сольдог тул зөрүү нь
-> тайлангийн *Scanner хамрах хүрээ* хүснэгтэд `status: error` / `unavailable` болж харагдана — чимээгүй
-> тэг болохгүй.
-
-> `kube-bench` (node/CIS) нь privileged DaemonSet шаарддаг тул MVP-д багтаагүй.
-
-### Онцлог
-
-- **Live Mode B** — ажиллаж буй cluster-ийг (read-only) бодит scanner CLI-ууд ажиллуулан шалгана
-- Local (Mode A) + **offline ingest** (урьдчилан цуглуулсан raw)
-- **Parallel adapters** — scanner-ууд зэрэг ажиллана, тус бүр өөрийн timeout-той; нэг нь унахад бусад нь үргэлжилнэ (graceful degradation), гаралт нь тогтмол, давтагдахуйц хэвээр
-- **Canonical Control Mapping** — scanner бүрийн rule ID-г нэг `TATAR-*` control руу
-- **Deduplication** — олон scanner-ийн ижил асуудлыг нэгтгэж `found_by`-г хадгална
-- **Confidence engine** — олон scanner-ийн санал нийлэлт + determinism (Trivy ганц CVE ч HIGH)
-- **Blind-shot engine** — контекстээр severity бууруулна (устгахгүй, ил үлдэнэ)
-- **Тайлбарлагдах risk scoring v1.2.1** — finding бүрийн `risk_factors` (суурь × орчин × ил гарц × итгэл) + cluster `risk_breakdown` (томьёо + топ хувь нэмэгчид)
-- **MITRE ATT&CK for Containers** — finding нь ямар халдлагын техникийг *боломжжуулж* болзошгүйг харуулна (ж: privileged контейнер → T1611 Escape to Host), tactic тус бүрээр **ATT&CK exposure** хураангуйтай. "Илрүүлсэн" биш, "боломжжуулна" хүрээтэй — үз [`docs/MITRE_ATTACK.md`](docs/MITRE_ATTACK.md)
-- **CI/CD gatekeeper** — `.tatar-kuber.yaml` бодлого (`fail_on`, `min_score`, хугацаатай `suppress`) + `gate` команд + GitHub Action + SARIF upload
-- **Reports** — JSON · SARIF 2.1.0 · HTML dashboard (хоёр хэлт)
-- **verify-lab** — expected baseline-тай тулгаж regression шалгах
-- **Дангаар ажиллах binary** — canonical registry шигтгэсэн; `brew` / `curl | sh` / Docker
-
-### Хамрах хүрээ (Scope)
-
-TATAR-Kuber нь **posture / configuration / IaC / image / RBAC + нэгдсэн тайлан**-д
-төвлөрдөг. Runtime threat detection (Falco/Tetragon), admission control (Kyverno/OPA),
-secrets management (Vault)-ыг **орлохгүй — тэдгээртэй хамт ажилладаг (complementary).**
-
-**Хийдэг**
-
-| Домэйн | | Тайлбар |
-|---|:--:|---|
-| Cluster configuration & posture | ✅ | Kubescape / Trivy (live Mode B) |
-| Kubernetes misconfiguration | ✅ | Trivy · Kubescape · Checkov |
-| RBAC аюулгүй байдал | ✅ | хэт их эрх, wildcard, cluster-admin |
-| Pod / Workload аюулгүй байдал | ✅ | privileged, hostPath, capabilities, runAsRoot… |
-| Image эмзэг байдал | ✅ | Trivy CVE |
-| IaC аюулгүй байдал | ✅ | YAML / Helm (Terraform хэсэгчлэн, Checkov) |
-| Compliance mapping | ✅ | NSA / CIS / MITRE (canonical, хэсэгчлэн) |
-| Тайлан & risk scoring | ✅ | dedup, оноо, JSON / SARIF / HTML |
-| Runtime hygiene | ⚠️ | Popeye — threat detection БИШ |
-
-**Хамрахгүй (зориудаар) — хамт ашиглана**
-
-| Хамрахгүй | Оронд нь |
-|---|---|
-| Runtime threat detection | Falco · Tetragon |
-| Network traffic monitoring (eBPF) | Cilium/Hubble · Falco |
-| Container behavioral detection | Falco · Tetragon |
-| Admission control (deploy блоклох) | Kyverno · OPA Gatekeeper |
-| Secrets management | HashiCorp Vault · External Secrets |
-
-### Түргэн эхлэл (offline — cluster ба scanner суулгах шаардлагагүй)
-
-Энэ repo-д бодит scanner гаралт [`examples/demo`](examples/demo)-д шигтгэсэн байдаг тул бүтэн
-pipeline ~30 секундэд ажиллана. `--registry` флаг ШААРДАХГҮЙ — canonical registry нь
-binary дотор шигтгэгдсэн:
+TATAR-Kuber өөрөө scanner биш. Энэ нь **Trivy · Kubescape · Checkov · Popeye**-ийг ажиллуулж, тэдний өөр
+өөр rule ID-г нэг **canonical control**-ийн багц руу буулгаж, давхардлыг арилгаж ("3 scanner нэг асуудал
+олсон" — 3 finding биш), эрсдэлийг үнэлээд нэг тайлан гаргана — **JSON, SARIF эсвэл HTML, англи эсвэл
+монгол хэлээр**. Инженер, аудитор, удирдлага бүгд ойлгоно.
 
 ```bash
-git clone https://github.com/ochmunkh/Tatar-Kuber && cd Tatar-Kuber
-tatar-kuber scan   --raw-dir examples/demo --out-dir out
+tatar-kuber scan   --kubeconfig ~/.kube/config --out-dir out     # ажиллаж буй cluster, зөвхөн унших
+tatar-kuber scan   --raw-dir ./raw --out-dir out                 # эсвэл offline: хадгалсан scanner гаралтаас
 tatar-kuber report --input out/scan-result.json --format html --lang mn --out report.html
 ```
 
-Бүрэн regression corpus (эмзэг ба hardened manifest, `expected-findings.json` baseline)-ыг
-дагалдах [**tatar-kuber-lab**](https://github.com/ochmunkh/tatar-kuber-lab) repo-оос нэмнэ:
+Суулгалгүйгээр жинхэнэ тайлан үзэх: **https://ochmunkh.github.io/Tatar-Kuber/**
+([Англи](https://ochmunkh.github.io/Tatar-Kuber/report.html) ·
+[Монгол](https://ochmunkh.github.io/Tatar-Kuber/report-mn.html) ·
+[SARIF](https://ochmunkh.github.io/Tatar-Kuber/tatar-kuber.sarif)), эсвэл
+[`examples/report/`](examples/report)-д байгаа файлуудыг нээ.
 
-```bash
-git clone https://github.com/ochmunkh/tatar-kuber-lab
-tatar-kuber scan       --raw-dir tatar-kuber-lab/raw --out-dir lab-out
-tatar-kuber verify-lab --input lab-out/scan-result.json \
-    --expected tatar-kuber-lab/expected/expected-findings.json
-```
-
-Нэг scan, аль ч хэл: `report` ч `--lang` авдаг тул тайлангийн хэлийг сэлгэхэд
-scanner-ууд дахин ажиллахгүй, cluster руу дахин хандахгүй.
-
-CLI өөрөө default-оор **англи** хэлээр ярина — usage, флаг бүрийн тайлбар, алдаа,
-scanner тус бүрийн явцын мөр, gate-ийн шийдвэр. `--lang mn` (эсвэл `TATAR_LANG=mn`)
-нь бүгдийг монгол руу сэлгэнэ.
-
-### Архитектур
+### Хэрхэн ажилладаг
 
 ![TATAR-Kuber архитектур](docs/img/architecture-mn.png)
 
@@ -676,216 +238,117 @@ scanner тус бүрийн явцын мөр, gate-ийн шийдвэр. `--la
 эх сурвалж → scanner-ууд (зэрэг) → normalize → canonical + dedup → blind-shot → risk score → тайлан → CI gate
 ```
 
-**Эх сурвалж** — ажиллаж буй cluster (read-only, Mode B), локал манифест (`-f`), эсвэл урьдчилан цуглуулсан raw (`--raw-dir`).
+1. **Цуглуулна.** Ажиллаж буй cluster (зөвхөн унших), локал манифест (`-f`), эсвэл хадгалсан scanner гаралт (`--raw-dir`)-аас.
+   Дөрвөн scanner зэрэг ажиллана, тус бүр өөрийн timeout-той; нэг нь унахад бусад нь дуусгана.
+2. **Normalize хийнэ.** Scanner бүрийн rule ID тогтвортой `TATAR-*` control болно.
+3. **Давхардлыг арилгана.** Хэд хэдэн scanner-ийн олсон ижил асуудал `found_by` болон итгэлийн түвшинтэй нэг finding болно.
+   Жишээ: Trivy `AVD-KSV0017`, Kubescape `C-0057`, Checkov `CKV_K8S_16` бүгд нэг privileged контейнер →
+   `deployment/api` дээр нэг `TATAR-CON-001`, итгэл HIGH. Харах: [`docs/dedup-example.md`](docs/dedup-example.md).
+4. **Оноо өгнө.** Эрсдэл тайлбарлагдахуйц: finding бүр өөрийн хүчин зүйлтэй, cluster-ийн оноо томьёо болон гол
+   нөлөөлөгчдөө харуулна. Зөвхөн ер бусын нөхцөлд хүрэх боломжтой finding-ийг бууруулна, хэзээ ч нууж болохгүй.
+5. **Тайлан ба gate.** JSON, SARIF 2.1.0, хоёр хэлт HTML dashboard; бодлого зөрчигдвөл `gate` команд pipeline-ийг унагана.
 
-**Scanner-ууд (зэрэг)** — Trivy, Kubescape, Checkov, Popeye нь **зэрэг** ажиллана, тус бүр өөрийн timeout-той. Нэг scanner унах/timeout болоход бусад нь үргэлжилнэ (graceful degradation), гаралт нь тогтмол, давтагдахуйц хэвээр.
-
-**Цөм** — scanner бүрийн гаралтыг нэгдсэн схем рүү хөрвүүлж, canonical `TATAR-*` control-той холбож **давхардлыг арилгана** (нэг асуудал, `found_by` = олсон бүх scanner), blind-shot бууралт хийж, дараа нь **тайлбарлагдах** risk оноог тооцно (finding бүрт `risk_factors` + cluster `risk_breakdown`).
-
-**Гаралт** — JSON, SARIF 2.1.0, англи, монгол хэл дээрх HTML dashboard, мөн `verify-lab` regression.
-
-**Нэвтрүүлэлтийн түвшин** — `gate` команд нь `.tatar-kuber.yaml` бодлогыг CI-д мөрдүүлнэ (exit code), GitHub Action нь SARIF-ийг Code Scanning руу upload хийнэ, binary нь brew / curl / Docker-оор түгнэ.
-
-> **v1.0.0-д юу өөрчлөгдсөн:** live-cluster scan болон зэрэгцээ гүйцэтгэл хэсэгчлэн/туршилтын түвшнээс бүрэн ажиллагаатай болов; risk оноо тайлбарлагдах болов; CI gate + түгээлт шинээр нэмэгдэв.
-
-### CLI командууд
-
-```
-tatar-kuber scan        --kubeconfig | --context | -f | --raw-dir  [--out-dir DIR] [--namespace ns1,ns2] [--no-raw] [--no-rollup]
-                        # live scan нь scanner-уудын түүхий гаралтыг <out>/raw/-д хадгална (нотолгоо; --raw-dir-ээр дахин боловсруулна)
-tatar-kuber report      --input scan-result.json --format json | sarif | html | audit | pdf  [--out FILE] [--fail-on high]
-                        # audit = хуудаслалтад бэлэн хоёр хэлт аудитын тайлан; pdf = түүнийг энэ машин дээр хөрвүүлсэн нь
-tatar-kuber gate        --input scan-result.json [--policy .tatar-kuber.yaml] [--fail-on high] [--min-score N]
-                        # --baseline prev/scan-result.json : зөвхөн шинэ ба дордсон finding дээр fail болно
-tatar-kuber doctor      # ямар scanner суусан, хувилбар, дэмжих горим
-tatar-kuber diff        --old prev/scan-result.json --new out/scan-result.json
-                        # тренд: шинэ / зассан / дордсон / сайжирсан  [--fail-on-new high] [--format json]
-tatar-kuber top         --input scan-result.json [--limit 10]
-                        # юунаас эхлэх вэ: хамгийн муу workload, хамгийн олон resource-д нөлөөлсөн control
-tatar-kuber attest create --out attestations.yaml [--all] [--cluster НЭР]
-tatar-kuber attest apply  --input scan-result.json --attestations attestations.yaml [--out-dir DIR]
-                        # scanner шалгадаггүй control-д хүний гарын үсэгтэй хариулт
-tatar-kuber verify-lab  --input scan-result.json --expected expected-findings.json
-tatar-kuber update      [--scanner trivy,popeye] [--dry-run] [--check] [--home ~/.tatar-kuber]
-tatar-kuber version
-
-команд бүр мөн хүлээж авна   [--lang en|mn]
-```
-
-`scan --out-dir` нь **хавтас**, `report --format` / `diff --format` нь **формат**. Хоёул `-o`
-гэсэн хуучин бичиглэлээ хэвээр хүлээж авна (байгаа pipeline эвдрэхгүй) — гэхдээ `-o` нь
-командаас хамаарч хоёр өөр зүйл гэсэн утгатай байсан тул баримтад бүтэн нэрийг ашиглана.
-Severity босго (`--fail-on`, `--fail-on-new`, `fail_on:`) нь үсгийн том/жижигт үл хамаарна.
-
-**Юунаас эхлэх вэ.** `tatar-kuber top` нь дууссан scan-ийг уншаад хоёр хүснэгт хэвлэнэ:
-хамгийн их ачаа үүрсэн workload-ууд (зүгээр тоолсон биш, severity-гээр нь жигнэсэн), ба
-хамгийн олон өөр resource-д тусч байгаа control-ууд. Ихэвчлэн **хоёр дахь хүснэгт** нь
-чухал — гучин workload дээр унасан нэг control бол гучин засвар биш, НЭГ засвар.
-`--limit` нь хүснэгт тус бүрийн мөрийн тоог тогтооно. Диск дээр юу ч өөрчлөхгүй, зөвхөн
-`scan-result.json`-ийг уншина.
-
-**Зарлагдсан цоорхойг хаах.** `docs/coverage.md` нь ямар ч scanner шалгадаггүй control бүрийг
-нэрээр нь бичдэг — өнөөдөр нэг, `TATAR-NET-004`. Нэрлэсэн нь шударга, гэвч цоорхой хэвээр.
-`attest` бол түүнийг хаах зам: `attest create` нь яг тэр control-уудын загвар гаргана, хүн
-шийдвэр, үндэслэл, нэрээ, мөн **хугацаа** бичнэ, `attest apply` нь үр дүнд нэгтгэнэ.
-
-Үүнийг галочка биш, аудитын бүртгэл болгож байгаа дөрвөн зүйл:
-
-- **Хугацаа заавал.** Дуусмагц control нь дахин шалгагдаагүйд тооцогдож, `gate` түүнийг
-  нэрээр нь хэлнэ. Хугацаагүй баталгаа нэг удаа бичигдээд үүрд үнэн мэт уншигдана.
-- **`non-compliant` нь gate-ийг унагаана** — control-ийн severity-ийн түвшинд. Хүн зөрчил
-  байгааг баталсан бол үр дүн түүнийг харуулах ёстой; эс бөгөөс баталгаажуулалт бол бичээд
-  мартах арга болно.
-- **Энэ нь олдвор БИШ.** Attestation нь тусдаа `attestations[]` дотор амьдарна, `findings`-д
-  хэзээ ч орохгүй — тиймээс `found_by` нь scanner хараагүй зүйлээ харсан гэж хэлэхгүй, мөн
-  `metadata.result_hash` нь зөвхөн олдворыг хамардаг тул хүний хариулт scanner-ийн нотолгоог
-  чимээгүй өөрчилж чадахгүй.
-- **Severity нь бүртгэлээс** ирнэ, файлаас биш. Attestation-д өөрийн severity тавих боломж
-  өгөх нь gate-ийг тойрох чимээгүй зам болно.
-
-**Аудитын deliverable.** `report --format html` бол ДЭЛГЭЦИЙН самбар — шүүлтүүр, задардаг
-хэсэгтэй. Аудиторын үйлчлүүлэгчдээ өгдөг зүйл бол өөр баримт, тиймээс өөр формат:
-`--format audit` нь хуудаслагдсан, бие даасан, хоёр хэлт тайлан гаргана — хамрах хүрээ, арга
-зүй, **юу ажиллаагүй**, оноо ба түүний гарал, гараар баталсан хяналтууд, мөн canonical
-хяналтаар бүлэглэсэн олдворууд засах арга хэмжээтэйгээ.
-
-`--format pdf` нь яг тэр баримтыг PDF болгоно. TATAR-Kuber нь PDF-ийг өөрөө бичдэггүй:
-машин дээр БАЙГАА headless хөтөч эсвэл `wkhtmltopdf`-ээр хөрвүүлнэ. Энэ бол ухамсартай
-сонголт — Go-гийн PDF сан нэмбэл гадаад хамаарал хоёр дахин нэмэгдэж, кирилл үсэгт шрифт
-шигтгэх асуудал дагалдана. **Хөрвүүлэгч олдохгүй бол команд ИЛ ТАТГАЛЗАНА**: юу хайснаа
-нэрлээд, `--format audit` болон хөтчийн Print → Save as PDF-ийг зааж өгнө. Хоосон файл
-гаргаад "болов" гэж хэлэхгүй.
-
-**Scanner-уудыг шинэчлэх.** `tatar-kuber update` нь scanner бүрийг татаж, SHA256-ыг нь
-`~/.tatar-kuber/tools.lock.yaml` доторх pin-тэй тулгаж, дараа нь л суулгана. Нэг нь зөрвөл
-ЮУ Ч суухгүй — баталгаажсан scanner-ууд нь ч суухгүй. Пиннэсэн checksum-гүй scanner нь
-татагдахаас нь ӨМНӨ татгалзагдана, тиймээс trust-on-first-use гэсэн зам огт байхгүй.
-`--dry-run` нь юу татагдахыг яг таг (scanner, хувилбар, URL, хүлээгдэх checksum) хэвлээд
-юу ч бичихгүй; `--check` нь pin-үүдийг lock-д суусан гэж бичигдсэнтэй тулгана.
-Тодорхойлолтын cosign алхам **хараахан хэрэгжээгүй**: гарын үсэг шалгагддаггүй, команд
-үүнийгээ ажиллалт бүрт хэлнэ, `tools.lock.yaml` нь өөрөөр мэдүүлэхийн оронд
-`cosign: unverified` гэж бичигдэнэ.
-
-**Гаралтын хэл.** Хэрэгслийн хэвлэдэг бүх зүйл default-оор **англи**. `--lang mn` нь
-бүгдийг — usage, флагийн тайлбар, алдаа, явцын мөр, gate-ийн шийдвэрийг — монгол руу
-сэлгэнэ, `TATAR_LANG=mn` нь бүтэн session-д тавина (флаг нь орчны хувьсагчийг дарна).
-`--lang`-ыг команд бүр хүлээж авах бөгөөд танигдаагүй утга нь команд бүрт хэрэглээний
-алдаа (exit `3`). `report` дээр `--lang` нь тайланг өөрийг нь ч дахин үүсгэнэ; өгөөгүй
-бол тайлан scan-д сонгосон хэлээрээ үлдэх тул байгаа pipeline хөндөгдөхгүй.
-
-Мэдэгдэж байгаа нэг үл хамаарах зүйл: **scanner adapter-ийн үүсгэдэг зарим finding-ийн
-тайлбар** нь монгол хэл дээр хатуу бичигдсэн бөгөөд `scan-result.json`-д тэр чигээрээ
-ордог тул `en` баримт дотор ч орчуулагдаагүй харагдана — практикт тааралдах нь Trivy-ийн
-нууц илрүүлэлт ("Илэрсэн нууц: …"). Эдгээр нь консолын гаралт биш, схемийн цуваа
-талбарууд тул хоёр хэлтэй болгох нь v1 баримтын хэлбэрийг өөрчилнө — тусад нь
-шийдвэрлэнэ.
-
-### Live Mode B — read-only хандалт олгох
-
-Амьд кластерыг шалгахад эрх шаардагдана, "read-only гэдэгт минь итгэ" гэдэг нь platform
-багийн хүлээж авах хариулт биш. Тиймээс RBAC нь энэ repo дотор хянагдах боломжтой файл юм:
-
-```bash
-kubectl apply -f deploy/least-privilege-clusterrole.yaml
-tatar-kuber scan --kubeconfig ~/.kube/config --namespace prod --out-dir ./out
-```
-
-[`deploy/least-privilege-clusterrole.yaml`](deploy/least-privilege-clusterrole.yaml) нь
-дангаараа бүрэн: `tatar-kuber-reader` ClusterRole, `kube-system`-д `tatar-kuber`
-ServiceAccount, мөн тэдгээрийг холбох ClusterRoleBinding-ыг үүсгэнэ. Өөр юу ч нэмэх
-шаардлагагүй. Дүрэм бүр нь ЗӨВХӨН `get` / `list` / `watch` эрх олгодог: файлын хаана ч
-`create`, `update`, `patch`, `delete` verb байхгүй — **Read-Only First** гэсэн зарчим
-бүхэлдээ diff хийж шалгах боломжтой хэлбэрт байна.
-
-Secret-ийн талаар ил хэлэх нь зүйтэй: **ClusterRole нь `secrets`-д огт эрх олгодоггүй.**
-
-Өмнө нь олгодог байсан бөгөөд тайлбартаа "зөвхөн metadata уншина" гэж амладаг байв. Тэр
-амлалтыг биелүүлэх боломжгүй: RBAC дээр Secret-д "зөвхөн metadata" гэсэн эрх байдаггүй,
-`get` / `list` нь `data:` талбарыг бүхэлд нь буцаана. Өөрөөр хэлбэл эрхийг нь авчхаад
-"ашиглахгүй" гэж амлаж байсан хэрэг — тэр нь амлалт, хяналт биш. v1.0.4-д хассан.
-
-Хасснаар алдагдах зүйл алга. Аль secret хаана mount хийгдсэн, env руу орсон нь pod-ийн
-тодорхойлолтод (`volumes.secret`, `envFrom.secretRef`) бичигдсэн байдаг бөгөөд энэ эрх түүнийг
-аль хэдийн уншдаг; RBAC-ийн шинжилгээ нь Secret объект дээр биш, `Role` / `RoleBinding`
-дээр тулгуурладаг.
-
-### Exit code
-
-`gate` команд нь pipeline-д холбогдохын тулд байдаг тул түүний exit code бол гэрээ. `set -e`
-дор "бодлого зөрчигдсөн" ба "хэрэгсэл оролтоо уншиж чадсангүй" хоёр ижил харагдаж болохгүй:
-
-| Код | Утга | Хаанаас гардаг |
-|---|---|---|
-| `0` | амжилттай / gate давсан | бүх команд |
-| `1` | бодлого эсвэл босго зөрчигдсөн | `gate` FAILED, `diff --fail-on-new`, `report --fail-on`, `verify-lab` FAIL, `doctor` — **ямар ч scanner суугаагүй** |
-| `2` | ажиллагааны алдаа — оролт уншигдсангүй/эвдэрсэн, эсвэл **танигдаагүй флаг** | байхгүй/эвдэрсэн `scan-result.json` эсвэл expected-findings файл, мөн **эвдэрсэн** бодлогын файл — бодлогын файл БАЙХГҮЙ бол алдаа БИШ (`.tatar-kuber.yaml` нь сонголт: built-in `fail_on: high` default хэрэглэгдэж gate ажиллаад `1` буцааж ч болно); мөн `--no-such-flag` — үүнийг Go-ийн flag parser команд ажиллахаас өмнө буцаана |
-| `3` | хэрэглээний алдаа — команд, формат, хэл танигдсангүй, эсвэл заавал флаг дутуу | `tatar-kuber frobnicate`, `report --format nope`, `report --lang de`, `--old`-гүй `diff`, оролтгүй `scan` |
-
-Severity босго **танигдаагүй** тохиолдол нь зориуд хэрэглээний алдаа БИШ, тиймээс `3`
-болж харагдахгүй. `report --fail-on` ба `diff --fail-on-new` нь stderr-т анхааруулаад
-шалгалтыг алгасна (exit `0`); `gate --fail-on` ба `fail_on:` нь анхааруулаад built-in `high`
-руу унана — энэ нь ХАТУУ тал. Тиймээс бичиглэлийн алдаа gate-ийг хэзээ ч чимээгүй
-ХАТУУРУУЛАХГҮЙ — харин `report` ба `diff` дээр шалгалтыг чимээгүй УНТРААНА, тул CI-д тэр
-анхааруулгыг үйлдэл шаардсан гэж авч үзнэ.
-
-`tatar-kuber doctor` нь scanner суугаагүй машин дээр **1** буцаана. Энэ бол алдаа биш,
-зориудын бэлэн байдлын дохио — гэхдээ `set -e` дор шинэ runner-ыг зогсооно, тиймээс зөвхөн
-хүснэгт хэрэгтэй бол `tatar-kuber doctor || true` гэж хамгаална.
-
-### Байгаа кластерт gate нэвтрүүлэх
-
-Бодит кластерын анхны шалгалт олон зүйл буцаана. Эхний өдөр бүгдэд нь унадаг gate нэг
-долоо хоногийн дараа унтраагдана — унтраасан gate бол gate биш. Ингэхээс сэргийлэх хоёр
-механизм бий, энэ дарааллаар ашиглана.
-
-**1. Baseline — өнөөдрийн төлөвийг хүлээн зөвшөөрч, маргаашийн өөрчлөлтийг шалгах.** Одоогийн шалгалтыг лавлагаа
-болгож үлдээгээд, зөвхөн шинэ ба дордсоныг тооцуулна:
-
-```bash
-tatar-kuber gate --input out/scan-result.json --baseline baseline/scan-result.json
-```
-
-Baseline-д аль хэдийн байгаа олдвор тооцогдохгүй. Харин байсан атлаа severity нь өссөн бол
-**тооцогдоно** — LOW нь CRITICAL болох нь шинэ эрсдэл, хуучин асуудал биш. `min_score` нь
-үнэмлэхүй хэвээр: тэр бол кластерын шинж чанар, зөрүүнийх биш.
-
-Харьцуулалт итгэх боломжгүй бол — өөр cluster, өөр горим, нэг тал нь `--no-rollup` —
-baseline **хэрэгсэгдэхгүй**, бүх олдвор тооцогдоно. Аюулгүй байдлын gate эргэлзээтэй үедээ
-fail-closed зарчмаар ажиллана.
-
-*Хаана хадгалах вэ.* `baseline/scan-result.json`-ыг repo-д commit хийнэ. Хэдэн зуун KB JSON,
-бусад хүлээн зөвшөөрсөн эрсдэлийн адил хянагдах ёстой, мөн `git log` нь "хэзээ, хэн үүнийг
-зөвшөөрсөн" гэсэн асуултад хариулна. CI cache/artifact ч болно, гэхдээ хугацаа нь дуусдаг —
-чимээгүй алга болсон baseline нь даваа гарагт gate-ийг хэн ч тайлбарлаж чадахгүйгээр улаан
-болгоно. Шинэчлэхдээ зориудаар: baseline-ыг хөдөлгөсөн commit бол "бид энэ жагсаалтыг одоо
-хүлээн зөвшөөрч байна" гэсэн мэдэгдэл.
-
-**2. Suppress — нэг олдворыг шалтгаан ба хугацаатайгаар хүлээн зөвшөөрөх.** Ухамсартай
-үлдээхээр шийдсэн цөөн эрсдэлийг `.tatar-kuber.yaml`-д нэрлэнэ:
-
-```yaml
-suppress:
-  - control: TATAR-CON-001
-    resource: deployment/legacy-api
-    reason: "Хуучин систем, 2027 Q1-д шилжүүлнэ (JIRA-1234)"
-    expires: 2027-03-31
-```
-
-`expires` нь чимэглэл биш: тэр өдөр дүрэм идэвхгүй болж, олдвор буцаж гарна. Мөн gate нь
-хугацаа дууссан дүрэм, байхгүй control руу заасан дүрэм, юунд ч тохироогүй дүрмийг
-мэдэгдэнэ — хэн ч анзаардаггүй suppress бол мартагдсан эрсдэл болох зам. Уншигдахгүй огноо
-(`2026-13-45`, `tomorrow`) нь "хугацаагүй" гэсэн үг **биш**: дүрэм хэрэглэгдэхгүй, gate үүнийг
-мэдэгдэнэ.
-
-Baseline нь нэвтрүүлэх үеийн олон тоонд, suppress нь ухамсартай үлдээсэн цөөнд.
+Зарчим: **эхлээд зөвхөн унших** (`get`/`list`/`watch`), **scanner-аас хамаарахгүй** (adapter солигдох боломжтой),
+**цоорхойгоо нуухгүй** (ямар ч scanner шалгадаггүй control-ыг "шалгаагүй" гэж харуулна, "тэнцсэн" гэж тоолохгүй).
 
 ### Суулгах
 
 ```bash
+# Homebrew (macOS / Linux)
 brew install ochmunkh/tap/tatar-kuber
+
+# Linux / macOS — release binary татаж checksum шалгана
 curl -fsSL https://raw.githubusercontent.com/ochmunkh/Tatar-Kuber/master/install.sh | sh
+
+# Docker
 docker run --rm -v "$PWD:/work" -w /work ghcr.io/ochmunkh/tatar-kuber:latest scan --raw-dir ./raw --out-dir .
+
+# Эх кодоос
+go install github.com/ochmunkh/tatar-kuber/cmd/tatar-kuber@latest
 ```
+
+Live scan хийхэд дөрвөн scanner суусан байх ёстой. `tatar-kuber doctor` аль нь суусныг харуулна,
+`tatar-kuber update` нь пиннэсэн хувилбаруудыг checksum шалгаад суулгана.
+
+### Түргэн эхлэл (offline — cluster ба scanner суулгах шаардлагагүй)
+
+Энэ repo-д жинхэнэ scanner гаралт [`examples/demo`](examples/demo)-д байдаг тул бүтэн pipeline ~30 секундэд ажиллана:
+
+```bash
+git clone https://github.com/ochmunkh/Tatar-Kuber && cd Tatar-Kuber
+tatar-kuber scan   --raw-dir examples/demo --out-dir out
+tatar-kuber report --input out/scan-result.json --format html --out report.html
+tatar-kuber report --input out/scan-result.json --format html --lang mn --out report-mn.html
+```
+
+`--lang` нь тайланг дахин зурдаг тул хэл сэлгэхэд scanner дахин ажиллахгүй, cluster руу дахин хандахгүй.
+CLI өөрөө default-оор англи хэлээр ярина; `--lang mn` эсвэл `TATAR_LANG=mn` нь монгол руу сэлгэнэ.
+Том regression corpus (эмзэг ба hardened manifest) нь [**tatar-kuber-lab**](https://github.com/ochmunkh/tatar-kuber-lab)-д байна.
+
+### Scanner-ууд
+
+| Scanner | Зорилго | Бодит орчинд шалгасан |
+|---|---|---|
+| Trivy | Image CVE, secret, misconfiguration | 0.76 |
+| Kubescape | NSA / MITRE / RBAC / compliance (үндсэн posture engine) | 4.0 |
+| Checkov | IaC (YAML / Helm / Terraform) | 3.4 |
+| Popeye | Runtime hygiene (dead service, unused, broken reference) | 0.22 |
+
+Хувилбарууд нь [`tools.lock.yaml`](tools.lock.yaml)-д пиннэгдсэн, [real-cluster workflow](.github/workflows/real-cluster.yml)
+өдөр бүр бодитоор ажиллуулдаг хувилбарууд. Флагаа сольсон scanner нь тайлангийн *Scanner хамрах хүрээ*
+хүснэгтэд `error` / `unavailable` гэж харагдана — чимээгүй тэг болохгүй.
+
+### Командууд
+
+| Команд | Юу хийдэг |
+|---|---|
+| `scan` | Scanner-уудыг ажиллуулж (эсвэл `--raw-dir` уншиж) `scan-result.json` бичнэ; live scan нь scanner-ийн түүхий гаралтыг нотолгоо болгон хадгална |
+| `report` | Үр дүнг `json`, `sarif`, `html`, `audit`, `pdf` болгон зурна (`--format`, `--lang`) |
+| `gate` | `.tatar-kuber.yaml` бодлогыг зөрчвөл унана (exit 1) (`--fail-on`, `--baseline`) |
+| `diff` | Хоёр scan-ийн хооронд юу шинэ, засагдсан, дордсоныг харуулна |
+| `top` | Юуг түрүүлж засах: хамгийн муу workload-ууд, хамгийн олон resource-д хүрсэн control-ууд |
+| `attest` | Ямар ч scanner шалгадаггүй control-д хүний өгсөн, хугацаатай хариулт |
+| `doctor`, `update` | Аль scanner суусныг харуулах; пиннэсэн хувилбаруудыг суулгах |
+
+Команд бүр `--lang en|mn` авна. Exit code: `0` амжилттай, `1` бодлого зөрчигдсөн, `2` ажиллалтын алдаа,
+`3` хэрэглээний алдаа. Бүрэн флаг, exit code, live scan-д хэрэгтэй read-only RBAC:
+[`docs/cli.md`](docs/cli.md).
+
+### CI/CD gate
+
+`.tatar-kuber.yaml` ([жишээ](.tatar-kuber.yaml.example)) нэмж pipeline-ээ gate-лэ, эсвэл GitHub Action ашигла:
+
+```yaml
+- uses: ochmunkh/Tatar-Kuber@v1
+  with:
+    raw-dir: ./raw      # эсвэл path: ./k8s
+    fail-on: high
+```
+
+Жинхэнэ cluster-ийн анхны scan олон юм буцаадаг, эхний өдрөөс бүгдэд нь унадаг gate нэг долоо хоногийн дотор
+унтарна. Өнөөдрийн finding-үүдийг **baseline**-аар (`gate --baseline`) хүлээн зөвшөөрч зөвхөн шинэ эсвэл
+дордсон дээр унага; нэг finding-ийг шалтгаан, дуусах огноотойгоор `suppress`-ээр хүлээн зөвшөөр.
+Хэрхэн, жишээтэй: [`docs/gate.md`](docs/gate.md).
+
+### Аюулгүй байдал
+
+Аюулгүй байдлын хэрэгсэл өөрөө мөрддөг стандартаа өөртөө хэрэглэх ёстой. Товчоор:
+
+- **Зөвхөн унших.** Cluster role нь зөвхөн `get` / `list` / `watch` олгоно, Secret-ийг агуулахгүй.
+- **Жижиг supply chain.** Нэг шууд хамаарал (`gopkg.in/yaml.v3`); GitHub Action, container image бүр пиннэгдсэн; `govulncheck`, `gosec` push бүрд ажиллана.
+- **Scanner бол итгэлгүй програм.** Тайлан аль binary ажилласан, түүний SHA-256-г бичдэг; `update` шалгасны дараа өөрчлөгдсөн binary ажиллахгүй; forge credential scanner-т дамжихгүй; түүхий гаралт `SHA256SUMS` manifest-тэй.
+- **Gate өөрийн оролтыг шалгана.** Өөртэйгөө зөрсөн `scan-result.json`-оос татгалзана. Энэ бол тууштай байдлын шалгалт, гарын үсэг биш.
+- **Оролт хязгаартай, гаралт зөвхөн эзэмшигчид** (эрх `0600`).
+
+Дэлгэрэнгүй ба scanner бүрийн хэмжсэн сүлжээний зан төлөв: [`docs/security.md`](docs/security.md).
+Эмзэг байдал олсон уу? [`SECURITY.md`](SECURITY.md) — GitHub-ын **Security → Report a vulnerability** (хаалттай мэдээлэл).
+
+### Хамрах хүрээ
+
+TATAR-Kuber нь **posture, тохиргоо, IaC, image, RBAC-ийн шинжилгээг нэгдсэн тайлантайгаар** хамарна. Runtime
+илрүүлэлт, admission control, нууц удирдлагыг **орлохгүй, нөхөж** ажиллана — Falco/Tetragon, Kyverno/OPA, Vault-тай
+хамт ажиллуул. Онцлог, юуг хамарч юуг хамаргүйг: [`docs/scope.md`](docs/scope.md). Control бүрийг scanner бүртэй
+тулгасан матриц, ямар ч scanner шалгадаггүй нэгийг оролцуулан: [`docs/coverage.md`](docs/coverage.md).
 
 ### Build
 
@@ -897,101 +360,28 @@ go test ./...          # 23 багц, бүгд ногоон
 
 ### Баримт бичиг
 
-`docs/` дотор 6 инженерийн баримт, **Word (`.docx`) файл** хэлбэрээр — GitHub тэднийг
-browser дээр харуулахгүй тул татаж үзнэ:
+`docs/` дотор 6 инженерийн баримт **Word (`.docx`)** хэлбэрээр (GitHub тэдгээрийг browser дээр харуулахгүй):
 [01 Unified Schema](docs/01_Unified-Schema-JSON-v1.docx) ·
 [02 Canonical Mapping](docs/02_Canonical-Control-Mapping.docx) ·
 [03 Scanner Adapter Interface](docs/03_Scanner-Adapter-Interface.docx) ·
 [04 Severity & Risk Scoring](docs/04_Severity-Risk-Scoring-Model.docx) ·
 [05 CLI Spec](docs/05_CLI-Specification.docx) ·
 [06 Repository Structure](docs/06_Repository-Structure.docx).
-
-**[`docs/coverage.md`](docs/coverage.md)** — хэрэгсэл яг юуг шалгадгийг харуулна:
-canonical control бүрийг scanner бүртэй тулгасан матриц. Registry-ээс үүсдэг бөгөөд тестээр
-нийцлийг нь барина. Ямар ч rule зураглагдаагүй control-ыг "шалгагддаггүй" гэж ил гаргана —
-33-аас 1 нь.
-
-**[`pkg/schema/tatar-schema-v1.json`](pkg/schema/tatar-schema-v1.json)** —
-`scan-result.json`-ы JSON Schema. `report` / `gate` / `diff` / `verify-lab` бүгд үүнийг
-уншдаг, adopter нь baseline болгож commit хийдэг солилцооны формат. Go бүтэцтэй нийцлийг
-тестээр барьсан тул чимээгүй зөрөх боломжгүй.
-
-**[`docs/releases/`](docs/releases)** — хувилбар бүрийн тэмдэглэлийн эх хувь; GitHub-ын
-release хуудас нь ХУУЛБАР бөгөөд CI хоёрын зөрүүг өдөр бүр шалгадаг.
-
-### Туршилтын лаборатори
-
-Эмзэг/аюулгүй manifest + regression baseline тусдаа repo-д:
-[**tatar-kuber-lab**](https://github.com/ochmunkh/tatar-kuber-lab).
+Markdown гарын авлага: [командууд](docs/cli.md) · [CI gate](docs/gate.md) · [аюулгүй байдлын загвар](docs/security.md) ·
+[хамрах хүрээ](docs/scope.md) · [coverage](docs/coverage.md). `scan-result.json`-ы JSON Schema нь
+[`pkg/schema/tatar-schema-v1.json`](pkg/schema/tatar-schema-v1.json). Хувилбарын тэмдэглэл: [`docs/releases/`](docs/releases).
 
 ### Төлөв
 
-**v1.0.5** — `attest` · хоёр хэлт аудитын тайлан / PDF · пиннэсэн release зам
-(бодлого + GitHub Action + SARIF) · goreleaser + brew/curl/Docker · scanner хамрах хүрээний тайлан ·
-Pod → controller rollup · **тренд (`diff`)** · **`report --lang` — нэг scan, аль ч хэл** ·
-**үнэн `scan_mode`**.
+**v1.0.5** — хувилбар бүр юуг өөрчилсөн нь [`docs/releases/`](docs/releases)-д, цаашид юу ирэх нь [`ROADMAP.md`](ROADMAP.md)-д.
+Дөрвөн scanner-ийн зураглагдсан rule бүр scanner-ийн өөрийн тодорхойлолттой тестээр тулгагдсан тул scanner
+шалгалтаа нэрлэж сольсон эсвэл дугаарыг нь өөрчилсөн бол build унана.
 
-Хувилбар тус бүрийн дэлгэрэнгүй — дөрвөн scanner-ийн зураглалын аудит, rollup-ийн зохиомж,
-трендийн шалтгаан — энд давтагдахын оронд [**docs/releases/**](docs/releases)-д байна.
+### Хувь нэмэр оруулах
 
-Зураглалын аудитын дүн: **Popeye 10-аас 7 буруу, Kubescape 28-аас 6, Checkov 18-аас 2,
-Trivy 11-ээс 0.** Дөрвүүлэнгийн зурагдсан rule бүр одоо upstream-ийн өөрийн тодорхойлолттой тулгах
-тестээр бэхлэгдсэн тул scanner шалгалтаа дахин нэрлэхэд build унана.
-
-Хаашаа явж байгаа — v2 (аудитын PDF + compliance mapping + trending), v3 (тасралтгүй +
-dashboard): [**Замын зураг**](ROADMAP.md)-г үз.
-
-### Аюулгүй байдал
-
-Аюулгүй байдлын багаж өөрөө өөрийн шаарддаг стандартыг барих ёстой:
-
-- **CI-д SAST + CVE скан** — push бүрд [`govulncheck`](https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck)
-  (хамаарал **болон** Go stdlib дахь мэдэгдэж буй CVE) + [`gosec`](https://github.com/securego/gosec)
-  (статик шинжилгээ) ажиллана; gosec-ийн үр дүн GitHub **Code scanning** таб руу ордог.
-  ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)).
-- **Patched toolchain** — release бинарууд зассан Go stdlib-ээр build хийгддэг (`go.mod`-ийн
-  `toolchain`-аар бэхлэсэн) тул тайлан рендерлэгч `html/template` CVE-үүдээс цэвэр.
-- **Минимал supply chain** — ганц шууд хамаарал (`gopkg.in/yaml.v3`) + stdlib.
-- **Пиннэсэн release зам** — гуравдагч этгээдийн GitHub Action бүр **commit SHA**-гаар
-  ажиллана, хөдөлгөөнт tag-аар биш. Tag-ийг action-ы эзэмшигч өөр commit руу зөөж чадна, бас
-  `checksums.txt` ба SBOM-ыг ЯГ ТЭР алхмууд үүсгэдэг — тиймээс эвдэрсэн нэг нь backdoor-той
-  binary-г *таарсан checksum-тай нь* нийтэлнэ. `.github/dependabot.yml` долоо хоног тутам
-  шинэчлэлтийг PR болгон ирүүлдэг тул пин нь хөлдөхгүй, хянагдсан хэвээр үлдэнэ.
-- **Бүтцээрээ аюулгүй** — read-only cluster хандалт (`get`/`list`/`watch`; хянагдах
-  [`deploy/least-privilege-clusterrole.yaml`](deploy/least-privilege-clusterrole.yaml)-аар
-  олгогдоно — Secret тэр эрхэнд **огт байхгүй**: RBAC дээр Secret-д "зөвхөн metadata" гэсэн
-  эрх байдаггүй, `get`/`list` нь `data:` талбарыг бүхэлд нь буцаана), shell дуудлагагүй
-  (scanner-ууд тогтмол аргументтэй `exec`-ээр, `sh -c` байхгүй), тайлан `html/template`
-  auto-escape-аар рендерлэгддэг.
-- **Гаралт зөвхөн эзэмшигчид уншигдахаар бичигдэнэ** — `scan-result.json`, scanner-ийн түүхий
-  гаралт, мөн тайлан бүр (`html`, `audit`, `sarif`, `json`, `pdf`) `0600` эрхтэй үүснэ. Тайлан
-  бол кластерын сул талуудын хүн уншихуйц жагсаалт — хаашаа ч явсан нууц мэдээлэл гэж хандана.
-- **Scanner-ууд бол гуравдагч талын програм; тайлан аль нь ажилласныг хэлнэ.**
-  `metadata.scanner_runs[]` бичлэг бүр binary-ийн зам, хаанаас олдсон (`path` эсвэл `tools`),
-  SHA-256-г бүртгэнэ. PATH нь `~/.tatar-kuber/tools`-оос ӨМНӨ хайгддаг тул `update`-ийн пин
-  хийсэн scanner-ийг өөр хуулбар далдалж чадна; ингэвэл анхааруулга хэвлэж, run-д хадгална.
-  Scanner-ууд таны орчныг өвлөнө, **гэхдээ** forge/CI credential-аас бусад
-  (`GITHUB_TOKEN`, `GH_TOKEN`, `ACTIONS_*` token, …); нэрлэсэн нэгийг `TATAR_PASS_ENV=NAME,NAME`-ээр
-  өгч болно. `TATAR_STRICT_ENV=1` нь үүнийг allow-list болгоно (зөвхөн `PATH`, `HOME`, `KUBECONFIG`,
-  proxy/CA хувьсагч, `TRIVY_*` төрлийн угтвар, `TATAR_PASS_ENV`-д нэрлэсэн); cloud credential мөн
-  хаагдана. `~/.tatar-kuber/tools` доторх scanner binary-г `update`-ийн бүртгэсэн SHA-256-тай
-  (`tools.lock.yaml`-ийн `installed_sha256`) тулгана; дараа нь өөрчлөгдсөн бол scanner
-  `unavailable` болж ажиллахгүй. `scan` нь `raw/SHA256SUMS` (`sha256sum` формат) бичнэ,
-  `scan --raw-dir` нь үүнтэй таарахгүй хавтсыг татгалзана. Checkov-г `BC_SKIP_MAPPING=TRUE`-тай эхлүүлнэ: үгүй бол run бүрд
-  `api0.prismacloud.io` руу хандана. Trivy-ийн secret болон misconfiguration скан сүлжээнд
-  хандахгүй; vulnerability скан нь өөрийн database-ийг татна. Kubescape, Popeye сүлжээгээр юу
-  илгээдгийг энд шалгаагүй.
-- **Gate нь өөрт нь өгсөн файлыг шалгана.** `gate` нь result hash, finding-ийн тоо,
-  эрсдэлийн оноог findings-ээс дахин бодож, өөртэйгөө зөрсөн `scan-result.json`-оос татгалзана
-  (exit 2). Гар засвар, таслагдсан файл, өөр оноолтын загвараар үүссэн файлыг барина; энэ бол
-  гарын үсэг биш, зөвхөн тууштай байдлын шалгалт — бүх талбарыг дахин бодож чадах хүнийг
-  зогсоохгүй. `--skip-integrity-check` үүнийг унтрааж, тухай бүрд мэдэгдэнэ.
-- **Оролт хязгаарлагдмал.** Scanner-ийн гаралт, raw JSON, scan result 256 MiB, policy /
-  attestation / registry файл 16 MiB-ээс хэтрэхгүй; илүү том файл бол алдаа — хэзээ ч таслаж
-  уншихгүй. `-`-ээр эхэлсэн kube context, namespace-ийг scanner-т flag болгон дамжуулахгүй,
-  татгалзана.
-
-Эмзэг байдал олсон уу? [`SECURITY.md`](SECURITY.md) — GitHub-ын **Security → Report a vulnerability** (хаалттай мэдээлэл).
+Хувь нэмэр оруулахад таатай. [CONTRIBUTING.md](CONTRIBUTING.md) болон
+[`docs/03_Scanner-Adapter-Interface.docx`](docs/03_Scanner-Adapter-Interface.docx)-аас эхэл; `go test ./...`-ийг
+ногоон байлгаж, [Code of Conduct](CODE_OF_CONDUCT.md)-ийг унш.
 
 ### Холбоо барих
 
@@ -999,3 +389,7 @@ dashboard): [**Замын зураг**](ROADMAP.md)-г үз.
 
 [![Facebook](https://img.shields.io/badge/Facebook-Enkhbat%20Oyunbayar-1877F2?logo=facebook&logoColor=white)](https://www.facebook.com/enkhbat.o/)
 [![GitHub](https://img.shields.io/badge/GitHub-ochmunkh-181717?logo=github&logoColor=white)](https://github.com/ochmunkh)
+
+### Лиценз
+
+Apache-2.0 — [LICENSE](LICENSE)-ийг үз.

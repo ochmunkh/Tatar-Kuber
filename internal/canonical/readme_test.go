@@ -163,38 +163,30 @@ func TestREADMEFlagParity(t *testing.T) {
 // энд бүртгэгдэх ёстой, эс бөгөөс тест унана — нэг хэл дээр л нэмэгдсэн хэсэг
 // PR дээр баригдана.
 var enToMN = map[string]string{
-	"Deduplication in action (`3 findings → 1`)": "Давхардлыг арилгах жишээ (`3 finding → 1`)",
-	"Design principles":                          "Гол зарчим",
-	"Scanner stack":                              "Scanner-ууд",
-	"Features":                                   "Онцлог",
-	"Scope & positioning":                        "Хамрах хүрээ (Scope)",
-	"Install":                                    "Суулгах",
+	"How it works": "Хэрхэн ажилладаг",
+	"Install":      "Суулгах",
 	"Quick start (offline, no cluster, no scanner install)": "Түргэн эхлэл (offline — cluster ба scanner суулгах шаардлагагүй)",
-	"Architecture": "Архитектур",
-	"Build":        "Build",
-	"CLI":          "CLI командууд",
-	"Live Mode B — granting read-only access": "Live Mode B — read-only хандалт олгох",
-	"Exit codes": "Exit code",
-	"Adopting the gate on an existing cluster": "Байгаа кластерт gate нэвтрүүлэх",
+	"Scanners":      "Scanner-ууд",
+	"Commands":      "Командууд",
+	"CI/CD gate":    "CI/CD gate",
+	"Security":      "Аюулгүй байдал",
+	"Scope":         "Хамрах хүрээ",
+	"Build":         "Build",
 	"Documentation": "Баримт бичиг",
 	"Status":        "Төлөв",
-	"Security":      "Аюулгүй байдал",
+	"Contributing":  "Хувь нэмэр оруулах",
 	"Contact":       "Холбоо барих",
+	"License":       "Лиценз",
 }
 
-// enOnlyHeadings / mnOnlyHeadings — ӨНӨӨДРИЙН мэдэгдэж байгаа тэнцвэргүй
-// хэсгүүд. Эдгээрийг хоёр хэл дээр болгох эсэх нь ЗОХИОГЧИЙН бүтээгдэхүүний
-// шийдвэр, тестийн зүйл биш — тиймээс энд ил бүртгэж, тестийг ОДОО ажиллуулах
-// боломжтой болгож байна. Зорилго нь ДАРААГИЙН тэнцвэргүй хэсгийг барих.
+// enOnlyHeadings / mnOnlyHeadings — зориуд нэг хэл дээр л байгаа хэсгүүд. Хоёр
+// хэл дээр болгох эсэх нь зохиогчийн шийдвэр; энд ил бүртгэсэн нь ДАРААГИЙН
+// тэнцвэргүй хэсгийг барих зорилготой.
 var enOnlyHeadings = map[string]bool{
 	"Report — one issue, every scanner, both languages": true,
-	"CI/CD gate":   true,
-	"Contributing": true,
-	"License":      true,
 }
 
 var mnOnlyHeadings = map[string]bool{
-	"Туршилтын лаборатори": true,
 	// Монгол хэсгийн өөрийн гарчиг (зааг).
 	"Монгол хэл дээр": true,
 }
