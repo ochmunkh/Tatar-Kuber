@@ -4,7 +4,7 @@
 # Тэмдэглэл: энэ образ нь orchestrator (tatar-kuber)-ийг л агуулна. Live scan-д
 # scanner CLI-ууд (trivy, kubescape, ...) тусад нь шаардлагатай; offline ingest,
 # report, gate нь энэ образ дотор бүрэн ажиллана (registry шигтгэгдсэн).
-FROM golang:1.25-alpine@sha256:1ae0735f00daffa3aaf1363a5184c0d2dc55c78e3db4ec70241cdac97bf84b59 AS build
+FROM golang:1.27-alpine@sha256:70bd7ddea8b6cbe5d6943cde279d6b67feb10cc924fb9100d1d8757c1575b280 AS build
 WORKDIR /src
 COPY go.mod go.sum ./
 RUN go mod download
