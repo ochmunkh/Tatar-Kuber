@@ -188,3 +188,22 @@ func max(a, b int) int {
 	}
 	return b
 }
+
+// A finding title is attacker-influenced (it comes from scanned manifests). The
+// page must neither execute it nor let it reach out: the title is escaped, and a
+// CSP forbids scripts and any fetch even if an escape were ever missed.
+func TestRender_HostileTitleIsInertAndCSPPresent(t *testing.T) {
+	res := sample()
+	res.Findings[0].Title = `<script>alert(1)</script><img src="file:///etc/passwd">`
+	var buf bytes.Buffer
+	if err := Render(&buf, res, "en"); err != nil {
+		t.Fatal(err)
+	}
+	out := buf.String()
+	if strings.Contains(out, "<script") || strings.Contains(out, `<img src="file:`) {
+		t.Fatal("hostile title leaked into the document as markup")
+	}
+	if !strings.Contains(out, `Content-Security-Policy" content="default-src 'none'`) {
+		t.Fatal("audit HTML must carry a restrictive CSP")
+	}
+}

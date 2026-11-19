@@ -491,7 +491,13 @@ A security tool should hold itself to the standard it enforces:
   `update` pinned can be shadowed by another copy; when that happens a warning is printed and
   stored in the run. Scanners inherit your environment **except** forge/CI credentials
   (`GITHUB_TOKEN`, `GH_TOKEN`, `ACTIONS_*` tokens, …); `TATAR_PASS_ENV=NAME,NAME` hands a named
-  one over. Checkov is started with `BC_SKIP_MAPPING=TRUE`: without it, it calls
+  one over. `TATAR_STRICT_ENV=1` switches this to an allow-list (only `PATH`, `HOME`, `KUBECONFIG`,
+  proxy/CA variables, `TRIVY_*`-style tool prefixes and what `TATAR_PASS_ENV` names); cloud
+  credentials are then withheld too. A scanner binary in `~/.tatar-kuber/tools` is compared with
+  the SHA-256 `update` recorded (`installed_sha256` in `tools.lock.yaml`); if it was changed
+  afterwards the scanner is reported `unavailable` and not run. `scan` writes `raw/SHA256SUMS`
+  (`sha256sum` format) and `scan --raw-dir` refuses a directory that no longer matches it.
+  Checkov is started with `BC_SKIP_MAPPING=TRUE`: without it, it calls
   `api0.prismacloud.io` on every run. Trivy's secret and misconfiguration scans make no network
   call; its vulnerability scan downloads its database. What Kubescape and Popeye send over the
   network has not been verified here.
@@ -966,7 +972,12 @@ dashboard): [**Замын зураг**](ROADMAP.md)-г үз.
   хийсэн scanner-ийг өөр хуулбар далдалж чадна; ингэвэл анхааруулга хэвлэж, run-д хадгална.
   Scanner-ууд таны орчныг өвлөнө, **гэхдээ** forge/CI credential-аас бусад
   (`GITHUB_TOKEN`, `GH_TOKEN`, `ACTIONS_*` token, …); нэрлэсэн нэгийг `TATAR_PASS_ENV=NAME,NAME`-ээр
-  өгч болно. Checkov-г `BC_SKIP_MAPPING=TRUE`-тай эхлүүлнэ: үгүй бол run бүрд
+  өгч болно. `TATAR_STRICT_ENV=1` нь үүнийг allow-list болгоно (зөвхөн `PATH`, `HOME`, `KUBECONFIG`,
+  proxy/CA хувьсагч, `TRIVY_*` төрлийн угтвар, `TATAR_PASS_ENV`-д нэрлэсэн); cloud credential мөн
+  хаагдана. `~/.tatar-kuber/tools` доторх scanner binary-г `update`-ийн бүртгэсэн SHA-256-тай
+  (`tools.lock.yaml`-ийн `installed_sha256`) тулгана; дараа нь өөрчлөгдсөн бол scanner
+  `unavailable` болж ажиллахгүй. `scan` нь `raw/SHA256SUMS` (`sha256sum` формат) бичнэ,
+  `scan --raw-dir` нь үүнтэй таарахгүй хавтсыг татгалзана. Checkov-г `BC_SKIP_MAPPING=TRUE`-тай эхлүүлнэ: үгүй бол run бүрд
   `api0.prismacloud.io` руу хандана. Trivy-ийн secret болон misconfiguration скан сүлжээнд
   хандахгүй; vulnerability скан нь өөрийн database-ийг татна. Kubescape, Popeye сүлжээгээр юу
   илгээдгийг энд шалгаагүй.

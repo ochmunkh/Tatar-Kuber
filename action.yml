@@ -39,10 +39,10 @@ inputs:
     default: ".tatar-kuber.yaml"
   version:
     description: |-
-      tatar-kuber version (go install tag). Default: latest.
-      tatar-kuber хувилбар (go install tag). Default: latest.
+      tatar-kuber version (go install tag). Default: the latest published release tag (pinned, not a moving `latest`).
+      tatar-kuber хувилбар (go install tag). Default: сүүлд нийтэлсэн release tag (`latest` биш, тогтсон).
     required: false
-    default: "latest"
+    default: "v1.0.5"
   registry:
     description: |-
       Path to canonical-controls.yaml. Leave empty to use the registry embedded in the binary — correct for almost every repo.
@@ -66,7 +66,7 @@ runs:
   using: "composite"
   steps:
     - name: Setup Go
-      uses: actions/setup-go@v5
+      uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
       with:
         go-version: "stable"
 

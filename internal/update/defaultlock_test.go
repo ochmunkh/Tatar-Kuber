@@ -118,6 +118,9 @@ func TestDefaultLock_EveryPinIsWellFormed(t *testing.T) {
 			t.Errorf("%s: installed = %q — the shipped lock records pins, not installs",
 				name, e.Installed)
 		}
+		if e.InstalledSHA256 != "" {
+			t.Errorf("%s: installed_sha256 is machine-local and must not ship in the lock", name)
+		}
 	}
 	if len(missing) > 0 {
 		sort.Strings(missing)

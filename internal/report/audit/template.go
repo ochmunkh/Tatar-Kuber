@@ -7,6 +7,7 @@ package audit
 // харагдана — аудитын баримт тийм байж болохгүй.
 const doc = `<!DOCTYPE html>
 <html lang="{{.Lang}}"><head><meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:">
 <title>{{.L.DocTitle}} — {{.Res.Metadata.ClusterName}}</title>
 <style>
   @page { size: A4; margin: 18mm 16mm 20mm 16mm; }

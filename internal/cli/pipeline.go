@@ -58,6 +58,9 @@ func buildPipeline(registryPath string) (*orchestrator.Pipeline, error) {
 // loadRawDir — <dir>/{trivy,kubescape,checkov,popeye}.json-г RawResult болгож ачаална.
 // Сонголттойгоор versions.json (scanner->version) ба inventory.json (объект->тоо)-г уншина.
 func loadRawDir(dir string) ([]scanner.RawResult, map[string]int, error) {
+	if err := verifyRawManifest(dir); err != nil {
+		return nil, nil, err
+	}
 	names := []string{"trivy", "kubescape", "checkov", "popeye"}
 	var raws []scanner.RawResult
 	for _, n := range names {

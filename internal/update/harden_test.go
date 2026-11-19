@@ -130,3 +130,60 @@ func TestCommitStaged_ReplacesAndCleansUp(t *testing.T) {
 		t.Fatal(".old must be removed after a successful swap")
 	}
 }
+
+// installed_sha256 is what lets a later scan notice that the binary was swapped
+// after `update` verified it. It has to survive a save/load round trip and keep
+// the exact key toolexec reads.
+func TestSaveLock_RoundTripsInstalledSHA256(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "tools.lock.yaml")
+	sum := strings.Repeat("ab", 32)
+	in := Lock{Tools: map[string]LockEntry{"trivy": {Version: "1.2.3", Installed: "1.2.3", InstalledSHA256: sum}}}
+	if err := SaveLock(path, in); err != nil {
+		t.Fatal(err)
+	}
+	raw, _ := os.ReadFile(path)
+	if !strings.Contains(string(raw), "installed_sha256: \""+sum+"\"") {
+		t.Fatalf("lock must contain installed_sha256:\n%s", raw)
+	}
+	out, err := LoadLock(path)
+	if err != nil || out.Tools["trivy"].InstalledSHA256 != sum {
+		t.Fatalf("round trip lost installed_sha256: %+v err=%v", out, err)
+	}
+	// A pin that was never installed carries none.
+	_ = SaveLock(path, Lock{Tools: map[string]LockEntry{"trivy": {Version: "1.2.3"}}})
+	raw, _ = os.ReadFile(path)
+	if strings.Contains(string(raw), "    installed_sha256:") {
+		t.Fatalf("never installed -> no installed_sha256 line:\n%s", raw)
+	}
+}
+
+func TestFileSHA256(t *testing.T) {
+	p := filepath.Join(t.TempDir(), "f")
+	_ = os.WriteFile(p, []byte("abc"), 0o600)
+	got, err := fileSHA256(p)
+	if err != nil || got != "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad" {
+		t.Fatalf("sha256(abc) = %q err=%v", got, err)
+	}
+}
+
+// FuzzLoadLock — tools.lock.yaml can be hand-edited or hostile; loading it must
+// never panic, and whatever loads must re-save and re-load without error.
+func FuzzLoadLock(f *testing.F) {
+	f.Add([]byte("tools:\n  trivy:\n    version: \"1\"\n    sha256: abc\n"))
+	f.Add([]byte("tools:\n  trivy:\n    sha256:\n      linux/amd64: x\n"))
+	f.Add([]byte("tools: [1,2"))
+	dir := f.TempDir()
+	f.Fuzz(func(t *testing.T, data []byte) {
+		p := filepath.Join(dir, "l.yaml")
+		if os.WriteFile(p, data, 0o600) != nil {
+			t.Skip()
+		}
+		l, err := LoadLock(p)
+		if err != nil {
+			return
+		}
+		if err := SaveLock(p, l); err != nil {
+			t.Fatalf("a lock that loads must save: %v", err)
+		}
+	})
+}

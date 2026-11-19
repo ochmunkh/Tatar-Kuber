@@ -201,6 +201,12 @@ func TestApply_DownloadVerifyInstallLock(t *testing.T) {
 	if !bytes.Equal(got, binary) {
 		t.Errorf("installed binary content = %q", got)
 	}
+	// The lock must record the digest of what was unpacked, so a later scan can
+	// tell the binary was swapped after `update` verified it.
+	if l, err := LoadLock(LockPath(home)); err != nil || l.Tools["trivy"].InstalledSHA256 != sum(binary) {
+		t.Errorf("installed_sha256 = %q, want %q (err=%v)", l.Tools["trivy"].InstalledSHA256, sum(binary), err)
+	}
+	// And the shipped lock must not claim an install it never made.
 	fi, err := os.Stat(results[0].BinPath)
 	if err != nil {
 		t.Fatal(err)

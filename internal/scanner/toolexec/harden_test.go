@@ -187,3 +187,94 @@ func TestDescribe_OnlyOnPathIsNotAWarning(t *testing.T) {
 		t.Fatalf("a PATH-only binary shadows nothing: %+v ok=%v", b, ok)
 	}
 }
+
+// ── F2: the binary in the tools directory must still be the one `update` installed
+
+func writeLock(t *testing.T, name, sha string) {
+	t.Helper()
+	lock := filepath.Join(filepath.Dir(ToolsDir()), "tools.lock.yaml")
+	body := "tools:\n  " + name + ":\n    version: \"1.0.0\"\n    installed_sha256: \"" + sha + "\"\n"
+	if err := os.MkdirAll(filepath.Dir(lock), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(lock, []byte(body), 0o600); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestDescribe_ToolsBinaryMatchingTheLockIsFine(t *testing.T) {
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home)
+	t.Setenv("PATH", t.TempDir())
+	p := writeTool(t, filepath.Join(ToolsDir(), "faketool"), "faketool")
+	writeLock(t, "faketool", fileSHA256(p))
+
+	b, ok := Describe("faketool")
+	if !ok || b.Mismatch || b.Warning != "" || b.PinnedSHA256 != b.SHA256 {
+		t.Fatalf("a binary that still matches the lock must pass: %+v", b)
+	}
+}
+
+func TestDescribe_ToolsBinaryChangedAfterInstallIsFlagged(t *testing.T) {
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home)
+	t.Setenv("PATH", t.TempDir())
+	p := writeTool(t, filepath.Join(ToolsDir(), "faketool"), "faketool")
+	writeLock(t, "faketool", fileSHA256(p))
+	if err := os.WriteFile(p, []byte("swapped after update verified it"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+
+	b, ok := Describe("faketool")
+	if !ok || !b.Mismatch || !strings.Contains(b.Warning, "tatar-kuber update") {
+		t.Fatalf("a modified tools binary must be flagged: %+v", b)
+	}
+}
+
+func TestDescribe_NoPinInLockMeansNoMismatch(t *testing.T) {
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home)
+	t.Setenv("PATH", t.TempDir())
+	writeTool(t, filepath.Join(ToolsDir(), "faketool"), "faketool")
+	// no lock at all (hand-placed binary, older install): behaviour unchanged
+	if b, ok := Describe("faketool"); !ok || b.Mismatch || b.PinnedSHA256 != "" {
+		t.Fatalf("no recorded digest -> nothing to compare: %+v", b)
+	}
+	// a lock that does not mention this tool
+	writeLock(t, "othertool", strings.Repeat("a", 64))
+	if b, _ := Describe("faketool"); b.Mismatch {
+		t.Fatalf("another tool's pin must not apply: %+v", b)
+	}
+}
+
+func TestChildEnv_StrictModeIsAnAllowList(t *testing.T) {
+	environ := []string{
+		StrictEnvVar + "=1", "PATH=/usr/bin", "HOME=/h", "KUBECONFIG=/k", "HTTPS_PROXY=http://p", "TRIVY_CACHE_DIR=/c",
+		"AWS_SECRET_ACCESS_KEY=s", "GITHUB_TOKEN=t", "DATABASE_URL=postgres://x", "MY_API_KEY=k",
+	}
+	got := envMap(childEnv(environ, []string{"EXTRA=1"}))
+	for _, want := range []string{"PATH", "HOME", "KUBECONFIG", "HTTPS_PROXY", "TRIVY_CACHE_DIR", "EXTRA"} {
+		if _, ok := got[want]; !ok {
+			t.Errorf("strict mode must keep %s", want)
+		}
+	}
+	for _, gone := range []string{"AWS_SECRET_ACCESS_KEY", "GITHUB_TOKEN", "DATABASE_URL", "MY_API_KEY"} {
+		if _, ok := got[gone]; ok {
+			t.Errorf("strict mode must drop %s", gone)
+		}
+	}
+}
+
+func TestChildEnv_StrictModeStillHonoursPassEnv(t *testing.T) {
+	environ := []string{StrictEnvVar + "=1", "PATH=/p", ForwardEnvVar + "=AWS_PROFILE", "AWS_PROFILE=dev", "AWS_SECRET_ACCESS_KEY=s"}
+	got := envMap(childEnv(environ, nil))
+	if got["AWS_PROFILE"] != "dev" {
+		t.Error("TATAR_PASS_ENV must release a named variable in strict mode")
+	}
+	if _, ok := got["AWS_SECRET_ACCESS_KEY"]; ok {
+		t.Error("unnamed cloud credential must stay out in strict mode")
+	}
+}

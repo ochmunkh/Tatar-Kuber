@@ -65,3 +65,22 @@ func TestRender_HTMLLangMatchesReportLang(t *testing.T) {
 		}
 	}
 }
+
+func TestRender_HostileTitleIsInertAndCSPPresent(t *testing.T) {
+	res := finding.ScanResult{
+		SchemaVersion: "1.0",
+		Findings: []finding.Finding{{ID: "f1", CanonicalControl: "TATAR-CON-001", Resource: "deployment/api", Severity: finding.SeverityHigh,
+			Title: `<script>alert(1)</script><img src="file:///etc/passwd">`}},
+	}
+	var b bytes.Buffer
+	if err := Render(&b, res); err != nil {
+		t.Fatal(err)
+	}
+	s := b.String()
+	if strings.Contains(s, "<script") || strings.Contains(s, `<img src="file:`) {
+		t.Fatal("hostile title leaked into the page as markup")
+	}
+	if !strings.Contains(s, `Content-Security-Policy" content="default-src 'none'`) {
+		t.Fatal("HTML report must carry a restrictive CSP")
+	}
+}

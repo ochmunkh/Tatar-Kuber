@@ -26,9 +26,9 @@ jobs:
   live:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
         with:
           go-version: "stable"
           cache: true
@@ -47,48 +47,31 @@ jobs:
           kubectl apply -n demo -f examples/vulnerable/
           kubectl get all -n demo
 
-      # Суулгагчид нь upstream-ийн сүлжээнээс хамаарна. 2026-09-18-нд Kubescape-ийн
-      # install.sh түр зуурын саатлаар exit 1 өгч, БҮХЭЛ run унаж, doctor ба
-      # "scanner бүр finding өгсөн эсэх" шалгалт огт ажиллаагүй. Тиймээс:
-      #   1) суулгалт бүрийг 3 удаа дахин оролдоно;
-      #   2) эцэст нь бүтэхгүй бол алхам алдаатай гэж тэмдэглэгдэнэ (шар), гэхдээ
-      #      run үргэлжилнэ — scanner нь scanner_runs-д "unavailable" гэж гарч,
-      #      үлдсэн scanner-ууд шалгагдаж, тайлан artifact болж хадгалагдана.
-      # Ингэснээр суулгагчийн флюк ба scanner ЖИНХЭНЭ эвдэрсэн хоёр ялгарна.
-      - name: Install Trivy
+      # Scanner-уудыг `curl | sh`-ээр БИШ, төслийн өөрийн `update` командаар
+      # суулгана: хувилбар нь tools.lock.yaml-д пиннэгдсэн, татсан файл бүр
+      # lock дахь SHA-256-тай тулгагдана. Өмнө нь install.sh-г шууд shell-д
+      # дамжуулдаг байсан — upstream-ийн master дахь скрипт юу ч хийж чадна,
+      # мөн хувилбар нь ажиллах мөчийн "latest" байв (хянагдаагүй).
+      #
+      # Суулгалт upstream-ийн сүлжээнээс хамаарна (2026-09-18-нд Kubescape-ийн
+      # install.sh түр зуурын саатлаар унаж БҮХЭЛ run унасан). Тиймээс бүгдийг
+      # 3 удаа дахин оролдоно; эцэст нь бүтэхгүй бол алхам шар болно, гэхдээ
+      # run үргэлжилнэ — scanner нь scanner_runs-д "unavailable" гэж гарч,
+      # үлдсэн scanner-ууд шалгагдана. Ингэснээр суулгалтын флюк ба scanner
+      # ЖИНХЭНЭ эвдэрсэн хоёр ялгарна.
+      - name: Install pinned scanners with `update`
         run: |
-          for i in 1 2 3; do
-            curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin && exit 0
-            echo "::warning::trivy суулгалт $i дэх оролдлого амжилтгүй — дахин оролдоно"; sleep 5
+          mkdir -p "$HOME/.tatar-kuber"
+          cp tools.lock.yaml "$HOME/.tatar-kuber/tools.lock.yaml"
+          for s in trivy kubescape popeye; do
+            ok=0
+            for i in 1 2 3; do
+              if ./tatar-kuber update --scanner "$s"; then ok=1; break; fi
+              echo "::warning::$s суулгалт $i дэх оролдлого амжилтгүй — дахин оролдоно"; sleep 5
+            done
+            [ "$ok" = 1 ] || echo "::warning::$s суулгагдсангүй — scanner_runs-д unavailable гарна"
           done
-          exit 1
         continue-on-error: true
-
-      - name: Install Kubescape
-        run: |
-          # -f ЗААВАЛ: үгүй бол 404 буцаахад HTML хуудсыг шууд bash-д дамжуулна.
-          for i in 1 2 3; do
-            if curl -sfL https://raw.githubusercontent.com/kubescape/kubescape/master/install.sh | /bin/bash; then
-              echo "$HOME/.kubescape/bin" >> "$GITHUB_PATH"; exit 0
-            fi
-            echo "::warning::kubescape суулгалт $i дэх оролдлого амжилтгүй — дахин оролдоно"; sleep 5
-          done
-          exit 1
-        continue-on-error: true
-
-      - name: Install Popeye
-        run: |
-          for i in 1 2 3; do
-            VER="$(curl -s https://api.github.com/repos/derailed/popeye/releases/latest | grep -o '"tag_name": *"[^"]*"' | head -1 | sed -E 's/.*"v?([^"]+)".*/\1/')"
-            if [ -n "$VER" ] \
-              && curl -sfL "https://github.com/derailed/popeye/releases/download/v${VER}/popeye_linux_amd64.tar.gz" -o /tmp/popeye.tgz \
-              && tar -xzf /tmp/popeye.tgz -C /tmp popeye; then
-              sudo install -m0755 /tmp/popeye /usr/local/bin/popeye; exit 0
-            fi
-            echo "::warning::popeye суулгалт $i дэх оролдлого амжилтгүй — дахин оролдоно"; sleep 5
-          done
-          exit 1
-        continue-on-error: true # popeye нэмэлт — суулгаж чадахгүй бол алгасна
 
       - name: Doctor — which scanners are live
         run: ./tatar-kuber doctor
@@ -119,7 +102,7 @@ jobs:
 
       - name: Upload live scan artifacts (report + raw scanner output as evidence)
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: live-scan-report
           path: out/

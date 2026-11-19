@@ -36,6 +36,14 @@ type LockEntry struct {
 	// `update --check` report a scanner as installed and up to date when
 	// nothing had ever been downloaded.
 	Installed string `yaml:"installed,omitempty"`
+
+	// InstalledSHA256 — SHA-256 of the extracted binary Apply left on THIS
+	// machine. sha256 above pins the downloaded artefact; this pins what was
+	// unpacked from it, so a scan can tell that the file in the tools
+	// directory is still the one `update` verified. Machine-local by nature
+	// (a different platform unpacks a different binary), written ONLY by
+	// Apply, and read by toolexec.Describe.
+	InstalledSHA256 string `yaml:"installed_sha256,omitempty"`
 }
 
 // SHA256Set — one scanner's checksums, keyed by platform ("linux/amd64").
@@ -158,6 +166,10 @@ func SaveLock(path string, l Lock) error {
 	b.WriteString("# be installed; installed is what is. A pin with no installed line has never\n")
 	b.WriteString("# been downloaded, and `update --check` says so rather than reporting it as\n")
 	b.WriteString("# up to date.\n")
+	b.WriteString("#\n")
+	b.WriteString("# installed_sha256: SHA-256 of the extracted binary `update` left on this\n")
+	b.WriteString("# machine. A scan compares the file in ~/.tatar-kuber/tools with it and\n")
+	b.WriteString("# refuses to run a scanner whose binary no longer matches.\n")
 	b.WriteString("tools:\n")
 	for _, n := range names {
 		e := l.Tools[n]
@@ -180,6 +192,9 @@ func SaveLock(path string, l Lock) error {
 		// once parsed.
 		if e.Installed != "" {
 			fmt.Fprintf(&b, "    installed: %q\n", e.Installed)
+		}
+		if e.InstalledSHA256 != "" {
+			fmt.Fprintf(&b, "    installed_sha256: %q\n", e.InstalledSHA256)
 		}
 	}
 

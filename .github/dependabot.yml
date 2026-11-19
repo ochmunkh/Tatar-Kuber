@@ -28,3 +28,13 @@ updates:
     open-pull-requests-limit: 5
     commit-message:
       prefix: "chore"
+
+  # Docker образын суурь (golang, distroless) digest-ээр пиннэгдсэн; digest
+  # хуучирвал аюулгүй байдлын засвар ирэхээ болино — тиймээс мөн шинэчилнэ.
+  - package-ecosystem: docker
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: "chore"

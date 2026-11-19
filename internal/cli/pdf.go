@@ -68,14 +68,30 @@ func findConverter() *converter {
 	return nil
 }
 
+// needsNoSandbox — Chromium's sandbox cannot start as root or inside many
+// containers, so --no-sandbox is added ONLY there. Passing it everywhere
+// switched off the browser's main defence for the one case it is needed least:
+// an ordinary user on their own machine. A variable so tests can pin both
+// branches.
+var needsNoSandbox = func() bool {
+	if os.Geteuid() == 0 {
+		return true
+	}
+	_, err := os.Stat("/.dockerenv")
+	return err == nil
+}
+
 func chromium(name, path string) *converter {
 	return &converter{Name: name, Path: path, Args: func(h, o string) []string {
-		return []string{
-			"--headless", "--disable-gpu", "--no-sandbox",
-			"--no-pdf-header-footer",
-			"--print-to-pdf=" + o,
-			"file://" + filepath.ToSlash(h),
+		args := []string{"--headless", "--disable-gpu"}
+		if needsNoSandbox() {
+			args = append(args, "--no-sandbox")
 		}
+		return append(args,
+			"--no-pdf-header-footer",
+			"--print-to-pdf="+o,
+			"file://"+filepath.ToSlash(h),
+		)
 	}}
 }
 

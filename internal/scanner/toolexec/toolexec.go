@@ -24,6 +24,10 @@ import (
 	"regexp"
 	"runtime"
 	"strings"
+
+	"gopkg.in/yaml.v3"
+
+	"github.com/ochmunkh/tatar-kuber/internal/safeio"
 )
 
 // ToolsDir — TATAR-Kuber-ийн татаж авсан хэрэгслүүдийн лавлах.
@@ -222,6 +226,13 @@ type Binary struct {
 	// Shadowed is set when the binary came from PATH although a copy also
 	// exists in the tools directory -- the one `update` pins and verifies.
 	Shadowed bool
+	// PinnedSHA256 is the digest `update` recorded (tools.lock.yaml,
+	// installed_sha256) for the copy in the tools directory; "" when the lock
+	// holds none (older lock, hand-placed binary, or a PATH binary).
+	PinnedSHA256 string
+	// Mismatch is set when a tools-directory binary no longer hashes to
+	// PinnedSHA256: it was replaced or modified after `update` verified it.
+	Mismatch bool
 	// Warning is a ready-to-print sentence for the Shadowed case.
 	Warning string
 }
@@ -235,6 +246,14 @@ func Describe(name string) (Binary, bool) {
 	b := Binary{Path: p, Source: SourcePath, SHA256: fileSHA256(p)}
 	if inToolsDir(p) {
 		b.Source = SourceTools
+		if pin := lockedInstalledSHA(name); pin != "" {
+			b.PinnedSHA256 = pin
+			if b.SHA256 != pin {
+				b.Mismatch = true
+				b.Warning = fmt.Sprintf("%s at %s does not match the SHA-256 recorded by `update` (%s, now %s); it was changed after installation. Run `tatar-kuber update` to reinstall the pinned copy",
+					name, p, short(pin), short(b.SHA256))
+			}
+		}
 		return b, true
 	}
 	if tp, ok := resolveInTools(name); ok && !samePath(tp, p) {
@@ -242,6 +261,31 @@ func Describe(name string) (Binary, bool) {
 		b.Warning = fmt.Sprintf("%s was taken from PATH (%s); the pinned copy in %s was NOT used", name, p, ToolsDir())
 	}
 	return b, true
+}
+
+func short(h string) string {
+	if len(h) > 12 {
+		return h[:12]
+	}
+	return h
+}
+
+// lockedInstalledSHA — the installed_sha256 `update` wrote for name into
+// tools.lock.yaml (the file beside the tools directory), or "" if there is none.
+func lockedInstalledSHA(name string) string {
+	data, err := safeio.ReadFile(filepath.Join(filepath.Dir(ToolsDir()), "tools.lock.yaml"), safeio.MaxConfig)
+	if err != nil {
+		return ""
+	}
+	var l struct {
+		Tools map[string]struct {
+			InstalledSHA256 string `yaml:"installed_sha256"`
+		} `yaml:"tools"`
+	}
+	if yaml.Unmarshal(data, &l) != nil {
+		return ""
+	}
+	return strings.ToLower(strings.TrimSpace(l.Tools[name].InstalledSHA256))
 }
 
 func inToolsDir(p string) bool {
@@ -296,6 +340,37 @@ var secretEnv = map[string]bool{
 // are handed to the scanners even though they are on the list above.
 const ForwardEnvVar = "TATAR_PASS_ENV"
 
+// StrictEnvVar — set to "1" to switch the scanners' environment from the
+// default deny-list (drop forge credentials) to an allow-list (drop everything
+// not needed to run). Opt-in because a kubeconfig `exec` plugin may rely on
+// variables only the user knows about; TATAR_PASS_ENV releases those by name.
+const StrictEnvVar = "TATAR_STRICT_ENV"
+
+var strictNames = map[string]bool{
+	"PATH": true, "HOME": true, "USERPROFILE": true, "USER": true, "LOGNAME": true,
+	"TMPDIR": true, "TMP": true, "TEMP": true, "TERM": true, "LANG": true, "SHELL": true,
+	"KUBECONFIG": true, "SYSTEMROOT": true, "SYSTEMDRIVE": true, "WINDIR": true,
+	"COMSPEC": true, "PATHEXT": true, "APPDATA": true, "LOCALAPPDATA": true,
+	"HTTP_PROXY": true, "HTTPS_PROXY": true, "NO_PROXY": true, "ALL_PROXY": true,
+	"SSL_CERT_FILE": true, "SSL_CERT_DIR": true, "REQUESTS_CA_BUNDLE": true,
+	"BC_SKIP_MAPPING": true, ForwardEnvVar: true, StrictEnvVar: true,
+}
+
+var strictPrefixes = []string{"LC_", "XDG_", "TRIVY_", "KUBESCAPE_", "POPEYE_", "CHECKOV_", "BC_"}
+
+func strictAllowed(name string) bool {
+	u := strings.ToUpper(name)
+	if strictNames[u] {
+		return true
+	}
+	for _, p := range strictPrefixes {
+		if strings.HasPrefix(u, p) {
+			return true
+		}
+	}
+	return false
+}
+
 // childEnv — os.Environ() minus the credentials in secretEnv, plus extra.
 // extra wins over the inherited value, as before.
 func childEnv(environ, extra []string) []string {
@@ -305,13 +380,21 @@ func childEnv(environ, extra []string) []string {
 			pass[n] = true
 		}
 	}
+	strict := lookupEnv(environ, StrictEnvVar) == "1"
 	out := make([]string, 0, len(environ)+len(extra))
 	for _, kv := range environ {
 		name := kv
 		if i := strings.IndexByte(kv, '='); i >= 0 {
 			name = kv[:i]
 		}
-		if secretEnv[strings.ToUpper(name)] && !pass[name] {
+		if strict {
+			// Allow-list mode: only what a scanner needs to run, plus what the
+			// user named in TATAR_PASS_ENV. Cloud credentials are NOT included;
+			// a kubeconfig exec plugin that needs them must be listed there.
+			if !strictAllowed(name) && !pass[name] {
+				continue
+			}
+		} else if secretEnv[strings.ToUpper(name)] && !pass[name] {
 			continue
 		}
 		out = append(out, kv)

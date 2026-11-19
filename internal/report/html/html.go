@@ -223,6 +223,7 @@ const dashboard = `<!DOCTYPE html>
 <html lang="{{.HTMLLang}}">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:">
 <title>TATAR-Kuber Security Report</title>
 <style>
  body{font-family:Segoe UI,Arial,sans-serif;margin:0;background:#f4f6f8;color:#1a1a1a}

@@ -265,6 +265,11 @@ func Apply(ctx context.Context, opts Options) ([]Result, error) {
 		// Only Apply ever writes this, which is what makes --check able to tell
 		// "pinned in the lock" from "actually installed".
 		entry.Installed = u.plan.Version
+		sum, err := fileSHA256(bin)
+		if err != nil {
+			return nil, fmt.Errorf("%s: hash installed binary: %w", u.plan.Scanner, err)
+		}
+		entry.InstalledSHA256 = sum
 		lock.Tools[u.plan.Scanner] = entry
 		results = append(results, Result{Plan: u.plan, BinPath: bin, SigChecked: u.sigChecked})
 	}
@@ -313,6 +318,20 @@ func fetch(ctx context.Context, client *http.Client, url, dst string) (string, e
 	}
 	if n > maxArtefact {
 		return "", errors.New("artefact is larger than the 512 MiB limit")
+	}
+	return hex.EncodeToString(h.Sum(nil)), nil
+}
+
+// fileSHA256 — hex SHA-256 of a file on disk.
+func fileSHA256(path string) (string, error) {
+	f, err := os.Open(path) // #nosec G304 -- path was just produced by commitStaged
+	if err != nil {
+		return "", err
+	}
+	defer func() { _ = f.Close() }()
+	h := sha256.New()
+	if _, err := io.Copy(h, f); err != nil {
+		return "", err
 	}
 	return hex.EncodeToString(h.Sum(nil)), nil
 }

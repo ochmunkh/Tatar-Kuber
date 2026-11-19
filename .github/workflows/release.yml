@@ -37,21 +37,27 @@ on:
 # .github/dependabot.yml нь эдгээрийг долоо хоног тутам шалгаж, шинэчлэлтийг
 # PR болгон ирүүлнэ — пин нь хуучирвал хүн харна, чимээгүй хоцрохгүй.
 #
-# actions/* ба github/codeql-action нь GitHub-ийн өөрийнх тул major tag-аар
-# үлдээв: тэднийг эзэмдэх нь өөр, илүү том ангиллын халдлага.
+# actions/* ба github/codeql-action нь GitHub-ийн өөрийнх боловч тэднийг
+# мөн commit SHA-д пиннэв (OpenSSF Scorecard: Pinned-Dependencies; мөн
+# 'sha_pinning_required' repo тохиргоо бүх action-аас үүнийг шаарддаг).
+#
+# Эрх: workflow-ийн түвшинд зөвхөн уншихыг зөвшөөрч, бичих эрхийг ЗӨВХӨН
+# тэр шаардлагатай job-д өгнө (Scorecard: Token-Permissions).
 permissions:
-  contents: write # GitHub Release үүсгэх
-  packages: write # ghcr.io руу image түлхэх
+  contents: read
 
 jobs:
   goreleaser:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # GitHub Release үүсгэх
+      packages: write # ghcr.io руу image түлхэх
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0 # changelog-д бүх түүх хэрэгтэй
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
         with:
           go-version: "stable" # patched stdlib (html/template XSS засварууд)
           cache: true

@@ -212,7 +212,10 @@ func saveRaw(dir string, raws []scanner.RawResult) error {
 		}
 	}
 	vb, _ := json.MarshalIndent(vers, "", "  ")
-	return os.WriteFile(filepath.Join(dir, "versions.json"), vb, 0o600)
+	if err := os.WriteFile(filepath.Join(dir, "versions.json"), vb, 0o600); err != nil {
+		return err
+	}
+	return writeRawManifest(dir)
 }
 
 func writeResult(r interface{}, outDir string) int {

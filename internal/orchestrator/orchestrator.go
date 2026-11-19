@@ -124,6 +124,12 @@ func (p *Pipeline) Collect(ctx context.Context, t scanner.Target) ([]scanner.Raw
 			runs[i].BinarySource = b.Source
 			runs[i].BinarySHA256 = b.SHA256
 			runs[i].Warning = b.Warning
+			if b.Mismatch {
+				// Do not run a binary that is not the one `update` verified.
+				runs[i].Status = "unavailable"
+				runs[i].Error = b.Warning
+				continue
+			}
 		}
 		wg.Add(1)
 		go func(i int, a scanner.ScannerAdapter) {

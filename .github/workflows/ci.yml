@@ -12,9 +12,9 @@ jobs:
   build-test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
         with:
           go-version: "stable" # patched stdlib (html/template XSS засварууд)
           cache: true
@@ -53,9 +53,9 @@ jobs:
   build-test-windows:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
         with:
           go-version: "stable"
           cache: true
@@ -75,9 +75,9 @@ jobs:
       contents: read
       security-events: write # gosec SARIF-ийг Code Scanning руу upload
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
         with:
           go-version: "stable" # patched stdlib (html/template XSS засварууд)
           cache: true
@@ -85,7 +85,7 @@ jobs:
       # Хамааралууд болон stdlib дахь мэдэгдэж буй CVE-г шалгана (нарийвчлалтай).
       - name: govulncheck
         run: |
-          go install golang.org/x/vuln/cmd/govulncheck@latest
+          go install golang.org/x/vuln/cmd/govulncheck@v1.10.0
           "$(go env GOPATH)/bin/govulncheck" ./...
 
       # Статик аюулгүй байдлын шинжилгээ (SAST). CI-г унагахгүй — үр дүнг Code Scanning-д мэдээлнэ.
@@ -95,7 +95,7 @@ jobs:
           args: "-no-fail -fmt sarif -out gosec.sarif ./..."
 
       - name: Upload gosec SARIF
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@9418214df1f2c4b8128c770156c409013b07d6b9 # v3
         with:
           sarif_file: gosec.sarif
           category: gosec
@@ -118,15 +118,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout engine
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: Checkout lab
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           repository: ochmunkh/Tatar-Kuber-Lab
           path: lab
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
         with:
           go-version: "stable"
           cache: true
