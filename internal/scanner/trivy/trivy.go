@@ -54,6 +54,16 @@ func (s *Scanner) Timeout() time.Duration { return 6 * time.Minute }
 // Scan — Live Mode B: "trivy k8s --format json" ажиллуулж raw JSON цуглуулна.
 // (Local manifest scan-д Checkov ашиглагдана; Normalize нь k8s форматыг хүлээдэг.)
 func (s *Scanner) Scan(ctx context.Context, t scanner.Target) (scanner.RawResult, error) {
+	// User-supplied values go to the scanner as arguments: refuse one that the
+	// scanner would read as a flag of its own.
+	if err := toolexec.ValidateValue("kube context", t.Context); err != nil {
+		return scanner.RawResult{Scanner: "trivy"}, err
+	}
+	for _, ns := range t.Namespaces {
+		if err := toolexec.ValidateValue("namespace", ns); err != nil {
+			return scanner.RawResult{Scanner: "trivy"}, err
+		}
+	}
 	if t.Mode != scanner.ModeRemote {
 		return scanner.RawResult{Scanner: "trivy"}, fmt.Errorf("trivy live: зөвхөн remote (Mode B) дэмжигдэнэ")
 	}
@@ -182,7 +192,7 @@ func (s *Scanner) Normalize(raw scanner.RawResult) ([]finding.Finding, error) {
 					detail = "image"
 				}
 				ctx := canonical.ResolverContext{ResourceKind: res.Kind, Namespace: res.Namespace, Severity: sec.Severity, Detail: detail}
-				ev := finding.Evidence{Scanner: "trivy", Detail: sec.Match}
+				ev := finding.Evidence{Scanner: "trivy", Detail: safeMatch(sec.Match)}
 				meta := normalizer.Meta{Resource: resource, Namespace: res.Namespace, Title: sec.Title, Description: "secret detected: " + sec.Category, Evidence: []finding.Evidence{ev}, Remediation: "Move the secret out of the manifest into a secret store", Severity: sec.Severity}
 				if f, ok := normalizer.Build(s.resolver, "trivy", "secret", ctx, meta, s.now); ok {
 					out = append(out, f)
@@ -202,4 +212,21 @@ func refs(url, cve string) []string {
 		r = append(r, url)
 	}
 	return r
+}
+
+// safeMatch — the secret "match" line as it may appear in a report.
+//
+// Trivy replaces the secret with asterisks in Match, so what arrives here is
+// normally already censored. That is the scanner's behaviour, not a contract this
+// tool controls: if a Trivy release (or a replaced binary) ever returned the line
+// uncensored, the secret would be copied into scan-result.json and from there into
+// every report. A line with no censoring is therefore withheld, not trusted.
+func safeMatch(m string) string {
+	if m == "" || strings.Contains(m, "****") {
+		if len(m) > 200 {
+			return m[:200] + "…"
+		}
+		return m
+	}
+	return "[match withheld: the scanner did not censor it]"
 }

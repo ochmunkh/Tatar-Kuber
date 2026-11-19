@@ -7,7 +7,7 @@
 ![Output](https://img.shields.io/badge/output-JSON%20%C2%B7%20SARIF%20%C2%B7%20HTML-1F6F54)
 [![CI](https://github.com/ochmunkh/Tatar-Kuber/actions/workflows/ci.yml/badge.svg)](https://github.com/ochmunkh/Tatar-Kuber/actions/workflows/ci.yml)
 [![Real cluster](https://github.com/ochmunkh/Tatar-Kuber/actions/workflows/real-cluster.yml/badge.svg)](https://github.com/ochmunkh/Tatar-Kuber/actions/workflows/real-cluster.yml)
-![Tests](https://img.shields.io/badge/tests-21%20packages%20green-brightgreen)
+![Tests](https://img.shields.io/badge/tests-23%20packages%20green-brightgreen)
 ![Release](https://img.shields.io/badge/release-v1.0.5-brightgreen)
 
 **Kubernetes security posture assessment framework — one command, four scanners, one standard report.**
@@ -212,7 +212,7 @@ sources → scanners (parallel) → normalize → canonical + dedup → blind-sh
 
 ```bash
 go build ./...
-go test ./...          # 21 packages, all green
+go test ./...          # 23 packages, all green
 ./scripts/build.sh 1.0.5
 ```
 
@@ -225,6 +225,7 @@ tatar-kuber report      --input scan-result.json --format json | sarif | html | 
                         # audit = print-ready bilingual audit report; pdf = the same, converted on this machine
 tatar-kuber gate        --input scan-result.json [--policy .tatar-kuber.yaml] [--fail-on high] [--min-score N]
                         # --baseline prev/scan-result.json : fail only on NEW and WORSENED
+                        # refuses (exit 2) a scan-result.json that disagrees with itself; --skip-integrity-check
 tatar-kuber doctor      # which scanners are installed, versions, supported modes
 tatar-kuber diff        --old prev/scan-result.json --new out/scan-result.json
                         # trending: new / fixed / worsened / improved  [--fail-on-new high] [--format json]
@@ -412,9 +413,10 @@ suppress:
 ```
 
 `expires` is not decoration: the rule stops applying on that date and the finding comes
-back. The gate also reports rules that have expired, rules pointing at a control that does
-not exist, and rules that matched nothing — a suppression nobody notices is how an accepted
-risk becomes a forgotten one.
+back. A date that cannot be read (`2026-13-45`, `tomorrow`) is **not** "no expiry": the rule is
+not applied and the gate says so. The gate also reports rules that have expired, rules
+pointing at a control that does not exist, and rules that matched nothing — a suppression
+nobody notices is how an accepted risk becomes a forgotten one.
 
 Baseline is for the bulk at adoption; suppression is for the few you consciously keep.
 
@@ -483,8 +485,27 @@ A security tool should hold itself to the standard it enforces:
 - **Output is written owner-only** — `scan-result.json`, the raw scanner output and every report
   (`html`, `audit`, `sarif`, `json`, `pdf`) are created with mode `0600`. A report is a list of a
   cluster's weaknesses in readable form; treat it as confidential wherever it travels.
+- **The scanners are third-party programs, and the report says which one ran.** Each
+  `metadata.scanner_runs[]` entry records the binary's path, where it was found (`path` or
+  `tools`) and its SHA-256. PATH is searched before `~/.tatar-kuber/tools`, so a scanner that
+  `update` pinned can be shadowed by another copy; when that happens a warning is printed and
+  stored in the run. Scanners inherit your environment **except** forge/CI credentials
+  (`GITHUB_TOKEN`, `GH_TOKEN`, `ACTIONS_*` tokens, …); `TATAR_PASS_ENV=NAME,NAME` hands a named
+  one over. Checkov is started with `BC_SKIP_MAPPING=TRUE`: without it, it calls
+  `api0.prismacloud.io` on every run. Trivy's secret and misconfiguration scans make no network
+  call; its vulnerability scan downloads its database. What Kubescape and Popeye send over the
+  network has not been verified here.
+- **The gate checks the file it is given.** `gate` recomputes the result hash, the finding
+  counts and the risk score from the findings and refuses (exit 2) a `scan-result.json` that
+  disagrees with itself. This catches hand edits, truncated files and files from another
+  scoring model; it is a consistency check, not a signature — someone who can recompute every
+  field is not stopped. `--skip-integrity-check` turns it off and says so each time.
+- **Inputs are bounded.** Scanner output, raw JSON and scan results are capped at 256 MiB, and
+  policy / attestation / registry files at 16 MiB; a larger file is an error, never a
+  truncated read. A kube context or namespace that starts with `-` is refused rather than
+  passed to a scanner as a flag.
 
-Found a vulnerability? Use GitHub's **Security → Report a vulnerability** (private disclosure).
+Found a vulnerability? See [`SECURITY.md`](SECURITY.md) — GitHub's **Security → Report a vulnerability** (private disclosure).
 
 ## Contributing
 
@@ -846,7 +867,9 @@ suppress:
 
 `expires` нь чимэглэл биш: тэр өдөр дүрэм идэвхгүй болж, олдвор буцаж гарна. Мөн gate нь
 хугацаа дууссан дүрэм, байхгүй control руу заасан дүрэм, юунд ч тохироогүй дүрмийг
-мэдэгдэнэ — хэн ч анзаардаггүй suppress бол мартагдсан эрсдэл болох зам.
+мэдэгдэнэ — хэн ч анзаардаггүй suppress бол мартагдсан эрсдэл болох зам. Уншигдахгүй огноо
+(`2026-13-45`, `tomorrow`) нь "хугацаагүй" гэсэн үг **биш**: дүрэм хэрэглэгдэхгүй, gate үүнийг
+мэдэгдэнэ.
 
 Baseline нь нэвтрүүлэх үеийн олон тоонд, suppress нь ухамсартай үлдээсэн цөөнд.
 
@@ -862,7 +885,7 @@ docker run --rm -v "$PWD:/work" -w /work ghcr.io/ochmunkh/tatar-kuber:latest sca
 
 ```bash
 go build ./...
-go test ./...          # 21 багц, бүгд ногоон
+go test ./...          # 23 багц, бүгд ногоон
 ./scripts/build.sh 1.0.5
 ```
 
@@ -937,8 +960,27 @@ dashboard): [**Замын зураг**](ROADMAP.md)-г үз.
 - **Гаралт зөвхөн эзэмшигчид уншигдахаар бичигдэнэ** — `scan-result.json`, scanner-ийн түүхий
   гаралт, мөн тайлан бүр (`html`, `audit`, `sarif`, `json`, `pdf`) `0600` эрхтэй үүснэ. Тайлан
   бол кластерын сул талуудын хүн уншихуйц жагсаалт — хаашаа ч явсан нууц мэдээлэл гэж хандана.
+- **Scanner-ууд бол гуравдагч талын програм; тайлан аль нь ажилласныг хэлнэ.**
+  `metadata.scanner_runs[]` бичлэг бүр binary-ийн зам, хаанаас олдсон (`path` эсвэл `tools`),
+  SHA-256-г бүртгэнэ. PATH нь `~/.tatar-kuber/tools`-оос ӨМНӨ хайгддаг тул `update`-ийн пин
+  хийсэн scanner-ийг өөр хуулбар далдалж чадна; ингэвэл анхааруулга хэвлэж, run-д хадгална.
+  Scanner-ууд таны орчныг өвлөнө, **гэхдээ** forge/CI credential-аас бусад
+  (`GITHUB_TOKEN`, `GH_TOKEN`, `ACTIONS_*` token, …); нэрлэсэн нэгийг `TATAR_PASS_ENV=NAME,NAME`-ээр
+  өгч болно. Checkov-г `BC_SKIP_MAPPING=TRUE`-тай эхлүүлнэ: үгүй бол run бүрд
+  `api0.prismacloud.io` руу хандана. Trivy-ийн secret болон misconfiguration скан сүлжээнд
+  хандахгүй; vulnerability скан нь өөрийн database-ийг татна. Kubescape, Popeye сүлжээгээр юу
+  илгээдгийг энд шалгаагүй.
+- **Gate нь өөрт нь өгсөн файлыг шалгана.** `gate` нь result hash, finding-ийн тоо,
+  эрсдэлийн оноог findings-ээс дахин бодож, өөртэйгөө зөрсөн `scan-result.json`-оос татгалзана
+  (exit 2). Гар засвар, таслагдсан файл, өөр оноолтын загвараар үүссэн файлыг барина; энэ бол
+  гарын үсэг биш, зөвхөн тууштай байдлын шалгалт — бүх талбарыг дахин бодож чадах хүнийг
+  зогсоохгүй. `--skip-integrity-check` үүнийг унтрааж, тухай бүрд мэдэгдэнэ.
+- **Оролт хязгаарлагдмал.** Scanner-ийн гаралт, raw JSON, scan result 256 MiB, policy /
+  attestation / registry файл 16 MiB-ээс хэтрэхгүй; илүү том файл бол алдаа — хэзээ ч таслаж
+  уншихгүй. `-`-ээр эхэлсэн kube context, namespace-ийг scanner-т flag болгон дамжуулахгүй,
+  татгалзана.
 
-Эмзэг байдал олсон уу? GitHub-ын **Security → Report a vulnerability** (хаалттай мэдээлэл).
+Эмзэг байдал олсон уу? [`SECURITY.md`](SECURITY.md) — GitHub-ын **Security → Report a vulnerability** (хаалттай мэдээлэл).
 
 ### Холбоо барих
 

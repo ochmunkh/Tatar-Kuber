@@ -123,6 +123,9 @@ func Resolve(opts Options) ([]Plan, error) {
 		if locked && entry.Version != "" {
 			version = entry.Version
 		}
+		if !validVersion(version) {
+			return nil, &InvalidVersionError{Scanner: name, Version: version}
+		}
 		a, ok := t.Assets[plat.String()]
 		if !ok {
 			return nil, &UnsupportedPlatformError{Scanner: name, Platform: plat, Available: t.platforms()}

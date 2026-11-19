@@ -9,6 +9,7 @@ import (
 	tatarkuber "github.com/ochmunkh/tatar-kuber"
 	"github.com/ochmunkh/tatar-kuber/internal/canonical"
 	"github.com/ochmunkh/tatar-kuber/internal/orchestrator"
+	"github.com/ochmunkh/tatar-kuber/internal/safeio"
 	"github.com/ochmunkh/tatar-kuber/internal/scanner"
 	"github.com/ochmunkh/tatar-kuber/internal/scanner/checkov"
 	"github.com/ochmunkh/tatar-kuber/internal/scanner/kubescape"
@@ -62,7 +63,7 @@ func loadRawDir(dir string) ([]scanner.RawResult, map[string]int, error) {
 	for _, n := range names {
 		// #nosec G304 -- dir бол --raw-dir, n нь бүртгэгдсэн scanner-уудын
 		// хаалттай жагсаалт. Энэ гурван уншилт бүгд ижил үндэслэлтэй.
-		data, err := os.ReadFile(filepath.Join(dir, n+".json"))
+		data, err := safeio.ReadFile(filepath.Join(dir, n+".json"), safeio.MaxScan)
 		if err != nil {
 			continue // тухайн scanner-ийн raw байхгүй бол алгасна
 		}
@@ -74,7 +75,7 @@ func loadRawDir(dir string) ([]scanner.RawResult, map[string]int, error) {
 
 	// versions.json (сонголт): scanner -> version
 	// #nosec G304 -- дээрхтэй адил: --raw-dir доторх тогтсон нэртэй файл.
-	if vb, err := os.ReadFile(filepath.Join(dir, "versions.json")); err == nil {
+	if vb, err := safeio.ReadFile(filepath.Join(dir, "versions.json"), safeio.MaxConfig); err == nil {
 		var vers map[string]string
 		if json.Unmarshal(vb, &vers) == nil {
 			for i := range raws {
@@ -88,7 +89,7 @@ func loadRawDir(dir string) ([]scanner.RawResult, map[string]int, error) {
 	// inventory.json (сонголт): объект -> тоо
 	var inv map[string]int
 	// #nosec G304 -- дээрхтэй адил: --raw-dir доторх тогтсон нэртэй файл.
-	if ib, err := os.ReadFile(filepath.Join(dir, "inventory.json")); err == nil {
+	if ib, err := safeio.ReadFile(filepath.Join(dir, "inventory.json"), safeio.MaxConfig); err == nil {
 		_ = json.Unmarshal(ib, &inv)
 	}
 

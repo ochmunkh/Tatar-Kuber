@@ -279,6 +279,15 @@ type ScannerRun struct {
 	Findings      int      `json:"findings"`                 // normalize хийгдсэн (dedup-ээс ӨМНӨХ) finding тоо
 	UnmappedRules []string `json:"unmapped_rules,omitempty"` // canonical registry-д зураглалгүй тул хаягдсан rule ID-ууд
 	UnmappedCount int      `json:"unmapped_count,omitempty"` // зураглалгүй илрүүлэлтийн нийт тоо
+
+	// Which executable produced this result. A scanner name says nothing about
+	// the file behind it: PATH is searched before the directory `update` installs
+	// into, so a verified, pinned copy can be shadowed. Recording the path, where
+	// it came from and its SHA-256 makes the report say what ran.
+	BinaryPath   string `json:"binary_path,omitempty"`
+	BinarySource string `json:"binary_source,omitempty"` // path | tools
+	BinarySHA256 string `json:"binary_sha256,omitempty"`
+	Warning      string `json:"warning,omitempty"` // e.g. the pinned copy was not the one used
 }
 
 type Summary struct {

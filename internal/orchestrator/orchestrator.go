@@ -19,6 +19,7 @@ import (
 	"github.com/ochmunkh/tatar-kuber/internal/risk"
 	"github.com/ochmunkh/tatar-kuber/internal/rollup"
 	"github.com/ochmunkh/tatar-kuber/internal/scanner"
+	"github.com/ochmunkh/tatar-kuber/internal/scanner/toolexec"
 )
 
 // Version — scan-result.json-ийн metadata.tatar_version ба SARIF-ийн
@@ -116,6 +117,13 @@ func (p *Pipeline) Collect(ctx context.Context, t scanner.Target) ([]scanner.Raw
 			runs[i].Status = "unavailable"
 			runs[i].Error = "binary not found in PATH or ~/.tatar-kuber/tools"
 			continue
+		}
+		// Record WHICH binary this is before it runs (path, origin, SHA-256).
+		if b, found := toolexec.Describe(a.Name()); found {
+			runs[i].BinaryPath = b.Path
+			runs[i].BinarySource = b.Source
+			runs[i].BinarySHA256 = b.SHA256
+			runs[i].Warning = b.Warning
 		}
 		wg.Add(1)
 		go func(i int, a scanner.ScannerAdapter) {
@@ -425,3 +433,8 @@ func resultHash(fs []finding.Finding) string {
 	}
 	return "sha256:" + hex.EncodeToString(h.Sum(nil))
 }
+
+// ResultHash — the same digest the pipeline stores in metadata.result_hash,
+// exported so a later step (the gate) can check that a scan-result.json still
+// agrees with its own findings.
+func ResultHash(fs []finding.Finding) string { return resultHash(fs) }

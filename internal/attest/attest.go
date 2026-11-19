@@ -25,12 +25,12 @@ package attest
 import (
 	"errors"
 	"fmt"
-	"os"
 	"sort"
 	"strings"
 	"time"
 
 	"github.com/ochmunkh/tatar-kuber/internal/finding"
+	"github.com/ochmunkh/tatar-kuber/internal/safeio"
 	"gopkg.in/yaml.v3"
 )
 
@@ -60,7 +60,7 @@ type Control struct {
 // файлгүй дуудах нь хэрэглээний алдаа, чимээгүй "attestation алга" биш.
 func Load(path string) (File, error) {
 	// #nosec G304 -- зам нь --attestations туг.
-	data, err := os.ReadFile(path)
+	data, err := safeio.ReadFile(path, safeio.MaxConfig)
 	if err != nil {
 		return File{}, err
 	}

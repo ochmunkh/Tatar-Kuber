@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/ochmunkh/tatar-kuber/internal/finding"
+	"github.com/ochmunkh/tatar-kuber/internal/safeio"
 	"gopkg.in/yaml.v3"
 )
 
@@ -36,7 +37,7 @@ func Default() Policy { return Policy{FailOn: "high"} }
 // (алдаа биш — бодлогогүй ажиллаж болно).
 func Load(path string) (Policy, error) {
 	// #nosec G304 -- бодлогын зам нь --policy туг эсвэл default .tatar-kuber.yaml.
-	data, err := os.ReadFile(path)
+	data, err := safeio.ReadFile(path, safeio.MaxConfig)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return Default(), nil
@@ -106,7 +107,7 @@ func (s Suppression) expired(now time.Time) bool {
 	}
 	t, err := time.Parse("2006-01-02", s.Expires)
 	if err != nil {
-		return false // буруу формат — хугацаагүй гэж үзнэ (warn нь Evaluate дотор)
+		return false // буруу формат: Evaluate энэ дүрмийг ОГТ хэрэглэхгүй (InvalidRules) — энд хүрэхгүй
 	}
 	return now.After(t.Add(24 * time.Hour)) // тухайн өдрийг оруулж тооцно
 }
@@ -172,7 +173,11 @@ func (p Policy) Evaluate(res finding.ScanResult, now time.Time) Result {
 	for _, s := range p.Suppress {
 		if s.Expires != "" {
 			if _, err := time.Parse("2006-01-02", s.Expires); err != nil {
+				// An expiry that cannot be read is NOT "no expiry". Treating it as
+				// one made `expires: 2026-13-45` a permanent suppression with only
+				// a warning. The rule is not applied, and it is listed.
 				out.InvalidRules = append(out.InvalidRules, s)
+				continue
 			}
 		}
 		if s.expired(now) {

@@ -160,6 +160,9 @@ func warnRuns(runs []finding.ScannerRun) {
 		default:
 			fmt.Fprintf(os.Stderr, "scanner %-10s %-9s %s\n", r.Scanner, r.Status, r.Error)
 		}
+		if r.Warning != "" {
+			warnln(r.Warning)
+		}
 	}
 	for _, p := range orchestrator.Problems(runs) {
 		warnln(problemText(p))

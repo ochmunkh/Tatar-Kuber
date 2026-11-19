@@ -93,11 +93,27 @@ func unpackStaged(artefact string, kind Archive, scanner, toolsDir string) (stag
 // directory, so the old one goes first; the window between the two is the price
 // of not needing a second copy of a few hundred megabytes on disk.
 func commitStaged(staging, dest, rel string) (string, error) {
-	if err := os.RemoveAll(dest); err != nil {
-		return "", err
+	// The previous install is moved aside, not deleted, until the new one is in
+	// place. Removing it first left a window -- and, if the rename then failed,
+	// a permanent state -- in which there was no scanner at all.
+	old := ""
+	if _, err := os.Lstat(dest); err == nil {
+		old = dest + ".old"
+		if err := os.RemoveAll(old); err != nil {
+			return "", err
+		}
+		if err := os.Rename(dest, old); err != nil {
+			return "", err
+		}
 	}
 	if err := os.Rename(staging, dest); err != nil {
+		if old != "" {
+			_ = os.Rename(old, dest) // put the working install back
+		}
 		return "", err
+	}
+	if old != "" {
+		_ = os.RemoveAll(old)
 	}
 	return filepath.Join(dest, rel), nil
 }

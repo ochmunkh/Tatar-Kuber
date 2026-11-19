@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"os"
 
 	"github.com/ochmunkh/tatar-kuber/internal/finding"
+	"github.com/ochmunkh/tatar-kuber/internal/safeio"
 )
 
 // expectedSpec — expected-findings.json бүтэц (lab regression).
@@ -30,7 +30,7 @@ func cmdVerifyLab(args []string) int {
 	addLangFlag(fs, "flag.lang")
 	_ = fs.Parse(args)
 
-	rb, err := os.ReadFile(*input)
+	rb, err := safeio.ReadFile(*input, safeio.MaxScan)
 	if err != nil {
 		errln(err)
 		return 2
@@ -40,7 +40,7 @@ func cmdVerifyLab(args []string) int {
 		errln(msg("verify.parse.result"), err)
 		return 2
 	}
-	eb, err := os.ReadFile(*expected)
+	eb, err := safeio.ReadFile(*expected, safeio.MaxConfig)
 	if err != nil {
 		errln(err)
 		return 2

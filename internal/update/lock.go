@@ -183,8 +183,36 @@ func SaveLock(path string, l Lock) error {
 		}
 	}
 
-	if err := os.MkdirAll(filepath.Dir(path), 0o700); err != nil {
+	dir := filepath.Dir(path)
+	if err := os.MkdirAll(dir, 0o700); err != nil {
 		return err
 	}
-	return os.WriteFile(path, []byte(b.String()), 0o600)
+	// Written beside the target and renamed over it: a crash or a full disk
+	// mid-write leaves the previous lock intact instead of a truncated file
+	// that LoadLock would then read as "no pins at all".
+	tmp, err := os.CreateTemp(dir, ".tools.lock-*")
+	if err != nil {
+		return err
+	}
+	tmpName := tmp.Name()
+	cleanup := func() { _ = os.Remove(tmpName) }
+	if err := tmp.Chmod(0o600); err != nil {
+		_ = tmp.Close()
+		cleanup()
+		return err
+	}
+	if _, err := tmp.WriteString(b.String()); err != nil {
+		_ = tmp.Close()
+		cleanup()
+		return err
+	}
+	if err := tmp.Close(); err != nil {
+		cleanup()
+		return err
+	}
+	if err := os.Rename(tmpName, path); err != nil {
+		cleanup()
+		return err
+	}
+	return nil
 }

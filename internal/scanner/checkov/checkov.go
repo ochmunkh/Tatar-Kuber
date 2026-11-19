@@ -44,12 +44,18 @@ func (s *Scanner) Scan(ctx context.Context, t scanner.Target) (scanner.RawResult
 	if t.Mode != scanner.ModeLocal || t.Path == "" {
 		return scanner.RawResult{Scanner: "checkov"}, fmt.Errorf("checkov: local зам (-f/--path) шаардлагатай")
 	}
+	if err := toolexec.ValidateValue("path", t.Path); err != nil {
+		return scanner.RawResult{Scanner: "checkov"}, err
+	}
 	flag := "-d" // лавлах
 	if fi, err := os.Stat(t.Path); err == nil && !fi.IsDir() {
 		flag = "-f" // ганц файл
 	}
 	args := []string{flag, t.Path, "-o", "json", "--compact", "--quiet"}
-	res, err := toolexec.Run(ctx, "checkov", args)
+	// BC_SKIP_MAPPING=TRUE: without it checkov calls api0.prismacloud.io for
+	// guideline links on every run, which breaks the offline promise and sends
+	// the machine's address to a third party. The findings are identical.
+	res, err := toolexec.Run(ctx, "checkov", args, "BC_SKIP_MAPPING=TRUE")
 	if len(res.Stdout) == 0 {
 		if err != nil {
 			return scanner.RawResult{Scanner: "checkov"}, err

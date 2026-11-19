@@ -4,13 +4,14 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"os"
 	"strings"
 	"time"
 
 	"github.com/ochmunkh/tatar-kuber/internal/diff"
 	"github.com/ochmunkh/tatar-kuber/internal/finding"
+	"github.com/ochmunkh/tatar-kuber/internal/integrity"
 	"github.com/ochmunkh/tatar-kuber/internal/policy"
+	"github.com/ochmunkh/tatar-kuber/internal/safeio"
 )
 
 // cmdGate — CI/CD gatekeeper: scan-result.json-ыг .tatar-kuber.yaml бодлоготой
@@ -27,6 +28,7 @@ func cmdGate(args []string) int {
 	failOn := fs.String("fail-on", "", msg("flag.gate.failon"))
 	minScore := fs.Int("min-score", 0, msg("flag.gate.minscore"))
 	baseline := fs.String("baseline", "", msg("flag.gate.baseline"))
+	skipIntegrity := fs.Bool("skip-integrity-check", false, msg("flag.gate.skipintegrity"))
 	addLangFlag(fs, "flag.lang")
 	_ = fs.Parse(args)
 	// Флагийг ЗӨВХӨН хэрэглэгч тодорхой өгсөн үед policy файлыг дарна. Өмнө нь
@@ -35,7 +37,7 @@ func cmdGate(args []string) int {
 	setFlags := map[string]bool{}
 	fs.Visit(func(f *flag.Flag) { setFlags[f.Name] = true })
 
-	data, err := os.ReadFile(*input)
+	data, err := safeio.ReadFile(*input, safeio.MaxScan)
 	if err != nil {
 		errln(err)
 		return 2
@@ -43,6 +45,20 @@ func cmdGate(args []string) int {
 	var res finding.ScanResult
 	if err := json.Unmarshal(data, &res); err != nil {
 		errln(msg("gate.parse.failed"), err)
+		return 2
+	}
+
+	// The file is checked against itself before any decision rests on it: a
+	// result whose findings, hash, counts or score disagree was edited or built
+	// by something else, and a gate must not pass on it. Skipping is possible,
+	// but never silent.
+	if *skipIntegrity {
+		warnln(msg("gate.integrity.skipped"))
+	} else if issues := integrity.Check(res); len(issues) > 0 {
+		for _, is := range issues {
+			errln(msg("gate.integrity.issue", is.Code, is.Detail))
+		}
+		errln(msg("gate.integrity.failed", len(issues)))
 		return 2
 	}
 

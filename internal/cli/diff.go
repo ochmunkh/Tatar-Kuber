@@ -9,6 +9,7 @@ import (
 
 	"github.com/ochmunkh/tatar-kuber/internal/diff"
 	"github.com/ochmunkh/tatar-kuber/internal/finding"
+	"github.com/ochmunkh/tatar-kuber/internal/safeio"
 )
 
 // Шошгууд нь бусад бүх CLI бичвэрийн хамт messages.go-ийн каталогт ("diff.*")
@@ -79,7 +80,7 @@ func loadScan(path string) (finding.ScanResult, int) {
 	var res finding.ScanResult
 	// #nosec G304 -- path бол хэрэглэгчийн --old/--new туг. Дурын зам уншихыг
 	// хориглох нь CLI-г утгагүй болгоно; энд хязгаарлах зөв хил байхгүй.
-	b, err := os.ReadFile(path)
+	b, err := safeio.ReadFile(path, safeio.MaxScan)
 	if err != nil {
 		errln(err)
 		return res, 2

@@ -105,3 +105,14 @@ type UnsupportedPlatformError struct {
 func (e *UnsupportedPlatformError) Error() string {
 	return fmt.Sprintf("%s: no release asset for %s", e.Scanner, e.Platform)
 }
+
+// InvalidVersionError — the version in tools.lock.yaml (or the catalogue) is not
+// a plain version string. It is refused before any URL is built from it.
+type InvalidVersionError struct {
+	Scanner string
+	Version string
+}
+
+func (e *InvalidVersionError) Error() string {
+	return fmt.Sprintf("%s: refusing version %q — it is not a plain version string (letters, digits, . _ + - only)", e.Scanner, e.Version)
+}

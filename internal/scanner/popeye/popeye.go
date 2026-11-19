@@ -41,6 +41,16 @@ func (s *Scanner) Timeout() time.Duration { return 90 * time.Second }
 
 // Scan — Live Mode B: "popeye -o json" ажиллуулж stdout-ийн JSON-ыг буцаана.
 func (s *Scanner) Scan(ctx context.Context, t scanner.Target) (scanner.RawResult, error) {
+	// User-supplied values go to the scanner as arguments: refuse one that the
+	// scanner would read as a flag of its own.
+	if err := toolexec.ValidateValue("kube context", t.Context); err != nil {
+		return scanner.RawResult{Scanner: "popeye"}, err
+	}
+	for _, ns := range t.Namespaces {
+		if err := toolexec.ValidateValue("namespace", ns); err != nil {
+			return scanner.RawResult{Scanner: "popeye"}, err
+		}
+	}
 	if t.Mode != scanner.ModeRemote {
 		return scanner.RawResult{Scanner: "popeye"}, fmt.Errorf("popeye: зөвхөн live cluster (Mode B)")
 	}

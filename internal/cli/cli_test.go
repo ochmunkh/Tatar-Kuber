@@ -456,6 +456,7 @@ func TestCLI_GateBaseline(t *testing.T) {
 
 	write := func(name string, r finding.ScanResult) string {
 		p := filepath.Join(out, name)
+		reseal(&r)
 		d, err := json.Marshal(r)
 		if err != nil {
 			t.Fatal(err)
@@ -546,7 +547,7 @@ func TestCLI_GateFailOnIsCaseInsensitive(t *testing.T) {
 		t.Fatal("demo-д MEDIUM/LOW finding алга — fixture үүсгэх боломжгүй")
 	}
 	res.Findings = medLow
-	res.Summary.RiskScore = 0 // min_score шалгалт хөндлөнгөөс оролцохгүй
+	reseal(&res) // gate нь өөртэйгөө зөрсөн файлаас татгалздаг; min_score энд тохируулагдаагүй тул оноо хөндлөнгөөс оролцохгүй
 	d, err := json.Marshal(res)
 	if err != nil {
 		t.Fatal(err)

@@ -13,6 +13,7 @@ import (
 	"github.com/ochmunkh/tatar-kuber/internal/canonical"
 	"github.com/ochmunkh/tatar-kuber/internal/finding"
 	"github.com/ochmunkh/tatar-kuber/internal/normalizer"
+	"github.com/ochmunkh/tatar-kuber/internal/safeio"
 	"github.com/ochmunkh/tatar-kuber/internal/scanner"
 	"github.com/ochmunkh/tatar-kuber/internal/scanner/toolexec"
 )
@@ -42,6 +43,16 @@ func (s *Scanner) Timeout() time.Duration { return 4 * time.Minute }
 // Scan — Live Mode B: "kubescape scan --format json --output <tmp>" ажиллуулж,
 // файлын JSON гаралтыг уншиж буцаана.
 func (s *Scanner) Scan(ctx context.Context, t scanner.Target) (scanner.RawResult, error) {
+	// User-supplied values go to the scanner as arguments: refuse one that the
+	// scanner would read as a flag of its own.
+	if err := toolexec.ValidateValue("kube context", t.Context); err != nil {
+		return scanner.RawResult{Scanner: "kubescape"}, err
+	}
+	for _, ns := range t.Namespaces {
+		if err := toolexec.ValidateValue("namespace", ns); err != nil {
+			return scanner.RawResult{Scanner: "kubescape"}, err
+		}
+	}
 	if t.Mode != scanner.ModeRemote {
 		return scanner.RawResult{Scanner: "kubescape"}, fmt.Errorf("kubescape live: зөвхөн remote (Mode B) дэмжигдэнэ")
 	}
@@ -95,7 +106,7 @@ func readOutput(dir string) []byte {
 			continue
 		}
 		// #nosec G304 -- dir бол --raw-dir, e.Name() нь түүний ReadDir-ийн гаралт.
-		b, err := os.ReadFile(filepath.Join(dir, e.Name()))
+		b, err := safeio.ReadFile(filepath.Join(dir, e.Name()), safeio.MaxScan)
 		if err == nil && len(b) > len(best) {
 			best = b
 		}

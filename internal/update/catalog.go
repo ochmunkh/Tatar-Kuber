@@ -1,6 +1,7 @@
 package update
 
 import (
+	"regexp"
 	"runtime"
 	"sort"
 	"strings"
@@ -150,3 +151,11 @@ func (t tool) platforms() []string {
 func expand(url, version string) string {
 	return strings.ReplaceAll(url, "{v}", version)
 }
+
+// versionPattern — what a scanner version may look like. The lock's version is
+// substituted into a download URL, so it must not be able to carry a path
+// separator, a query, or anything else that changes where the URL points.
+var versionPattern = regexp.MustCompile(`^[0-9A-Za-z][0-9A-Za-z._+-]{0,63}$`)
+
+// validVersion — reports whether v is safe to substitute into an asset URL.
+func validVersion(v string) bool { return versionPattern.MatchString(v) }

@@ -4,13 +4,13 @@ package canonical
 
 import (
 	"fmt"
-	"os"
 	"regexp"
 	"sort"
 	"strings"
 	"sync"
 
 	"github.com/ochmunkh/tatar-kuber/internal/finding"
+	"github.com/ochmunkh/tatar-kuber/internal/safeio"
 	"gopkg.in/yaml.v3"
 )
 
@@ -86,7 +86,7 @@ type Registry struct {
 func Load(path string) (*Registry, error) {
 	// #nosec G304 -- бүртгэлийн зам нь тохиргооноос ирнэ; энэ файлыг ачаалах нь
 	// Load-ийн цорын ганц үүрэг.
-	data, err := os.ReadFile(path)
+	data, err := safeio.ReadFile(path, safeio.MaxConfig)
 	if err != nil {
 		return nil, fmt.Errorf("canonical registry уншиж чадсангүй: %w", err)
 	}

@@ -12,7 +12,11 @@ package toolexec
 import (
 	"bytes"
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
+	"errors"
 	"fmt"
+	"io"
 	"io/fs"
 	"os"
 	"os/exec"
@@ -48,6 +52,11 @@ func Resolve(name string) (string, bool) {
 	if p, err := exec.LookPath(name); err == nil {
 		return p, true
 	}
+	return resolveInTools(name)
+}
+
+// resolveInTools — only the TATAR-Kuber tools directory, never PATH.
+func resolveInTools(name string) (string, bool) {
 	base := filepath.Join(ToolsDir(), name)
 	for _, cand := range []string{base, filepath.Join(base, name)} {
 		if p, ok := executableAt(cand); ok {
@@ -127,13 +136,17 @@ func Run(ctx context.Context, name string, args []string, extraEnv ...string) (R
 	// Аюулгүй: shell дуудлагагүй (execve шууд), path нь PATH/ToolsDir-ээс шийдэгдсэн,
 	// args нь тогтмол флаг + тодорхой утга — shell metachar-ийн injection боломжгүй.
 	cmd := exec.CommandContext(ctx, path, args...) // #nosec G204 -- see comment above
-	cmd.Env = append(os.Environ(), extraEnv...)
-	var out, errb bytes.Buffer
-	cmd.Stdout = &out
-	cmd.Stderr = &errb
+	cmd.Env = childEnv(os.Environ(), extraEnv)
+	out := &capBuffer{max: maxStdout}
+	errb := &capBuffer{max: maxStderr, drop: true}
+	cmd.Stdout = out
+	cmd.Stderr = errb
 	err := cmd.Run()
 
-	res := Result{Stdout: out.Bytes(), Stderr: errb.Bytes()}
+	res := Result{Stdout: out.buf.Bytes(), Stderr: errb.buf.Bytes()}
+	if errors.Is(err, ErrOutputTooLarge) || out.buf.Len() >= maxStdout {
+		return res, fmt.Errorf("%s: %w (limit %d MiB)", name, ErrOutputTooLarge, maxStdout>>20)
+	}
 	if err != nil {
 		var ee *exec.ExitError
 		if ok := asExit(err, &ee); ok {
@@ -179,7 +192,7 @@ func Version(ctx context.Context, name string, args ...string) (string, error) {
 		return "", err
 	}
 	if line := strings.TrimSpace(firstLine(txt)); line != "" {
-		return line, nil
+		return plainVersionLine(line), nil
 	}
 	return "", fmt.Errorf("%s: хувилбар танигдсангүй", name)
 }
@@ -189,4 +202,186 @@ func firstLine(s string) string {
 		return s[:i]
 	}
 	return s
+}
+
+// ── Which binary actually ran ────────────────────────────────────────────────
+
+// Source says where Resolve found the binary.
+const (
+	SourcePath  = "path"  // found on PATH
+	SourceTools = "tools" // found in ~/.tatar-kuber/tools (what `update` installs)
+)
+
+// Binary describes the executable a scan would run. It exists so the report can
+// say WHICH binary produced a result: Resolve prefers PATH, so a scanner that
+// `update` pinned and verified can be silently shadowed by another copy.
+type Binary struct {
+	Path   string
+	Source string // SourcePath | SourceTools
+	SHA256 string // hex digest of the file at Path ("" if it could not be read)
+	// Shadowed is set when the binary came from PATH although a copy also
+	// exists in the tools directory -- the one `update` pins and verifies.
+	Shadowed bool
+	// Warning is a ready-to-print sentence for the Shadowed case.
+	Warning string
+}
+
+// Describe resolves name exactly as Run will and reports what it found.
+func Describe(name string) (Binary, bool) {
+	p, ok := Resolve(name)
+	if !ok {
+		return Binary{}, false
+	}
+	b := Binary{Path: p, Source: SourcePath, SHA256: fileSHA256(p)}
+	if inToolsDir(p) {
+		b.Source = SourceTools
+		return b, true
+	}
+	if tp, ok := resolveInTools(name); ok && !samePath(tp, p) {
+		b.Shadowed = true
+		b.Warning = fmt.Sprintf("%s was taken from PATH (%s); the pinned copy in %s was NOT used", name, p, ToolsDir())
+	}
+	return b, true
+}
+
+func inToolsDir(p string) bool {
+	rel, err := filepath.Rel(ToolsDir(), p)
+	return err == nil && rel != "." && filepath.IsLocal(rel)
+}
+
+func samePath(a, b string) bool {
+	if ea, err := filepath.EvalSymlinks(a); err == nil {
+		a = ea
+	}
+	if eb, err := filepath.EvalSymlinks(b); err == nil {
+		b = eb
+	}
+	return a == b
+}
+
+func fileSHA256(path string) string {
+	f, err := os.Open(path) // #nosec G304 -- path was resolved by Resolve
+	if err != nil {
+		return ""
+	}
+	defer func() { _ = f.Close() }()
+	h := sha256.New()
+	if _, err := io.Copy(h, f); err != nil {
+		return ""
+	}
+	return hex.EncodeToString(h.Sum(nil))
+}
+
+// ── What the scanner is allowed to inherit ───────────────────────────────────
+
+// secretEnv — variables that carry a forge or CI credential. No scanner needs
+// them to scan a manifest or a cluster, and every scanner is a third-party
+// program that may talk to the network, so they are not handed over. Cloud
+// credentials (AWS_*, GOOGLE_*, AZURE_*) are deliberately NOT here: a kubeconfig
+// `exec` plugin needs them to authenticate to the cluster being scanned.
+var secretEnv = map[string]bool{
+	"GITHUB_TOKEN":                   true,
+	"GH_TOKEN":                       true,
+	"GITHUB_PAT":                     true,
+	"ACTIONS_RUNTIME_TOKEN":          true,
+	"ACTIONS_ID_TOKEN_REQUEST_TOKEN": true,
+	"ACTIONS_ID_TOKEN_REQUEST_URL":   true,
+	"HOMEBREW_TAP_GITHUB_TOKEN":      true,
+	"GITLAB_TOKEN":                   true,
+	"CI_JOB_TOKEN":                   true,
+	"BITBUCKET_TOKEN":                true,
+}
+
+// PassEnvVar names the escape hatch: a comma-separated list of variables that
+// are handed to the scanners even though they are on the list above.
+const PassEnvVar = "TATAR_PASS_ENV"
+
+// childEnv — os.Environ() minus the credentials in secretEnv, plus extra.
+// extra wins over the inherited value, as before.
+func childEnv(environ, extra []string) []string {
+	pass := map[string]bool{}
+	for _, n := range strings.Split(lookupEnv(environ, PassEnvVar), ",") {
+		if n = strings.TrimSpace(n); n != "" {
+			pass[n] = true
+		}
+	}
+	out := make([]string, 0, len(environ)+len(extra))
+	for _, kv := range environ {
+		name := kv
+		if i := strings.IndexByte(kv, '='); i >= 0 {
+			name = kv[:i]
+		}
+		if secretEnv[strings.ToUpper(name)] && !pass[name] {
+			continue
+		}
+		out = append(out, kv)
+	}
+	return append(out, extra...)
+}
+
+func lookupEnv(environ []string, key string) string {
+	for _, kv := range environ {
+		if strings.HasPrefix(kv, key+"=") {
+			return kv[len(key)+1:]
+		}
+	}
+	return ""
+}
+
+// ── Bounded output ───────────────────────────────────────────────────────────
+
+// maxStdout bounds what a scanner may write to stdout. Real cluster reports are
+// tens of MiB; the cap stops a hostile manifest or a broken scanner from
+// exhausting memory. A variable only so a test can lower it.
+var maxStdout = 256 << 20
+
+const maxStderr = 8 << 20
+
+// ErrOutputTooLarge — the scanner wrote more than the cap.
+var ErrOutputTooLarge = errors.New("scanner output exceeds the size limit")
+
+// capBuffer is a bytes.Buffer that refuses to grow past max. Once full it fails
+// the write, which closes the pipe and ends the scanner instead of buffering on.
+type capBuffer struct {
+	buf  bytes.Buffer
+	max  int
+	drop bool // true: silently discard the excess (stderr) instead of failing
+}
+
+func (c *capBuffer) Write(p []byte) (int, error) {
+	if c.buf.Len()+len(p) > c.max {
+		if c.drop {
+			return len(p), nil
+		}
+		return 0, ErrOutputTooLarge
+	}
+	return c.buf.Write(p)
+}
+
+// ── Arguments that come from the user ────────────────────────────────────────
+
+// ValidateValue refuses a user-supplied value (a kube context, a namespace) that
+// could be read as a flag by the scanner or that contains control characters.
+func ValidateValue(label, v string) error {
+	if strings.HasPrefix(v, "-") {
+		return fmt.Errorf("%s %q starts with '-' and would be read as a scanner flag", label, v)
+	}
+	for _, r := range v {
+		if r < 0x20 || r == 0x7f {
+			return fmt.Errorf("%s contains a control character", label)
+		}
+	}
+	return nil
+}
+
+var plainVersion = regexp.MustCompile(`^[A-Za-z0-9 ._+()/,:-]{1,80}$`)
+
+// plainVersionLine — a version line is kept only if it looks like one. The text
+// comes from the scanner binary itself; whatever else a (substituted or broken)
+// binary prints must not be copied into the report as if it were a version.
+func plainVersionLine(s string) string {
+	if plainVersion.MatchString(s) {
+		return s
+	}
+	return "unparsed"
 }

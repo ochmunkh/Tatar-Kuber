@@ -429,8 +429,24 @@ var catalog = map[string]canonical.I18n{
 		"mn": "fail_on='%s' танигдсангүй (critical|high|medium|low) — 'high' гэж үзнэ",
 	},
 	"gate.suppression.expires.invalid": {
-		"en": "suppression '%s' has a malformed expires (%s) — it must be YYYY-MM-DD",
-		"mn": "suppression '%s' expires формат буруу (%s) — YYYY-MM-DD байх ёстой",
+		"en": "suppression '%s' has a malformed expires (%s) — it must be YYYY-MM-DD; the suppression is NOT applied",
+		"mn": "suppression '%s' expires формат буруу (%s) — YYYY-MM-DD байх ёстой; энэ suppression ХЭРЭГЛЭГДЭХГҮЙ",
+	},
+	"flag.gate.skipintegrity": {
+		"en": "do not check that scan-result.json agrees with itself (hash, counts, score). Printed as a warning every time",
+		"mn": "scan-result.json өөртэйгөө таарч байгааг (hash, тоо, оноо) шалгахгүй. Дандаа анхааруулга хэвлэнэ",
+	},
+	"gate.integrity.issue": {
+		"en": "integrity: %s — %s",
+		"mn": "бүрэн бүтэн байдал: %s — %s",
+	},
+	"gate.integrity.failed": {
+		"en": "scan-result.json disagrees with itself (%d problem(s)) — it was edited or not produced by this tool; refusing to gate on it (--skip-integrity-check to override)",
+		"mn": "scan-result.json өөртэйгөө зөрж байна (%d асуудал) — засварласан эсвэл энэ хэрэгслээс үүсээгүй; gate хийхээс татгалзлаа (--skip-integrity-check-ээр давж болно)",
+	},
+	"gate.integrity.skipped": {
+		"en": "integrity check SKIPPED (--skip-integrity-check): scan-result.json is trusted as given",
+		"mn": "бүрэн бүтэн байдлын шалгалтыг АЛГАСЛАА (--skip-integrity-check): scan-result.json-д байгаагаар нь итгэж байна",
 	},
 	"gate.suppression.expired": {
 		"en": "suppression '%s' has expired (%s) — not re-enabled",

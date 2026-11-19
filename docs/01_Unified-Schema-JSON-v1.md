@@ -45,7 +45,9 @@
    "scanner_runs": [                    // scanner бүрийн БОДИТ явц (шударга тайлан)
      { "scanner": "trivy", "status": "ok", "version": "0.74.0",
        "duration_ms": 41230, "raw_bytes": 1555004, "findings": 323,
-       "unmapped_rules": ["KSV-0020"], "unmapped_count": 4 },
+       "unmapped_rules": ["KSV-0020"], "unmapped_count": 4,
+       "binary_path": "/home/u/.tatar-kuber/tools/trivy/trivy", "binary_source": "tools",
+       "binary_sha256": "9f2c…" },       // АЛЬ binary ажилласан (зам, хаанаас, SHA-256)
      { "scanner": "checkov", "status": "unsupported",
        "error": "scanner does not support mode remote", "findings": 0 }
    ],                                    // status: ok|ingested|unavailable|
@@ -213,6 +215,7 @@ status, owner, first_seen, last_seen талбарууд MVP-д бүрэн аши
 Хувилбарын тэмдэглэл — v1.1 / v1.2 / v1.3
 • Finding ID 6 hex -> 12 hex (24 -> 48 бит). 6 hex нь ~4 000 finding-тэй cluster дээр ~40% магадлалаар мөргөлддөг (birthday bound) бөгөөд ID давхцвал dedup, SARIF fingerprint, scan хоорондын diff бүгд эвдэрнэ. v1.0.1-д ID нэг удаа солигдсон.
 • metadata.scanner_runs[] нэмэгдсэн. Scanner бүрийн төлөв (ok / ingested / unavailable / unsupported / error / timeout / parse_error), хувилбар, хугацаа, түүхий байт, normalize хийгдсэн finding тоо, мөн canonical зураглалгүй тул хаягдсан rule-ууд. Шалтгаан: v1.0.0-д adapter-ийн алдаа чимээгүй залгигдаж, Trivy/Popeye 0 finding өгснийг хэн ч анзаараагүй.
+• (tatar-kuber 1.0.6) scanner_runs[] бичлэгт СОНГОЛТТОЙ binary_path, binary_source (path | tools), binary_sha256, warning нэмэгдсэн. Шалтгаан: PATH нь ~/.tatar-kuber/tools-оос ӨМНӨ хайгддаг тул `update`-ийн пин хийсэн scanner-ийг өөр хуулбар чимээгүй далдалж чаддаг байв; тайлан аль binary ажилласныг хэлэхгүй байсан. warning нь пин хийсэн хуулбар ашиглагдаагүй үед бөглөгдөнө. Талбарууд нь СОНГОЛТТОЙ тул хуучин уншигчид нөлөөлөхгүй.
 • confidence-ийн тодорхойлолт: HIGH = 2+ scanner баталсан ЭСВЭЛ 1 scanner + deterministic шалгалт; MEDIUM = 1 scanner + эвристик; LOW = зөвхөн контекст. (Өмнө нь "3+ scanner" гэж бичигдсэн байсан нь кодтой таарахгүй байв.)
 (v1.2) metadata.rollup нэмэгдсэн. Pod хэмжээнд тайлагдсан finding-ийг эзэмшигч controller руу зөөсөн тоо ба pod-ууд. Тоо буурсан нь "асуудал арилсан" гэсэн үг БИШ — "нэг зөрчил нэг удаа тоологдож байна" гэсэн үг тул тайланд ил байх ёстой.
 (v1.2) Зөөгдсөн pod бүр finding-ийн evidence-д {path: "pod/<нэр>", detail: "rolled up to <owner>"} болж бичигдэнэ — юу ч алдагдахгүй, аудитор ямар pod хамрагдсаныг харна.

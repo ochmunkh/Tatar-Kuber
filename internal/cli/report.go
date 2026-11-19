@@ -13,6 +13,7 @@ import (
 	htmlrep "github.com/ochmunkh/tatar-kuber/internal/report/html"
 	jsonrep "github.com/ochmunkh/tatar-kuber/internal/report/json"
 	sarifrep "github.com/ochmunkh/tatar-kuber/internal/report/sarif"
+	"github.com/ochmunkh/tatar-kuber/internal/safeio"
 )
 
 func cmdReport(args []string) int {
@@ -38,7 +39,7 @@ func cmdReport(args []string) int {
 	registry := fs.String("registry", "", msg("flag.report.registry"))
 	_ = fs.Parse(args)
 
-	data, err := os.ReadFile(*input)
+	data, err := safeio.ReadFile(*input, safeio.MaxScan)
 	if err != nil {
 		errln(err)
 		return 2
