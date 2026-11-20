@@ -31,11 +31,13 @@ import (
 
 const (
 	readmePath       = "../../README.md"
+	readmeMNPath     = "../../README.mn.md"
 	contributingPath = "../../CONTRIBUTING.md"
 	moduleRoot       = "../.."
 
-	// mnMarker — хоёр хэсгийн зааг.
-	mnMarker = "## Монгол хэл дээр"
+	// Хэл сонгох мөр: хоёр файлын дээд талд, нөгөө хэл рүү холбоно.
+	enSelector = "**English** · [Монгол](README.mn.md)"
+	mnSelector = "[English](README.md) · **Монгол**"
 )
 
 func readDoc(t *testing.T, path string) string {
@@ -47,16 +49,19 @@ func readDoc(t *testing.T, path string) string {
 	return string(b)
 }
 
-// splitHalves — README-г англи / монгол хоёр хэсэгт хуваана.
+// splitHalves — англи (README.md) ба монгол (README.mn.md) хоёр файлыг буцаана.
+// Хоёр хэл нь тусдаа файл тул хэл сонгох мөр хоёр талдаа байгааг шалгана:
+// нэг нь алга болбол уншигч нөгөө хэл рүүгээ хүрч чадахгүй.
 func splitHalves(t *testing.T) (en, mn string) {
 	t.Helper()
-	src := readDoc(t, readmePath)
-	i := strings.Index(src, mnMarker)
-	if i < 0 {
-		t.Fatalf("%s: '%s' зааг олдсонгүй — монгол хэсэг нь БҮТЭЭГДЭХҮҮНИЙ шийдвэр, устгагдах ёсгүй",
-			readmePath, mnMarker)
+	en, mn = readDoc(t, readmePath), readDoc(t, readmeMNPath)
+	if !strings.Contains(en, enSelector) {
+		t.Fatalf("%s: хэл сонгох мөр %q алга", readmePath, enSelector)
 	}
-	return src[:i], src[i:]
+	if !strings.Contains(mn, mnSelector) {
+		t.Fatalf("%s: хэл сонгох мөр %q алга", readmeMNPath, mnSelector)
+	}
+	return en, mn
 }
 
 // countTestPackages — модулийн мод дотор `*_test.go` агуулсан хавтасны тоо.
@@ -99,7 +104,7 @@ func TestREADMEPackageCount(t *testing.T) {
 	badge := regexp.MustCompile(`tests-(\d+)%20packages%20green`)
 	prose := regexp.MustCompile(`#\s*(\d+)\s+(?:packages|багц)`)
 
-	for _, path := range []string{readmePath, contributingPath} {
+	for _, path := range []string{readmePath, readmeMNPath, contributingPath} {
 		src := readDoc(t, path)
 		found := 0
 		for _, re := range []*regexp.Regexp{badge, prose} {
@@ -186,10 +191,7 @@ var enOnlyHeadings = map[string]bool{
 	"Report — one issue, every scanner, both languages": true,
 }
 
-var mnOnlyHeadings = map[string]bool{
-	// Монгол хэсгийн өөрийн гарчиг (зааг).
-	"Монгол хэл дээр": true,
-}
+var mnOnlyHeadings = map[string]bool{}
 
 var headingLine = regexp.MustCompile(`^#{2,3}\s+(.*)$`)
 

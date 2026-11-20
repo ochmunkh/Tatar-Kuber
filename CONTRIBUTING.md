@@ -182,11 +182,11 @@ release tooling. `TestVersionsAgree` catches the two that matter; the rest are m
 1. `internal/orchestrator/orchestrator.go` — `const Version` (**not** reachable by
    ldflags; this is the one that ends up in every `scan-result.json` and SARIF file)
 2. `internal/cli/root.go` — `var Version` (goreleaser overwrites it at build time)
-3. `README.md` — release badge, and the `./scripts/build.sh <version>` example in
-   both language sections
+3. `README.md` and `README.mn.md` — release badge, the `./scripts/build.sh <version>`
+   example and the `**v<version>**` status line, in each
 4. `docs/img/architecture.gen.py` — subtitle, then re-render both PNGs
 5. `examples/report/` — regenerate all four files (they embed the version)
-6. `ROADMAP.md` / `README.md` — move the new version out of the previous
+6. `ROADMAP.md` — move the new version out of the previous
    "shipped" section into its own
 
 Then:

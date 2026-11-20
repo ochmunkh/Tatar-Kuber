@@ -53,7 +53,7 @@ already leaves English. Column headings were kept inside their `%-10s` field so
 
 ## Deliberately *not* a gap
 
-- **`README.md`** carries a full Mongolian half, enforced structurally by
+- **`README.md`** has a full Mongolian twin, `README.mn.md`, linked from a language line at the top of both and enforced structurally by
   `internal/canonical/readme_test.go` in CI. The `update` paragraph (checksum
   refusal, `--dry-run`/`--check`, cosign not implemented) now has its Mongolian
   counterpart; so does CONTRIBUTING.md's `.docx`/`.md` section, written as a

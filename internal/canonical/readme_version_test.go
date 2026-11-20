@@ -26,33 +26,25 @@ import (
 func TestREADMEMentionsTheCurrentRelease(t *testing.T) {
 	latest := latestRelease(t)
 
-	data, err := os.ReadFile("../../README.md")
-	if err != nil {
-		t.Fatal(err)
-	}
-	readme := string(data)
-
-	// Хуучин хувилбар дурдагдаж болно (түүхийн тэмдэглэл), гэхдээ ДООРХ
-	// гурван газарт ОДООГИЙН хувилбар байх ёстой.
-	checks := []struct{ what, want string }{
-		{"release badge", "badge/release-v" + latest},
-		{"build жишээ", "./scripts/build.sh " + latest},
-		{"статусын мөр", "**v" + latest + "**"},
-	}
-	for _, c := range checks {
-		if !strings.Contains(readme, c.want) {
-			t.Errorf("README: %s нь %q-г агуулахгүй байна.\n"+
-				"  Хамгийн сүүлд гарсан хувилбар: v%s (docs/releases/-ээс)\n"+
-				"  Release гаргасны дараа README-г дагуулж шинэчилнэ — хоёр хэлэнд ч мөн адил.",
-				c.what, c.want, latest)
+	// Хоёр хэл тусдаа файл: README.md, README.mn.md тус бүрд ОДООГИЙН хувилбар.
+	for _, file := range []string{"../../README.md", "../../README.mn.md"} {
+		data, err := os.ReadFile(file)
+		if err != nil {
+			t.Fatal(err)
 		}
-	}
-
-	// Хоёр хэл: build жишээ ба статусын мөр хоёулаа хоёр удаа гарна.
-	for _, pair := range []string{"./scripts/build.sh " + latest, "**v" + latest + "**"} {
-		if n := strings.Count(readme, pair); n < 2 {
-			t.Errorf("README: %q нь %d удаа гарлаа, хоёр хэлэнд тус бүр нэг удаа (2) байх ёстой",
-				pair, n)
+		readme := string(data)
+		checks := []struct{ what, want string }{
+			{"release badge", "badge/release-v" + latest},
+			{"build жишээ", "./scripts/build.sh " + latest},
+			{"статусын мөр", "**v" + latest + "**"},
+		}
+		for _, c := range checks {
+			if !strings.Contains(readme, c.want) {
+				t.Errorf("%s: %s нь %q-г агуулахгүй байна.\n"+
+					"  Хамгийн сүүлд гарсан хувилбар: v%s (docs/releases/-ээс)\n"+
+					"  Release гаргасны дараа README.md болон README.mn.md-г дагуулж шинэчилнэ.",
+					file, c.what, c.want, latest)
+			}
 		}
 	}
 }
